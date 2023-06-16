@@ -13,7 +13,10 @@ PART_NAMES = {
 }
 
 
-def split_path_column(df: pd.DataFrame, semantic: Union[bool, Iterable] = False) -> pd.DataFrame:
+def split_path_column(
+        df: pd.DataFrame, 
+        semantic: Union[bool, Iterable] = False
+    ) -> pd.DataFrame:
     """Split the PATH column in a DataFrame into it's components. 
 
     Parameters
