@@ -1,0 +1,8 @@
+# Standard python ignore
+*\__pycache__
+*.pyc
+*.egg-info
+# Do not track large binary assets
+*\assets
+# Do not track the testing outputs
+tests.log
