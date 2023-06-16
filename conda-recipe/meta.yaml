@@ -1,0 +1,20 @@
+package:
+  name: pandss
+  version: 0.1
+
+source:
+  path: ../pandss
+
+requirements:
+  build:
+    - pip
+    - python=3.9
+    - setuptools
+
+  run:
+    - python=3.9
+    - pyhecdss
+    - pandas
+
+about:
+  home: http://dwrrhapp0179.ad.water.ca.gov/gitea/zachary.roy/pandss
