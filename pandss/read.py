@@ -4,6 +4,7 @@ from typing import Union, Iterable
 import pandas as pd
 import pyhecdss
 
+from .types import PathLike
 
 CONTEXT_ATTR = (
     'PATH',
@@ -12,10 +13,49 @@ CONTEXT_ATTR = (
 )
 
 
+
+def read_catalog(
+        dss: Union[PathLike, Iterable[PathLike]],
+        query_expr: Union[str, None] = None,
+    ) -> pd.DataFrame:
+    """Read the catalog from one or many DSS files. Optionally filter the 
+    catalog using pandas.DataFrame.query using the query_expr.
+
+    Parameters
+    ----------
+    dss : Union[PathLike, Iterable[PathLike]]
+        The path or paths to the DSS file(s).
+    query_expr : Union[str, None], optional
+        A query expression to be passed to pandas.DataFrame.query   , by default None
+
+    Returns
+    -------
+    pd.DataFrame
+        A list of, or single pandas.DataFrame catalogs.
+    """
+    single = False
+    if not isinstance(dss, Iterable):
+        dss = [dss]
+        single = True
+    
+    catalogs: list[pd.DataFrame] = list()
+    for p in dss:
+        with pyhecdss.DSSFile(str(p)) as P:
+            catalogs.append(P.read_catalog())
+    
+    if query_expr is not None:
+        catalogs = [c.query(query_expr) for c in catalogs]
+    
+    if single:
+        catalogs = catalogs[0]
+    
+    return catalogs
+
+
 def read_dss(
         dss: Union[Path, str], 
         paths: Union[Iterable[str], pd.DataFrame], 
-        add_context: Union[bool, Iterable[str]]
+        add_context: Union[bool, Iterable[str]] = False
     ) -> pd.DataFrame:
     """Create a DataFrame ledger from a set of Timeseries in a DSS file. 
 
@@ -30,7 +70,7 @@ def read_dss(
     paths : Union[Iterable[str], pd.DataFrame]
         A list of DSS A-F paths to be read, or a catalog DataFrame.
     add_context : Union[bool, Iterable[str]]
-        An iterable like ['PATH', 'UNITS', 'PERIOD_TYPE'], or a subset of these.
+        An iterable like ['PATH', 'UNITS', 'PERIOD_TYPE'], or a subset of these, by default False
 
     Returns
     -------
