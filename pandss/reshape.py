@@ -36,6 +36,8 @@ def split_path(
         .str.strip('/')\
         .str.split('/', n=6, expand=True)
     if semantic:
-        df = df.rename(columns=PART_NAMES)
+        if semantic is True:  
+            semantic = PART_NAMES  # Default to CalSim3 meaning
+        df = df.rename(columns=semantic)
         
     return df

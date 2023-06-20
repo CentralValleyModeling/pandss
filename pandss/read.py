@@ -13,7 +13,6 @@ CONTEXT_ATTR = (
 )
 
 
-
 def read_catalog(
         dss: Union[PathLike, Iterable[PathLike]],
         query_expr: Union[str, None] = None,
@@ -26,7 +25,7 @@ def read_catalog(
     dss : Union[PathLike, Iterable[PathLike]]
         The path or paths to the DSS file(s).
     query_expr : Union[str, None], optional
-        A query expression to be passed to pandas.DataFrame.query   , by default None
+        A query expression to be passed to pandas.DataFrame.query, by default None
 
     Returns
     -------
