@@ -102,7 +102,7 @@ def read_dss(
                 df_individual['PERIOD_TYPE'] = ts.period_type
 
             frames.append(df_individual)
-        df = pd.concat(frames, axis=0)
-        df.index.name = 'PERIOD'
+    df = pd.concat(frames, axis=0)
+    df.index.name = 'PERIOD'
 
-        return df
+    return df
