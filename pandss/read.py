@@ -94,9 +94,12 @@ def read_dss(
             ts = DSS.read_rts(p)
             df_individual = ts.data  # type: pd.DataFrame
             df_individual = df_individual.rename(columns={p: 'VALUE'})
-            df_individual['PATH'] = p
-            df_individual['UNITS'] = ts.units
-            df_individual['PERIOD_TYPE'] = ts.period_type
+            if 'PATH' in add_context:
+                df_individual['PATH'] = p
+            if 'UNITS' in add_context:
+                df_individual['UNITS'] = ts.units
+            if 'PERIOD_TYPE' in add_context:
+                df_individual['PERIOD_TYPE'] = ts.period_type
 
             frames.append(df_individual)
         df = pd.concat(frames, axis=0)
