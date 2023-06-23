@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Union, Iterable
+import logging
 
 import pandas as pd
 import pyhecdss
@@ -36,18 +37,18 @@ def read_catalog(
     if not isinstance(dss, Iterable):
         dss = [dss]
         single = True
-    
+    logging.info(f"reading {len(dss)} catalogs")
     catalogs: list[pd.DataFrame] = list()
     for p in dss:
         with pyhecdss.DSSFile(str(p)) as P:
             catalogs.append(P.read_catalog())
-    
+    logging.info(f"query_expr is {query_expr}")
     if query_expr is not None:
         catalogs = [c.query(query_expr) for c in catalogs]
     
     if single:
         catalogs = catalogs[0]
-    
+    logging.info('catalogs successfully read')
     return catalogs
 
 
@@ -75,7 +76,8 @@ def read_dss(
     -------
     pd.DataFrame
         A long-list DataFrame of the timeseries
-    """    
+    """
+    logging.info(f'reading {dss=}')
     if add_context is True:  # Add all
         add_context = CONTEXT_ATTR
     elif add_context is False:  # Add none
@@ -83,11 +85,11 @@ def read_dss(
     else:  # Make sure they are all recognizable
         add_context = [i.upper() for i in add_context]
         assert all([i for i in add_context in CONTEXT_ATTR])     
-
+    logging.info(f'{add_context=}')
     with pyhecdss.DSSFile(str(dss)) as DSS:
         if isinstance(paths, pd.DataFrame):  # Resolve the catalog to pathnames
             paths = DSS.get_pathnames(paths)
-
+        logging.info(f'reading {len(paths)} paths')
         frames = list()
         for p in paths:
             ts = DSS.read_rts(p)
@@ -101,7 +103,9 @@ def read_dss(
                 df_individual['PERIOD_TYPE'] = ts.period_type
 
             frames.append(df_individual)
+    logging.info('concatenating data')
     df = pd.concat(frames, axis=0)
     df.index.name = 'PERIOD'
-
+    logging.info(f'{len(df)} records read')
+    
     return df

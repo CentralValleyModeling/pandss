@@ -1,4 +1,5 @@
 from typing import Union, Iterable
+import logging
 
 import pandas as pd
 
@@ -30,7 +31,8 @@ def split_path(
     -------
     pandas.DataFrame
         A copy of the original pandas DataFrame with 6 new columns.
-    """    
+    """
+    logging.info('splitting path column')
     df = df.copy()
     df[['A', 'B', 'C', 'D', 'E', 'F']] = df['PATH']\
         .str.strip('/')\
@@ -39,5 +41,6 @@ def split_path(
         if semantic is True:  
             semantic = PART_NAMES  # Default to CalSim3 meaning
         df = df.rename(columns=semantic)
-        
+    logging.info(f'{df.columns=}')
+    
     return df
