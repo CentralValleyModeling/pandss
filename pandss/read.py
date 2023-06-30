@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import pyhecdss
 
-from .types import PathLike
+from .paths import PathLike
 
 CONTEXT_ATTR = (
     'PATH',
@@ -53,7 +53,7 @@ def read_catalog(
 
 
 def read_dss(
-        dss: Union[Path, str], 
+        dss: Union[PathLike, str], 
         paths: Union[Iterable[str], pd.DataFrame], 
         add_context: Union[bool, Iterable[str]] = False
     ) -> pd.DataFrame:
