@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import pyhecdss
 
-from .types import PathLike
+from .paths import PathLike, use_temp_paths
 
 CONTEXT_ATTR = (
     'PATH',
@@ -13,7 +13,7 @@ CONTEXT_ATTR = (
     'PERIOD_TYPE'
 )
 
-
+@use_temp_paths
 def read_catalog(
         dss: Union[PathLike, Iterable[PathLike]],
         query_expr: Union[str, None] = None,
@@ -52,9 +52,9 @@ def read_catalog(
     logging.info('catalogs successfully read')
     return catalogs
 
-
+@use_temp_paths
 def read_dss(
-        dss: Union[Path, str], 
+        dss: Union[PathLike, str], 
         paths: Union[Iterable[str], pd.DataFrame], 
         add_context: Union[bool, Iterable[str]] = False
     ) -> pd.DataFrame:
