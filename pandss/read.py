@@ -13,10 +13,12 @@ CONTEXT_ATTR = (
     'PERIOD_TYPE'
 )
 
-@use_temp_paths
+@use_temp_paths('make_temp')
 def read_catalog(
-        dss: Union[PathLike, Iterable[PathLike]],
+        dss: PathLike,
         query_expr: Union[str, None] = None,
+        *,
+        make_temp: bool = False
     ) -> pd.DataFrame:
     """Read the catalog from one or many DSS files. Optionally filter the 
     catalog using pandas.DataFrame.query using the query_expr.
@@ -27,36 +29,35 @@ def read_catalog(
         The path or paths to the DSS file(s).
     query_expr : Union[str, None], optional
         A query expression to be passed to pandas.DataFrame.query, by default None
+    make_temp : bool, optional
+        If true, the DSS file will be copied to a temp file in a local location, by default False
 
     Returns
     -------
     pd.DataFrame
         A list of, or single pandas.DataFrame catalogs.
     """
-    single = False
-    if not isinstance(dss, Iterable):
-        dss = [dss]
-        single = True
-    logging.info(f'reading {len(dss)} catalogs')
-    catalogs: list[pd.DataFrame] = list()
-    for p in dss:
-        logging.info(f"reading catalog from {p}")
-        with pyhecdss.DSSFile(str(p)) as P:
-            catalogs.append(P.read_catalog())
+    if make_temp:
+        logging.info(f'make_temp is {make_temp}, read_catalog is using temporary copy of dss')    
+    logging.info(f"reading catalog from {dss}")
+    with pyhecdss.DSSFile(str(dss)) as DSS:
+        catalog = DSS.read_catalog()
+
     logging.info(f'query_expr is {query_expr}')
     if query_expr is not None:
-        catalogs = [c.query(query_expr) for c in catalogs]
+        catalog = catalog.query(query_expr)
     
-    if single:
-        catalogs = catalogs[0]
-    logging.info('catalogs successfully read')
-    return catalogs
+    logging.info(f'catalog size is {len(catalog)}')
+    return catalog
 
-@use_temp_paths
+@use_temp_paths('make_temp')
 def read_dss(
-        dss: Union[PathLike, str], 
+        dss: PathLike, 
         paths: Union[Iterable[str], pd.DataFrame], 
-        add_context: Union[bool, Iterable[str]] = False
+        add_context: Union[bool, Iterable[str]] = False,
+        *,
+        make_temp: bool = False
+
     ) -> pd.DataFrame:
     """Create a DataFrame ledger from a set of Timeseries in a DSS file. 
 
@@ -72,12 +73,16 @@ def read_dss(
         A list of DSS A-F paths to be read, or a catalog DataFrame.
     add_context : Union[bool, Iterable[str]]
         An iterable like ['PATH', 'UNITS', 'PERIOD_TYPE'], or a subset of these, by default False
+    make_temp : bool, optional
+        If true, the DSS file will be copied to a temp file in a local location, by default False
 
     Returns
     -------
     pd.DataFrame
         A long-list DataFrame of the timeseries
     """
+    if make_temp:
+        logging.info(f'make_temp is {make_temp}, read_dss is using temporary copy of dss')
     logging.info(f'reading timeseries from {dss}')
     if add_context is True:  # Add all
         add_context = CONTEXT_ATTR
