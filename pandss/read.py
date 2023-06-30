@@ -37,12 +37,13 @@ def read_catalog(
     if not isinstance(dss, Iterable):
         dss = [dss]
         single = True
-    logging.info(f"reading {len(dss)} catalogs")
+    logging.info(f'reading {len(dss)} catalogs')
     catalogs: list[pd.DataFrame] = list()
     for p in dss:
+        logging.info(f"reading catalog from {p}")
         with pyhecdss.DSSFile(str(p)) as P:
             catalogs.append(P.read_catalog())
-    logging.info(f"query_expr is {query_expr}")
+    logging.info(f'query_expr is {query_expr}')
     if query_expr is not None:
         catalogs = [c.query(query_expr) for c in catalogs]
     
@@ -77,7 +78,7 @@ def read_dss(
     pd.DataFrame
         A long-list DataFrame of the timeseries
     """
-    logging.info(f'reading {dss=}')
+    logging.info(f'reading timeseries from {dss}')
     if add_context is True:  # Add all
         add_context = CONTEXT_ATTR
     elif add_context is False:  # Add none
@@ -107,5 +108,5 @@ def read_dss(
     df = pd.concat(frames, axis=0)
     df.index.name = 'PERIOD'
     logging.info(f'{len(df)} records read')
-    
+
     return df
