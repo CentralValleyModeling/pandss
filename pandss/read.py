@@ -15,7 +15,7 @@ CONTEXT_ATTR = (
 
 @use_temp_paths
 def read_catalog(
-        dss: Union[PathLike, Iterable[PathLike]],
+        dss: PathLike,
         query_expr: Union[str, None] = None,
     ) -> pd.DataFrame:
     """Read the catalog from one or many DSS files. Optionally filter the 
@@ -33,28 +33,20 @@ def read_catalog(
     pd.DataFrame
         A list of, or single pandas.DataFrame catalogs.
     """
-    single = False
-    if not isinstance(dss, Iterable):
-        dss = [dss]
-        single = True
-    logging.info(f'reading {len(dss)} catalogs')
-    catalogs: list[pd.DataFrame] = list()
-    for p in dss:
-        logging.info(f"reading catalog from {p}")
-        with pyhecdss.DSSFile(str(p)) as P:
-            catalogs.append(P.read_catalog())
+    logging.info(f"reading catalog from {dss}")
+    with pyhecdss.DSSFile(str(p)) as P:
+        catalog = P.read_catalog()
+        
     logging.info(f'query_expr is {query_expr}')
     if query_expr is not None:
-        catalogs = [c.query(query_expr) for c in catalogs]
+        catalog = catalog.query(query_expr)
     
-    if single:
-        catalogs = catalogs[0]
     logging.info('catalogs successfully read')
-    return catalogs
+    return catalog
 
 @use_temp_paths
 def read_dss(
-        dss: Union[PathLike, str], 
+        dss: PathLike, 
         paths: Union[Iterable[str], pd.DataFrame], 
         add_context: Union[bool, Iterable[str]] = False
     ) -> pd.DataFrame:
