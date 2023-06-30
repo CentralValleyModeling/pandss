@@ -32,6 +32,7 @@ def make_temp_kwargs(items: dict, new_loc: Path) -> dict:
                 logging.info(f'creating temp of {v} in {new_loc}')
                 v = create_temp(v, new_loc)
             yield k, v
+
     return dict(inner(items, new_loc))
 
 def use_temp_paths(func):
@@ -39,9 +40,6 @@ def use_temp_paths(func):
         with tempfile.TemporaryDirectory(dir=Path.home()) as temp_dir:
             safe_args = make_temp_args(args, temp_dir)
             safe_kwargs = make_temp_kwargs(kwargs, temp_dir)
-            try:
-                return func(safe_args, safe_kwargs)
-            except Exception as e:
-                _ = input()
-                raise e
+            return func(safe_args, safe_kwargs)
+        
     return runner
