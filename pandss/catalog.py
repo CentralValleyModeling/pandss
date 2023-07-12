@@ -1,4 +1,5 @@
-from typing import Union
+from pathlib import Path
+from typing import Union, Optional, Iterator
 import logging
 
 from pandas import DataFrame
@@ -43,15 +44,73 @@ def read_catalog(
 
 def common_catalog(
         left: Union[PathLike, DataFrame], 
-        right: Union[PathLike, DataFrame]
-    ) -> DataFrame:
-    if isinstance(left, PathLike):
+        right: Union[PathLike, DataFrame],
+        compare_on: Optional[list] = None
+    ) -> tuple[DataFrame, DataFrame]:
+    """Extract the common catalog from two DSS files. Allows for comparisons 
+    on custom collections of columns. Only can compare two catalogs.
+
+    Parameters
+    ----------
+    left : Union[PathLike, DataFrame]
+        The left DSS file, or catalog DataFrame
+    right : Union[PathLike, DataFrame]
+        The right DSS file, or catalog DataFrame
+    compare_on : Optional[list], optional
+        The list of A-F, T to compare on, by default None
+
+    Returns
+    -------
+    tuple[DataFrame, DataFrame]
+        The two intersecting catalogs, for the left and right
+    """
+    # Allow for paths instead
+    if isinstance(left, (Path, str)):
         left = read_catalog(left)
-    if isinstance(right, PathLike):
+    if isinstance(right, (Path, str)):
         right = read_catalog(right)
-    left = left.set_index(ALL_CATALOG_COLUMNS)
-    right = right.set_index(ALL_CATALOG_COLUMNS)
+    if compare_on is None:
+        compare_on = ALL_CATALOG_COLUMNS
+    # Track the order of the columns passed
+    left_og_order = left.columns
+    right_og_order = right.columns
 
+    left = left.set_index(compare_on)
+    right = right.set_index(compare_on)
     index_common = left.index.intersection(right.index)
+    left = left.loc[index_common].reset_index()
+    right = right.loc[index_common].reset_index()
 
-    return left.loc[index_common].reset_index()
+    return left[left_og_order], right[right_og_order] 
+
+def iter_common_catalog(
+        left: Union[PathLike, DataFrame], 
+        right: Union[PathLike, DataFrame], 
+        groupby: str,
+        compare_on: Optional[list] = None, 
+    ) -> Iterator[tuple[str, DataFrame, DataFrame]]:
+    """Iterate over two catalogs, only returning sections of the catalog that 
+    are common between two DSS files. The sections are grouped by the argument
+    groupby.
+
+    Parameters
+    ----------
+    left : Union[PathLike, DataFrame]
+        The left DSS file, or DataFrame catalog.
+    right : Union[PathLike, DataFrame]
+        The right DSS file, or DataFrame catalog.
+    groupby : str
+        The argument passed to pandas.DataFrame.groupby for each catalog    
+    compare_on : Optional[list], optional
+        Passed to pandss.catalog.common_catalog, by default None
+
+    Yields
+    ------
+    Iterator[tuple[str, DataFrame, DataFrame]]
+        An iterator that yields a tuple of the groupby index, and each section
+    """
+    cat_base, cat_alt = common_catalog(left, right, compare_on=compare_on)
+    g_L = cat_base.groupby(groupby)
+    g_R = cat_alt.groupby(groupby)
+    for (c, df_L), (_, df_R) in zip(g_L, g_R):
+        yield c, df_L, df_R
