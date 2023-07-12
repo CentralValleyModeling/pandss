@@ -41,7 +41,14 @@ def read_catalog(
     logging.info(f'catalog size is {len(catalog)}')
     return catalog
 
-def common_catalog(left: DataFrame, right: DataFrame) -> DataFrame:
+def common_catalog(
+        left: Union[PathLike, DataFrame], 
+        right: Union[PathLike, DataFrame]
+    ) -> DataFrame:
+    if isinstance(left, PathLike):
+        left = read_catalog(left)
+    if isinstance(right, PathLike):
+        right = read_catalog(right)
     left = left.set_index(ALL_CATALOG_COLUMNS)
     right = right.set_index(ALL_CATALOG_COLUMNS)
 
