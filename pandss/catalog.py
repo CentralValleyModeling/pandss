@@ -7,7 +7,7 @@ import pyhecdss
 from .paths import PathLike
 
 
-ALL_CATALOG_COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F']
+ALL_CATALOG_COLUMNS = ['T', 'A', 'B', 'C', 'F', 'E', 'D']
 
 def read_catalog(
         dss: PathLike,
