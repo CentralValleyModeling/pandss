@@ -13,7 +13,6 @@ PART_NAMES = {
     'F': 'DEVELOPMENT',
 }
 
-
 def split_path(
         df: pd.DataFrame, 
         semantic: Union[bool, Iterable] = False
