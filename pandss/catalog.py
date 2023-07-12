@@ -47,4 +47,4 @@ def common_catalog(left: DataFrame, right: DataFrame) -> DataFrame:
 
     index_common = left.index.intersection(right.index)
 
-    return index_common.reset_index()
+    return left.loc[index_common].reset_index()
