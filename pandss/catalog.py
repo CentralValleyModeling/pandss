@@ -7,25 +7,18 @@ import pyhecdss
 
 from .paths import PathLike
 
-
-ALL_CATALOG_COLUMNS = ['T', 'A', 'B', 'C', 'F', 'E', 'D']
+COMPARE_ON = ['A', 'B', 'C', 'E', 'D']
+ALL_CATALOG_COLUMNS = ['T', *COMPARE_ON]
 
 def read_catalog(
         dss: PathLike,
-        query_expr: Union[str, None] = None,
     ) -> DataFrame:
-    """Read the catalog from one or many DSS files. Optionally filter the 
-    catalog using pandas.DataFrame.query using the query_expr.
+    """Read the catalog from a DSS file.
 
     Parameters
     ----------
     dss : Union[PathLike, Iterable[PathLike]]
         The path or paths to the DSS file(s).
-    query_expr : Union[str, None], optional
-        A query expression to be passed to pandas.DataFrame.query, by default None
-    make_temp : bool, optional
-        If true, the DSS file will be copied to a temp file in a local location, by default False
-
     Returnss
     -------
     pd.DataFrame
@@ -34,10 +27,6 @@ def read_catalog(
     logging.info(f"reading catalog from {dss}")
     with pyhecdss.DSSFile(str(dss)) as DSS:
         catalog = DSS.read_catalog()
-
-    logging.info(f'query_expr is {query_expr}')
-    if query_expr is not None:
-        catalog = catalog.query(query_expr)
     
     logging.info(f'catalog size is {len(catalog)}')
     return catalog
@@ -66,18 +55,26 @@ def common_catalog(
     """
     # Allow for paths instead
     if isinstance(left, (Path, str)):
+        logging.info(f"reading path: {left=}")
         left = read_catalog(left)
     if isinstance(right, (Path, str)):
+        logging.info(f"reading path: {right=}")
         right = read_catalog(right)
     if compare_on is None:
-        compare_on = ALL_CATALOG_COLUMNS
+        compare_on = COMPARE_ON
+    logging.info(f"{compare_on=}")
     # Track the order of the columns passed
     left_og_order = left.columns
     right_og_order = right.columns
+    logging.info(f'left columns seen: {left_og_order}')
+    logging.info(f'left catalog length: {len(left)}')
+    logging.info(f'right columns seen: {right_og_order}')
+    logging.info(f'right catalog length: {len(right)}')
 
     left = left.set_index(compare_on)
     right = right.set_index(compare_on)
     index_common = left.index.intersection(right.index)
+    logging.info(f"length of common index {len(index_common)}")
     left = left.loc[index_common].reset_index()
     right = right.loc[index_common].reset_index()
 
