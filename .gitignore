@@ -6,3 +6,5 @@
 *\assets
 # Do not track the testing outputs
 tests.log
+# VS Code files
+.vscode
