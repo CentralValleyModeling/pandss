@@ -19,7 +19,8 @@ def read_catalog(
     ----------
     dss : Union[PathLike, Iterable[PathLike]]
         The path or paths to the DSS file(s).
-    Returnss
+    
+    Returns
     -------
     pd.DataFrame
         A list of, or single pandas.DataFrame catalogs.
@@ -83,7 +84,7 @@ def common_catalog(
 def iter_common_catalog(
         left: Union[PathLike, DataFrame], 
         right: Union[PathLike, DataFrame], 
-        groupby: str,
+        groupby: str = 'B',
         compare_on: Optional[list] = None, 
     ) -> Iterator[tuple[str, DataFrame, DataFrame]]:
     """Iterate over two catalogs, only returning sections of the catalog that 
