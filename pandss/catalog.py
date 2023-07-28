@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Union, Optional, Iterator
 import logging
+from warnings import warn
 
 from pandas import DataFrame
 import pyhecdss
@@ -35,7 +36,7 @@ def read_catalog(
 def common_catalog(
         left: Union[PathLike, DataFrame], 
         right: Union[PathLike, DataFrame],
-        compare_on: Optional[list] = None
+        ignore_parts: Optional[list] = None
     ) -> tuple[DataFrame, DataFrame]:
     """Extract the common catalog from two DSS files. Allows for comparisons 
     on custom collections of columns. Only can compare two catalogs.
@@ -46,8 +47,8 @@ def common_catalog(
         The left DSS file, or catalog DataFrame
     right : Union[PathLike, DataFrame]
         The right DSS file, or catalog DataFrame
-    compare_on : Optional[list], optional
-        The list of A-F, T to compare on, by default None
+    ignore_parts : Optional[list], optional
+        Parts of the path to ignore when considering equality, by default None
 
     Returns
     -------
@@ -61,31 +62,39 @@ def common_catalog(
     if isinstance(right, (Path, str)):
         logging.info(f"reading path: {right=}")
         right = read_catalog(right)
-    if compare_on is None:
-        compare_on = COMPARE_ON
+    compare_on = COMPARE_ON
+    if ignore_parts is not None:
+        compare_on = [c for c in compare_on if c not in ignore_parts]
+    if not compare_on:  # All items removed.
+        raise ValueError(f"Cannot ignore all parts of the catalog. invalid arg: {ignore_parts=}")
+    
     logging.info(f"{compare_on=}")
     # Track the order of the columns passed
-    left_og_order = left.columns
-    right_og_order = right.columns
-    logging.info(f'left columns seen: {left_og_order}')
+    left_col_order = left.columns
+    right_col_order = right.columns
+    logging.info(f'left columns seen: {left_col_order}')
     logging.info(f'left catalog length: {len(left)}')
-    logging.info(f'right columns seen: {right_og_order}')
+    logging.info(f'right columns seen: {right_col_order}')
     logging.info(f'right catalog length: {len(right)}')
 
     left = left.set_index(compare_on)
     right = right.set_index(compare_on)
+    if any(left.value_counts() > 1):
+        warn(f"common index ({compare_on}) does not create unique values on left.")
+    if any(right.value_counts() > 1):
+        warn(f"common index ({compare_on}) does not create unique values on right.")
     index_common = left.index.intersection(right.index)
     logging.info(f"length of common index {len(index_common)}")
     left = left.loc[index_common].reset_index()
     right = right.loc[index_common].reset_index()
 
-    return left[left_og_order], right[right_og_order] 
+    return left[left_col_order], right[right_col_order] 
 
 def iter_common_catalog(
         left: Union[PathLike, DataFrame], 
         right: Union[PathLike, DataFrame], 
         groupby: str = 'B',
-        compare_on: Optional[list] = None, 
+        ignore_parts: Optional[list] = None, 
     ) -> Iterator[tuple[str, DataFrame, DataFrame]]:
     """Iterate over two catalogs, only returning sections of the catalog that 
     are common between two DSS files. The sections are grouped by the argument
@@ -99,15 +108,15 @@ def iter_common_catalog(
         The right DSS file, or DataFrame catalog.
     groupby : str
         The argument passed to pandas.DataFrame.groupby for each catalog    
-    compare_on : Optional[list], optional
-        Passed to pandss.catalog.common_catalog, by default None
+    ignore_parts : Optional[list], optional
+        Parts of the path to ignore when considering equality, by default None
 
     Yields
     ------
     Iterator[tuple[str, DataFrame, DataFrame]]
         An iterator that yields a tuple of the groupby index, and each section
     """
-    cat_base, cat_alt = common_catalog(left, right, compare_on=compare_on)
+    cat_base, cat_alt = common_catalog(left, right, ignore_parts=ignore_parts)
     g_L = cat_base.groupby(groupby)
     g_R = cat_alt.groupby(groupby)
     for (c, df_L), (_, df_R) in zip(g_L, g_R):
