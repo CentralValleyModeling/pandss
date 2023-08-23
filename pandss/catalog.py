@@ -4,6 +4,7 @@ import logging
 from warnings import warn
 
 from pandas import DataFrame
+from pandas.errors import OutOfBoundsDatetime
 import pyhecdss
 
 from .paths import PathLike
@@ -79,9 +80,9 @@ def common_catalog(
 
     left = left.set_index(compare_on)
     right = right.set_index(compare_on)
-    if any(left.value_counts() > 1):
+    if any(left.groupby(left.index).size() > 1):
         warn(f"common index ({compare_on}) does not create unique values on left.")
-    if any(right.value_counts() > 1):
+    if any(right.groupby(right.index).size() > 1):
         warn(f"common index ({compare_on}) does not create unique values on right.")
     index_common = left.index.intersection(right.index)
     logging.info(f"length of common index {len(index_common)}")
