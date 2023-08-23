@@ -180,5 +180,4 @@ class PandssAccessor:
         write_dss(dst, self._df)
 
     def read(self, src: PathLike):
-        catalog = read_catalog(src)
-        return read_dss(src, catalog)
+        return read_dss(src, self._df)
