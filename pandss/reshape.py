@@ -1,23 +1,22 @@
-from typing import Union, Iterable
 import logging
+from typing import Iterable, Union
 
 import pandas as pd
 
-
 PART_NAMES = {
-    'A': 'MODEL',
-    'B': 'NAME',
-    'C': 'TYPE',
-    'D': 'DATE',
-    'E': 'INTERVAL',
-    'F': 'DEVELOPMENT',
+    "A": "MODEL",
+    "B": "NAME",
+    "C": "TYPE",
+    "D": "DATE",
+    "E": "INTERVAL",
+    "F": "DEVELOPMENT",
 }
 
+
 def split_path(
-        df: pd.DataFrame, 
-        semantic: Union[bool, Iterable] = False
-    ) -> pd.DataFrame:
-    """Split the PATH column in a DataFrame into it's components. 
+    df: pd.DataFrame, semantic: Union[bool, Iterable] = False
+) -> pd.DataFrame:
+    """Split the PATH column in a DataFrame into it's components.
 
     Parameters
     ----------
@@ -31,15 +30,15 @@ def split_path(
     pandas.DataFrame
         A copy of the original pandas DataFrame with 6 new columns.
     """
-    logging.info('splitting path column')
+    logging.info("splitting path column")
     df = df.copy()
-    df[['A', 'B', 'C', 'D', 'E', 'F']] = df['PATH']\
-        .str.strip('/')\
-        .str.split('/', n=6, expand=True)
+    df[["A", "B", "C", "D", "E", "F"]] = (
+        df["PATH"].str.strip("/").str.split("/", n=6, expand=True)
+    )
     if semantic:
-        if semantic is True:  
+        if semantic is True:
             semantic = PART_NAMES  # Default to CalSim3 meaning
         df = df.rename(columns=semantic)
-    logging.info(f'{df.columns=}')
-    
+    logging.info(f"{df.columns=}")
+
     return df

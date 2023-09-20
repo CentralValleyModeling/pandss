@@ -1,14 +1,15 @@
-from typing import Union, TypeVar
-from pathlib import Path
-import tempfile
-import shutil
 import logging
+import shutil
+import tempfile
+from pathlib import Path
+from typing import TypeVar, Union
 
+PathLike = TypeVar("PathLike", bound=Union[Path, str])
 
-PathLike = TypeVar('PathLike', bound=Union[Path, str])
 
 def is_path_like(p) -> bool:
     return isinstance(p, (Path, str))
+
 
 def create_temp(p: PathLike, new_loc: Path) -> Path:
     temp_f = tempfile.mktemp(dir=new_loc, suffix=p.suffix)
