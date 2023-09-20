@@ -3,10 +3,14 @@ from pathlib import Path
 from typing import Iterable, Union
 
 import pandas as pd
-import pyhecdss
 
+from . import silent_std_out
 from .catalog import read_catalog
 from .paths import PathLike
+
+with silent_std_out():
+    import pyhecdss
+
 
 CONTEXT_ATTR = ("PATH", "UNITS", "PERIOD_TYPE")
 

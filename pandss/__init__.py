@@ -38,10 +38,9 @@ def silent_std_out():
             os.dup2(sys.__stdout__.fileno(), null.fileno())
 
 
-with silent_std_out():
-    from . import catalog, reshape, timeseries
-    from .catalog import common_catalog, iter_common_catalog, read_catalog
-    from .reshape import split_path
-    from .timeseries import read_dss, write_dss
+from . import catalog, reshape, timeseries
+from .catalog import common_catalog, iter_common_catalog, read_catalog
+from .reshape import split_path
+from .timeseries import read_dss, write_dss
 
 __all__ = ["timeseries", "reshape"]

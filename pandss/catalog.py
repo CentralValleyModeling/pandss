@@ -3,11 +3,14 @@ from pathlib import Path
 from typing import Iterator, Optional, Union
 from warnings import warn
 
-import pyhecdss
 from pandas import DataFrame
 from pandas.errors import OutOfBoundsDatetime
 
+from . import silent_std_out
 from .paths import PathLike
+
+with silent_std_out():
+    import pyhecdss
 
 COMPARE_ON = ["A", "B", "C", "E", "D"]
 ALL_CATALOG_COLUMNS = ["T", *COMPARE_ON]
