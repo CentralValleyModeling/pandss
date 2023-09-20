@@ -39,6 +39,7 @@ def silent_std_out():
             # Clear pending, we do not want to see these
             null.flush()
             os.dup2(PLACEHOLDER_FD, STD_OUT_FD)
+            os.close(PLACEHOLDER_FD)
 
 
 from . import catalog, reshape, timeseries
