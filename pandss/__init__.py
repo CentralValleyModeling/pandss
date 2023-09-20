@@ -28,14 +28,17 @@ def silent_std_out():
     """
     # Clear pending, we want to see these
     sys.__stdout__.flush()
+    STD_OUT_FD = 1
+    PLACEHOLDER_FD = 11
     with null_io() as null:
         try:
-            os.dup2(null.fileno(), sys.__stdout__.fileno())
+            os.dup2(sys.__stdout__.fileno(), PLACEHOLDER_FD)
+            os.dup2(null.fileno(), STD_OUT_FD)
             yield None
         finally:
             # Clear pending, we do not want to see these
             null.flush()
-            os.dup2(sys.__stdout__.fileno(), null.fileno())
+            os.dup2(PLACEHOLDER_FD, STD_OUT_FD)
 
 
 from . import catalog, reshape, timeseries
