@@ -55,11 +55,11 @@ class TestCatalogObject(unittest.TestCase):
     def test_creation(self):
         cat = pdss.Catalog(
             data=[
-                ['T', 'A1', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E']
+                ['T', 'A1', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F']
             ],
-            columns=['T', 'A', 'B', 'C', 'D', 'E']
+            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F']
         )
         self.assertIsInstance(cat, pdss.Catalog)
     
@@ -78,32 +78,32 @@ class TestCatalogObject(unittest.TestCase):
         with self.assertRaises(ValueError):
             cat = pdss.Catalog(
                 data=[
-                ['T', 'A1', 'B', 'C', 'D', 'E', 'F'],
-                ['T', 'A2', 'B', 'C', 'D', 'E', 'F'],
-                ['T', 'A2', 'B', 'C', 'D', 'E', 'F']
+                ['T', 'A1', 'B', 'C', 'D', 'E', 'F', 'G'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F', 'G'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F', 'G']
             ],
-            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F']
+            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
             )
     
     def test_slice_type(self):
         cat = pdss.Catalog(
             data=[
-                ['T', 'A1', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E']
+                ['T', 'A1', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F']
             ],
-            columns=['T', 'A', 'B', 'C', 'D', 'E']
+            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F']
         )
         self.assertIsInstance(cat['A'], Series)
     
     def test_metadata(self):
         cat = pdss.Catalog(
             data=[
-                ['T', 'A1', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E'],
-                ['T', 'A2', 'B', 'C', 'D', 'E']
+                ['T', 'A1', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F']
             ],
-            columns=['T', 'A', 'B', 'C', 'D', 'E']
+            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F']
         )
         cat = cat.copy()
         self.assertTrue(hasattr(cat, 'source'))

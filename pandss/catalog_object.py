@@ -15,12 +15,12 @@ class Catalog(DataFrame):
         source = kwargs.pop('source', None)
         super().__init__(*args, **kwargs)
         missing_columns = [
-            c for c in ['A', 'B', 'C', 'D', 'E']
+            c for c in ['A', 'B', 'C', 'D', 'E', 'F']
             if c not in self.columns
         ]
         extra_columns = [
             c for c in self.columns 
-            if c not in ['T', 'A', 'B', 'C', 'D', 'E']
+            if c not in ['T', 'A', 'B', 'C', 'D', 'E', 'F']
         ]
         if missing_columns:
             raise ValueError(missing_columns) 
