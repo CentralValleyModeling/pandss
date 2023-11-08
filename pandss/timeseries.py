@@ -5,7 +5,6 @@ from typing import Iterable, Union
 import pandas as pd
 
 from . import silent_std_out
-from .catalog import read_catalog
 from .paths import PathLike
 
 with silent_std_out():

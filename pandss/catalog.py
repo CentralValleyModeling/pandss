@@ -4,7 +4,6 @@ from typing import Iterator, Optional, Union
 from warnings import warn
 
 from pandas import DataFrame
-from pandas.errors import OutOfBoundsDatetime
 
 from . import silent_std_out
 from .paths import PathLike

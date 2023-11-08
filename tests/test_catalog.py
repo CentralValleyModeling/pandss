@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from time import perf_counter
 
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import pandss as pdss
 
 DSS_SMALL = Path('./assets/small.dss').resolve()
@@ -50,6 +50,66 @@ class TestCommonCatalog(unittest.TestCase):
                 cat_2, 
                 ignore_parts=['B', 'C', 'D', 'E'])
         self.assertEqual(len(L), len(R))
+
+class TestCatalogObject(unittest.TestCase):
+    def test_creation(self):
+        cat = pdss.Catalog(
+            data=[
+                ['T', 'A1', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E']
+            ],
+            columns=['T', 'A', 'B', 'C', 'D', 'E']
+        )
+        self.assertIsInstance(cat, pdss.Catalog)
+    
+    def test_error_on_missing_column(self):
+        with self.assertRaises(ValueError):
+            cat = pdss.Catalog(
+                data=[
+                    ['A1', 'B', 'C', 'E'],
+                    ['A2', 'B', 'C', 'E'],
+                    ['A2', 'B', 'C', 'E']
+                ],
+                columns=['A', 'B', 'C', 'E']
+            )
+    
+    def test_error_on_extra_column(self):
+        with self.assertRaises(ValueError):
+            cat = pdss.Catalog(
+                data=[
+                ['T', 'A1', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F'],
+                ['T', 'A2', 'B', 'C', 'D', 'E', 'F']
+            ],
+            columns=['T', 'A', 'B', 'C', 'D', 'E', 'F']
+            )
+    
+    def test_slice_type(self):
+        cat = pdss.Catalog(
+            data=[
+                ['T', 'A1', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E']
+            ],
+            columns=['T', 'A', 'B', 'C', 'D', 'E']
+        )
+        self.assertIsInstance(cat['A'], Series)
+    
+    def test_metadata(self):
+        cat = pdss.Catalog(
+            data=[
+                ['T', 'A1', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E'],
+                ['T', 'A2', 'B', 'C', 'D', 'E']
+            ],
+            columns=['T', 'A', 'B', 'C', 'D', 'E']
+        )
+        cat = cat.copy()
+        self.assertTrue(hasattr(cat, 'source'))
+
+        
+
             
 if __name__ == '__main__':
     unittest.main()
