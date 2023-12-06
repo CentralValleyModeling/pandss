@@ -117,7 +117,7 @@ def read_dss(
     if len(frames) == 0:
         raise ValueError("No timeseries found, check paths requested.")
     elif len(frames) > 1:
-        logging.info("concatenating data")
+        logging.info("multiple paths read, concatenating data")
         df = pd.concat(frames, axis=0)
     else:
         df = frames[0]

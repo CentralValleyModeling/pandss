@@ -30,11 +30,11 @@ def read_catalog(
     pd.DataFrame
         A list of, or single pandas.DataFrame catalogs.
     """
-    logging.info(f"reading catalog from {dss}")
+    logging.info(f"reading catalog, {dss=}")
     with pyhecdss.DSSFile(str(dss)) as DSS:
         catalog = DSS.read_catalog()
 
-    logging.info(f"catalog size is {len(catalog)}")
+    logging.info(f"catalog read, size is {len(catalog)}")
     return catalog
 
 
@@ -62,10 +62,8 @@ def common_catalog(
     """
     # Allow for paths instead
     if isinstance(left, (Path, str)):
-        logging.info(f"reading path: {left=}")
         left = read_catalog(left)
     if isinstance(right, (Path, str)):
-        logging.info(f"reading path: {right=}")
         right = read_catalog(right)
     compare_on = COMPARE_ON
     if ignore_parts is not None:
@@ -79,10 +77,6 @@ def common_catalog(
     # Track the order of the columns passed
     left_col_order = left.columns
     right_col_order = right.columns
-    logging.info(f"left columns seen: {left_col_order}")
-    logging.info(f"left catalog length: {len(left)}")
-    logging.info(f"right columns seen: {right_col_order}")
-    logging.info(f"right catalog length: {len(right)}")
 
     left = left.set_index(compare_on)
     right = right.set_index(compare_on)
