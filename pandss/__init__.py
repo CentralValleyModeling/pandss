@@ -47,5 +47,6 @@ from .catalog import common_catalog, iter_common_catalog, read_catalog
 from .catalog_object import Catalog
 from .reshape import split_path
 from .timeseries import read_dss, write_dss
+from .heclib import HECLIB
 
 __all__ = ["timeseries", "reshape"]
