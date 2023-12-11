@@ -1,12 +1,15 @@
-import ctypes as ct
 import logging
+from ctypes import (CDLL, POINTER, c_char_p, c_double, c_int, c_longlong,
+                    pointer)
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator
 
 DLL_AVAIL = {
     6: None,
-    7: str(Path(__file__).parent / "heclib-7-IR-4-win-x86_64/debug64/hecdss.dll"),
+    7: str(Path(__file__).parent / "hecdss.dll"),
 }
+
+DSS_FILE = c_longlong * 250
 
 
 class DLL_Signature:
@@ -28,86 +31,93 @@ class DLL_API:
         self.version = version
         self.hec_dss_open = DLL_Signature(
             argtypes=(
-                ct.c_char_p,
-                ct.POINTER(ct.c_void_p),
+                c_char_p,
+                POINTER(POINTER(DSS_FILE)),
             ),
-            restype=ct.c_int,
+            restype=c_int,
         )
         self.hec_dss_close = DLL_Signature(
-            argtypes=(ct.c_void_p,),
-            restype=ct.c_int,
+            argtypes=(POINTER(DSS_FILE),),
+            restype=c_int,
         )
         self.hec_dss_catalog = DLL_Signature(
             argtypes=(
-                ct.c_void_p,
-                ct.c_char_p,
-                ct.POINTER(ct.c_int),
-                ct.c_char_p,
-                ct.c_int,
-                ct.c_int,
+                POINTER(DSS_FILE),
+                c_char_p,
+                POINTER(c_int),
+                c_char_p,
+                c_int,
+                c_int,
             ),
-            restype=ct.c_int,
+            restype=c_int,
         )
         self.hec_dss_record_count = DLL_Signature(
-            argtypes=(ct.c_void_p,), restype=ct.c_int
+            argtypes=(POINTER(DSS_FILE),),
+            restype=c_int,
         )
-        self.hec_dss_CONSTANT_MAX_PATH_SIZE = DLL_Signature(restype=ct.c_int)
+        self.hec_dss_CONSTANT_MAX_PATH_SIZE = DLL_Signature(
+            restype=c_int,
+        )
+        self.hec_dss_tsRetrieveInfo = DLL_Signature(
+            argtypes=(
+                POINTER(DSS_FILE),
+                c_char_p,
+                c_char_p,
+                c_int,
+                c_char_p,
+                c_int,
+            ),
+            restype=c_int,
+        )
+
         self.hec_dss_tsRetrieve = DLL_Signature(
             argtypes=(
-                ct.c_void_p,  # dss
-                ct.c_char_p,  # A-F path
-                ct.c_char_p,  # start_date
-                ct.c_char_p,  # start_time
-                ct.c_char_p,  # end_date
-                ct.c_char_p,  # end_time
-                ct.POINTER(ct.c_int),  # time_array
-                ct.POINTER(ct.c_double),  # value_array
-                ct.c_int,  # array_size
-                ct.POINTER(ct.c_int),  # number_read
-                ct.POINTER(ct.c_int),  # quality
-                ct.c_int,  # quality_len
-                ct.POINTER(ct.c_int),  # base_date
-                ct.POINTER(ct.c_int),  # time_resolution
-                ct.c_char_p,  # units
-                ct.c_int,  # units_len
-                ct.c_char_p,  # data_type
-                ct.c_int,  # data_type_len
+                POINTER(DSS_FILE),  # dss
+                c_char_p,  # A-F path
+                c_char_p,  # start_date
+                c_char_p,  # start_time
+                c_char_p,  # end_date
+                c_char_p,  # end_time
+                POINTER(c_int),  # time_array
+                POINTER(c_double),  # value_array
+                c_int,  # array_size
+                POINTER(c_int),  # number_read
+                POINTER(c_int),  # quality
+                c_int,  # quality_len
+                POINTER(c_int),  # base_date
+                POINTER(c_int),  # time_resolution
+                c_char_p,  # units
+                c_int,  # units_len
+                c_char_p,  # data_type
+                c_int,  # data_type_len
             ),
-            restype=ct.c_int,
+            restype=c_int,
         )
+
         self.hec_dss_tsGetSizes = DLL_Signature(
             argtypes=(
-                ct.c_void_p,  # dss
-                ct.c_char_p,  # A-F path
-                ct.c_char_p,  # start_date
-                ct.c_char_p,  # start_time
-                ct.c_char_p,  # end_date
-                ct.c_char_p,  # end_time
-                ct.POINTER(ct.c_int),  # number_values
-                ct.POINTER(ct.c_int),  # quality_elements
+                POINTER(DSS_FILE),  # dss
+                c_char_p,  # A-F path
+                c_char_p,  # start_date
+                c_char_p,  # start_time
+                c_char_p,  # end_date
+                c_char_p,  # end_time
+                POINTER(c_int),  # number_values
+                POINTER(c_int),  # quality_elements
             ),
-            restype=ct.c_int,
+            restype=c_int,
         )
         self.hec_dss_tsGetDateTimeRange = DLL_Signature(
             argtypes=(
-                ct.c_void_p,  # dss
-                ct.c_char_p,  # A-F path
-                ct.c_int,  # full_set
-                ct.POINTER(ct.c_int),  # first_date
-                ct.POINTER(ct.c_int),  # first_seconds
-                ct.POINTER(ct.c_int),  # last_date
-                ct.POINTER(ct.c_int),  # last_seconds
+                POINTER(DSS_FILE),  # dss
+                c_char_p,  # A-F path
+                c_int,  # full_set
+                POINTER(c_int),  # first_date
+                POINTER(c_int),  # first_seconds
+                POINTER(c_int),  # last_date
+                POINTER(c_int),  # last_seconds
             ),
-            restype=ct.c_int,
-        )
-        self.hec_dss_julianToYearMonthDay = DLL_Signature(
-            argtypes=(
-                ct.c_int,
-                ct.POINTER(ct.c_int),
-                ct.POINTER(ct.c_int),
-                ct.POINTER(ct.c_int),
-            ),
-            restype=ct.c_void_p,
+            restype=c_int,
         )
 
     def __iter__(self) -> Iterator[tuple[str, DLL_Signature]]:
@@ -117,34 +127,34 @@ class DLL_API:
             yield function, signature
 
 
-def get_file_version(dll: ct.CDLL, dss_path: str) -> int:
-    dll.hec_dss_getFileVersion.argtypes = (ct.c_char_p,)
-    dll.hec_dss_getFileVersion.restype = ct.c_int
+def get_file_version(dll: CDLL, dss_path: str) -> int:
+    dll.hec_dss_getFileVersion.argtypes = (c_char_p,)
+    dll.hec_dss_getFileVersion.restype = c_int
     version = dll.hec_dss_getFileVersion(dss_path.encode())
 
     return int(version)
 
 
-def get_dll(dss_path: str | Path) -> ct.CDLL:
-    dll_default = ct.CDLL(DLL_AVAIL[7])
+def get_dll(dss_path: str | Path) -> CDLL:
+    dll_default = CDLL(DLL_AVAIL[7])
     version = get_file_version(dll_default, str(dss_path))
     if version == 0:
         raise FileNotFoundError(dss_path)
-    logging.info(f"version determined to be {version}")
+    logging.debug(f"version determined to be {version}")
 
     dll_path = DLL_AVAIL.get(version, None)
-    logging.info(f"using dll={dll_path}")
+    logging.debug(f"using dll={dll_path}")
     if dll_path is None:
         raise NotImplementedError(f"DSS File Version {version} not supported")
-    dll = ct.CDLL(dll_path)
+    dll = CDLL(dll_path)
     api = DLL_API(version)
-    logging.info("DLL loaded, applying known API to functions via ctypes")
+    logging.debug("DLL loaded, applying known API to functions via ctypes")
 
     for function, signature in api:
-        func: ct.CDLL._FuncPtr = getattr(dll, function)
+        func: CDLL._FuncPtr = getattr(dll, function)
         if signature.argtypes:
             func.argtypes = signature.argtypes
         func.restype = signature.restype
-        logging.info(f"api added for {function}")
+        logging.debug(f"api added for {function}")
 
     return dll
