@@ -1,11 +1,13 @@
-from typing import Callable
-from ctypes import c_int
 import logging
+from ctypes import c_int
+from typing import Callable
+
 
 class HECDSS_ErrorHandler:
     def __init__(self):
         self.severity = {
-            0: ("STATUS_OKAY", None),
+            -1: ("UNKNOWN", RuntimeError),
+            0: ("STATUS_OKAY", print),
             1: ("INFORMATION", logging.info),
             2: ("WARNING", logging.warn),
             3: ("INVALID_ARGUMENT", ValueError),
@@ -34,4 +36,3 @@ class HECDSS_ErrorHandler:
             raise action(msg)
         else:
             action(msg)
-
