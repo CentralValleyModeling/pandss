@@ -140,6 +140,9 @@ class DLL_API:
 
 
 def get_file_version(dll: CDLL, dss_path: str) -> int:
+    if not Path(dss_path).exists():
+        logging.warn("file not found, assuming version 7")
+        return 7
     dll.hec_dss_getFileVersion.argtypes = (c_char_p,)
     dll.hec_dss_getFileVersion.restype = c_int
     version = dll.hec_dss_getFileVersion(dss_path.encode())
