@@ -101,6 +101,24 @@ class Test_DSS_Handle(unittest.TestCase):
         self.assertIsInstance(dates, list)
         self.assertEqual(len(values), 1200)
 
+    def test_ts_store(self):
+        with DSS_Handle(self.dss_file) as DSS:
+            path = "/PANDSS/TEST_STORE/TESTING//1Month/L2023A/"
+            dt = [
+                datetime(2023, 1, 1),
+                datetime(2023, 12, 1)
+            ]
+            vals = list(range(12))
+            DSS.ts_store_regular(
+                path, 
+                dt, 
+                vals,
+                quality=list(),
+                period_type='PER-INST',
+                units='COUNT',
+                save_as_float=True
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
