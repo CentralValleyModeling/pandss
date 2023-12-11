@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 DLL_AVAIL = {
-    6: None,
+    6: None,  # TODO, find applicable DLL
     7: str(Path(__file__).parent / "hecdss.dll"),
 }
 
