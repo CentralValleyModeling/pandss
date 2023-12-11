@@ -69,7 +69,6 @@ class DLL_API:
             ),
             restype=c_int,
         )
-
         self.hec_dss_tsRetrieve = DLL_Signature(
             argtypes=(
                 POINTER(DSS_FILE),  # dss
@@ -93,7 +92,6 @@ class DLL_API:
             ),
             restype=c_int,
         )
-
         self.hec_dss_tsGetSizes = DLL_Signature(
             argtypes=(
                 POINTER(DSS_FILE),  # dss
@@ -118,6 +116,20 @@ class DLL_API:
                 POINTER(c_int),  # last_seconds
             ),
             restype=c_int,
+        )
+        self.hec_dss_set_value = DLL_Signature(
+            argtypes=(
+                c_char_p,
+                c_int,
+            ),
+            restype=c_int
+        )
+        self.hec_dss_set_string = DLL_Signature(
+            argtypes=(
+                c_char_p,
+                c_char_p,
+            ),
+            restype=c_int
         )
 
     def __iter__(self) -> Iterator[tuple[str, DLL_Signature]]:
@@ -151,10 +163,13 @@ def get_dll(dss_path: str | Path) -> CDLL:
     logging.debug("DLL loaded, applying known API to functions via ctypes")
 
     for function, signature in api:
-        func: CDLL._FuncPtr = getattr(dll, function)
-        if signature.argtypes:
-            func.argtypes = signature.argtypes
-        func.restype = signature.restype
-        logging.debug(f"api added for {function}")
+        try:
+            func: CDLL._FuncPtr = getattr(dll, function)
+            if signature.argtypes:
+                func.argtypes = signature.argtypes
+            func.restype = signature.restype
+            logging.debug(f"api added for {function}")
+        except AttributeError:
+            logging.warn(f"DLL has no function `{function}`")
 
     return dll
