@@ -9,12 +9,13 @@ from .. import suppress_stdout_stderr
 from .api import get_dll
 from .dates import datetime_encode, get_datetime_range_pyobj, julian_to_date
 from .decorators import must_be_open, silent
+from .errors import HECDSS_ErrorHandler
 
 
 class DSS_Handle:
     """Wrapper class exposing DLL functions in the USACE heclib.dll to python."""
 
-    __slots__ = ["open", "file_path", "file_table", "dll"]
+    __slots__ = ["open", "file_path", "file_table", "dll", "handler"]
 
     def __init__(self, dss: str | Path):
         self.open = False
@@ -22,6 +23,7 @@ class DSS_Handle:
         self.file_table = ct.pointer((ct.c_longlong * 250)())
         with suppress_stdout_stderr():
             self.dll = get_dll(self.file_path)
+        self.handler = HECDSS_ErrorHandler()
 
     @silent
     def __enter__(self):
@@ -48,7 +50,7 @@ class DSS_Handle:
         fp = str(self.file_path).encode()
         success = self.dll.hec_dss_open(fp, ct.byref(self.file_table))
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
         self.open = True
 
         return self
@@ -62,7 +64,7 @@ class DSS_Handle:
         logging.info(f"closing dss file {self.file_path}")
         success = self.dll.hec_dss_close(self.file_table)
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
         self.open = False
 
     @silent
@@ -154,7 +156,7 @@ class DSS_Handle:
             buffer_size,
         )
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
 
         return units.value.decode(), period_type.value.decode()
 
@@ -205,7 +207,7 @@ class DSS_Handle:
             ct.byref(end_seconds),
         )
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
         logging.debug(
             "{}: start JD-{} T-{}, end JD-{} T-{}".format(
                 path,
@@ -270,7 +272,7 @@ class DSS_Handle:
             ct.byref(quality_len),
         )
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
         logging.debug(f"number of times: {time_len.value}")
         logging.debug(f"number of quality: {quality_len.value}")
 
@@ -358,7 +360,7 @@ class DSS_Handle:
             buffer_size,
         )
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
 
         values = np.int32(values[: values_read.value])
         times = times[: values_read.value]
@@ -436,4 +438,4 @@ class DSS_Handle:
         )
 
         if success != 0:
-            raise RuntimeError("")  # TODO create error handling
+            self.handler.resolve(success)
