@@ -1,6 +1,7 @@
 import ctypes as ct
 import unittest
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 
@@ -10,7 +11,7 @@ from pandss import DSS_Handle, heclib
 class Test_DSS_Handle(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        cls.dss_file = "C:/Users/zroy/Documents/_Python/pandss/tests/test.dss"
+        cls.dss_file = Path(__file__).parent / "test.dss"
 
     def _test_all(self):
         with DSS_Handle(self.dss_file) as DSS:
@@ -102,7 +103,7 @@ class Test_DSS_Handle(unittest.TestCase):
         self.assertEqual(len(values), 1200)
 
     def test_ts_store(self):
-        with DSS_Handle(self.dss_file) as DSS:
+        with DSS_Handle(self.dss_file.with_stem('test_new')) as DSS:
             path = "/PANDSS/TEST_STORE/TESTING//1Month/L2023A/"
             dt = [
                 datetime(2023, 1, 1),
@@ -118,6 +119,10 @@ class Test_DSS_Handle(unittest.TestCase):
                 units='COUNT',
                 save_as_float=True
             )
+            cat, _t = DSS.catalog()
+        self.assertNotEqual(len(cat), 0)
+            
+        
 
 
 if __name__ == "__main__":
