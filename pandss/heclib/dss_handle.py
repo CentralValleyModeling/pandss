@@ -19,8 +19,7 @@ class DSS_Handle:
     def __init__(self, dss: str | Path):
         self.open = False
         self.file_path = dss
-        zeros = list(0 for _ in range(250))
-        self.file_table = ct.pointer((ct.c_longlong * 250)(*zeros))
+        self.file_table = ct.pointer((ct.c_longlong * 250)())
         with suppress_stdout_stderr():
             self.dll = get_dll(self.file_path)
 
