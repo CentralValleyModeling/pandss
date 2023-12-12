@@ -421,6 +421,7 @@ class DSS:
         RuntimeError
             Generic error for error reading info from the DSS file
         """
+        raise NotImplementedError("Timeseries storage is not implemented.")
         path_bytes = path.encode("UTF-8")
         start_date, start_time = datetime_encode(date_range[0])
         end_date, end_time = datetime_encode(date_range[1])

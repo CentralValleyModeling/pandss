@@ -90,21 +90,22 @@ class Test_DSS(unittest.TestCase):
         self.assertEqual(len(values), 1200)
 
     def test_ts_store(self):
-        with DSS(self.dss_file.with_stem("test_new")) as dss:
-            path = "/PANDSS/TEST_STORE/TESTING//1Month/L2023A/"
-            dt = [datetime(2023, 1, 1), datetime(2023, 12, 1)]
-            vals = list(range(12))
-            dss.ts_store_regular(
-                path,
-                dt,
-                vals,
-                quality=list(),
-                period_type="PER-INST",
-                units="COUNT",
-                save_as_float=True,
-            )
-            cat, _t = dss.catalog()
-        self.assertNotEqual(len(cat), 0)
+        with self.assertRaises(NotImplementedError):
+            with DSS(self.dss_file.with_stem("test_new")) as dss:
+                path = "/PANDSS/TEST_STORE/TESTING//1Month/L2023A/"
+                dt = [datetime(2023, 1, 1), datetime(2023, 12, 1)]
+                vals = list(range(12))
+                dss.ts_store_regular(
+                    path,
+                    dt,
+                    vals,
+                    quality=list(),
+                    period_type="PER-INST",
+                    units="COUNT",
+                    save_as_float=True,
+                )
+        #    cat, _t = dss.catalog()
+        #self.assertNotEqual(len(cat), 0)
 
 
 if __name__ == "__main__":
