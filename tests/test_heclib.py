@@ -1,64 +1,51 @@
 import ctypes as ct
 import unittest
 from datetime import datetime
+from os import remove
 from pathlib import Path
 
 import numpy as np
 
-from pandss import DSS_Handle, heclib
+from pandss import DSS, heclib
 
 
-class Test_DSS_Handle(unittest.TestCase):
+class Test_DSS(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        cls.dss_file = Path(__file__).parent / "test.dss"
+        cls.dss_file_6 = Path(
+            r"C:\Users\zroy\Documents\_Modeling\_2023DCR\_studies\_cartridges\0525-Nile\Adjusted\SV\DCR2023_SV_Nile_Adj_v14.dss"
+        )  # Path(__file__).parent / "test.dss"
+        cls.dss_file = cls.dss_file_6.with_suffix(".7.dss")
 
-    def _test_all(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            # paths, record_types = DSS.catalog()
-            # result = DSS.ts_info(paths[0])
-            # result = DSS.ts_retrieve(paths[0])
-            # result = DSS.ret()
-            new_path = "/PANDSS/NEW_TS_2/TESTING//1MON/L2023A"
-            units = "HOPE"
-            period_type = "PER-AVER"
-            values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-            quality = []
-            result = DSS.ts_store_regular(
-                new_path,
-                date_range=[datetime(2023, 1, 1), datetime(2023, 12, 1)],
-                values=values,
-                quality=quality,
-                units=units,
-                period_type=period_type,
-            )
-
-            print(result)
+    def test_convert_version(self):
+        if self.dss_file.exists():
+            remove(self.dss_file)
+        heclib.dll.convert_to_version_7(self.dss_file_6, self.dss_file)
 
     def test_open_close(self):
         try:
-            with DSS_Handle(self.dss_file) as DSS:
+            with DSS(self.dss_file):
                 pass
         except Exception as e:
             self.fail()
 
     def test_catalog(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            paths, record_types = DSS.catalog()
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
         self.assertIsInstance(paths, np.ndarray)
         self.assertIsInstance(paths, np.ndarray)
 
     def test_ts_info(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            paths, record_types = DSS.catalog()
-            units, period_type = DSS.ts_info(paths[0])
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
+            units, period_type = dss.ts_info(paths[0])
         self.assertIsInstance(units, str)
         self.assertIsInstance(period_type, str)
 
     def test_get_datetime_range(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            paths, record_types = DSS.catalog()
-            sj, ss, ej, es = DSS._get_datetime_range(paths[0].encode())
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
+            sj, ss, ej, es = dss._get_datetime_range(paths[0].encode())
         self.assertIsInstance(sj, ct.c_long)
         self.assertIsInstance(ss, ct.c_long)
         self.assertIsInstance(ej, ct.c_long)
@@ -75,14 +62,14 @@ class Test_DSS_Handle(unittest.TestCase):
         self.assertEqual(start, datetime(1921, 11, 1))
 
     def test_get_ts_sizes(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            paths, record_types = DSS.catalog()
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
             path_bytes = paths[0].encode()
-            date_range_julian = DSS._get_datetime_range(path_bytes)
+            date_range_julian = dss._get_datetime_range(path_bytes)
             start, end = heclib.dates.get_datetime_range_pyobj(*date_range_julian)
             start_date, start_time = heclib.dates.datetime_encode(start)
             end_date, end_time = heclib.dates.datetime_encode(end)
-            time_len, quality_len = DSS._get_ts_sizes(
+            time_len, quality_len = dss._get_ts_sizes(
                 path_bytes,
                 start_date,
                 start_time,
@@ -93,36 +80,31 @@ class Test_DSS_Handle(unittest.TestCase):
         self.assertIsInstance(quality_len, ct.c_long)
 
     def test_ts_retrieve(self):
-        with DSS_Handle(self.dss_file) as DSS:
-            paths, record_types = DSS.catalog()
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
 
-            values, dates = DSS.ts_retrieve(paths[0], full_set=True)
+            values, q, dates, u, pt = dss.ts_retrieve(paths[0], full_set=True)
 
         self.assertIsInstance(values, np.ndarray)
-        self.assertIsInstance(dates, list)
+        self.assertIsInstance(dates, np.ndarray)
         self.assertEqual(len(values), 1200)
 
     def test_ts_store(self):
-        with DSS_Handle(self.dss_file.with_stem('test_new')) as DSS:
+        with DSS(self.dss_file.with_stem("test_new")) as dss:
             path = "/PANDSS/TEST_STORE/TESTING//1Month/L2023A/"
-            dt = [
-                datetime(2023, 1, 1),
-                datetime(2023, 12, 1)
-            ]
+            dt = [datetime(2023, 1, 1), datetime(2023, 12, 1)]
             vals = list(range(12))
-            DSS.ts_store_regular(
-                path, 
-                dt, 
+            dss.ts_store_regular(
+                path,
+                dt,
                 vals,
                 quality=list(),
-                period_type='PER-INST',
-                units='COUNT',
-                save_as_float=True
+                period_type="PER-INST",
+                units="COUNT",
+                save_as_float=True,
             )
-            cat, _t = DSS.catalog()
+            cat, _t = dss.catalog()
         self.assertNotEqual(len(cat), 0)
-            
-        
 
 
 if __name__ == "__main__":
