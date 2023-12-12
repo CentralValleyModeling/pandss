@@ -12,8 +12,8 @@ def must_be_open(method):
 
 
 def silent(method):
-    def silent_method(obj, *args, **kwargs):
+    def silent_method(*args, **kwargs):
         with suppress_stdout_stderr():
-            return method(obj, *args, **kwargs)
+            return method(*args, **kwargs)
 
     return silent_method

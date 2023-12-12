@@ -22,14 +22,14 @@ class HECDSS_ErrorHandler:
             0: "do_nothing",
             1: "user_error",
             2: "data_error",
-            3: "process_error"
+            3: "process_error",
         }
-    
+
     def __call__(self, code: c_int) -> tuple[str, Callable]:
         code = int(code)
         msg, action = self.severity[code]
         return msg, action
-    
+
     def resolve(self, code: c_int) -> None:
         msg, action = self(code)
         if isinstance(action, Exception):

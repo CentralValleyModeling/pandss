@@ -1,13 +1,6 @@
 import logging
-from ctypes import (CDLL, POINTER, c_char_p, c_double, c_int, c_longlong,
-                    pointer)
-from pathlib import Path
-from typing import Any, Iterator
-
-DLL_AVAIL = {
-    6: None,  # TODO, find applicable DLL
-    7: str(Path(__file__).parent / "hecdss.dll"),
-}
+from ctypes import CDLL, POINTER, c_char_p, c_double, c_int, c_longlong
+from typing import Iterator
 
 DSS_FILE = c_longlong * 250
 
@@ -122,14 +115,17 @@ class DLL_API:
                 c_char_p,
                 c_int,
             ),
-            restype=c_int
+            restype=c_int,
         )
         self.hec_dss_set_string = DLL_Signature(
             argtypes=(
                 c_char_p,
                 c_char_p,
             ),
-            restype=c_int
+            restype=c_int,
+        )
+        self.hec_dss_convertToVersion7 = DLL_Signature(
+            argtypes=(c_char_p, c_char_p), restype=c_int
         )
 
     def __iter__(self) -> Iterator[tuple[str, DLL_Signature]]:
@@ -138,41 +134,15 @@ class DLL_API:
                 continue
             yield function, signature
 
+    def add_signatures_to_dll(self, dll: CDLL) -> CDLL:
+        for function, signature in self:
+            try:
+                func: CDLL._FuncPtr = getattr(dll, function)
+                if signature.argtypes:
+                    func.argtypes = signature.argtypes
+                func.restype = signature.restype
+                logging.debug(f"api added for {function}")
+            except AttributeError:
+                logging.warn(f"DLL has no function `{function}`")
 
-def get_file_version(dll: CDLL, dss_path: str) -> int:
-    if not Path(dss_path).exists():
-        logging.warn("file not found, assuming version 7")
-        return 7
-    dll.hec_dss_getFileVersion.argtypes = (c_char_p,)
-    dll.hec_dss_getFileVersion.restype = c_int
-    version = dll.hec_dss_getFileVersion(dss_path.encode())
-
-    return int(version)
-
-
-def get_dll(dss_path: str | Path) -> CDLL:
-    dll_default = CDLL(DLL_AVAIL[7])
-    version = get_file_version(dll_default, str(dss_path))
-    if version == 0:
-        raise FileNotFoundError(dss_path)
-    logging.debug(f"version determined to be {version}")
-
-    dll_path = DLL_AVAIL.get(version, None)
-    logging.debug(f"using dll={dll_path}")
-    if dll_path is None:
-        raise NotImplementedError(f"DSS File Version {version} not supported")
-    dll = CDLL(dll_path)
-    api = DLL_API(version)
-    logging.debug("DLL loaded, applying known API to functions via ctypes")
-
-    for function, signature in api:
-        try:
-            func: CDLL._FuncPtr = getattr(dll, function)
-            if signature.argtypes:
-                func.argtypes = signature.argtypes
-            func.restype = signature.restype
-            logging.debug(f"api added for {function}")
-        except AttributeError:
-            logging.warn(f"DLL has no function `{function}`")
-
-    return dll
+        return dll

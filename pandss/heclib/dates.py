@@ -2,7 +2,10 @@ import logging
 from ctypes import c_int
 from datetime import datetime, time, timedelta
 
+import numpy as np
+
 JULIAN_ANCHOR = datetime(1899, 12, 31, 0, 0)
+JULIAN_ANCHOR_NP = np.datetime64(JULIAN_ANCHOR)
 
 
 def datetime_encode(dt: datetime) -> tuple[bytes, bytes]:
@@ -43,6 +46,28 @@ def julian_to_date(
     if seconds is not None:
         date = date + timedelta(seconds=seconds.value)
     logging.debug(f"converted {julian}, {seconds} -> {date}")
+
+    return date
+
+
+def julian_array_to_date(
+    julian: np.ndarray,
+    seconds: np.ndarray = None,
+    resolution: int = 86400,
+) -> np.ndarray:
+    step_func_key = {
+        # resolution is given as how many seconds in 1 Unit
+        86400: lambda x: x.astype("timedelta64[D]"),
+        3600: lambda x: x.astype("timedelta64[h]"),
+        60: lambda x: x.astype("timedelta64[m]"),
+    }
+    step = step_func_key[resolution]
+    date = JULIAN_ANCHOR_NP + step(julian)
+    if seconds is not None:
+        date = date + np.timedelta64(seconds, "s")
+    else:
+        seconds = [None]
+    logging.debug(f"converted array, item 0 {julian[0]}, {seconds[0]} -> {date[0]}")
 
     return date
 

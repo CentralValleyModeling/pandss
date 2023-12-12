@@ -6,13 +6,14 @@ from pathlib import Path
 import numpy as np
 
 from .. import suppress_stdout_stderr
-from .api import get_dll
-from .dates import datetime_encode, get_datetime_range_pyobj, julian_to_date
+from .dates import (datetime_encode, get_datetime_range_pyobj,
+                    julian_array_to_date)
 from .decorators import must_be_open, silent
+from .dll import get_compatible_dll
 from .errors import HECDSS_ErrorHandler
 
 
-class DSS_Handle:
+class DSS:
     """Wrapper class exposing DLL functions in the USACE heclib.dll to python."""
 
     __slots__ = ["open", "file_path", "file_table", "dll", "handler"]
@@ -22,7 +23,7 @@ class DSS_Handle:
         self.file_path = dss
         self.file_table = ct.pointer((ct.c_longlong * 250)())
         with suppress_stdout_stderr():
-            self.dll = get_dll(self.file_path)
+            self.dll = get_compatible_dll(self.file_path)
         self.handler = HECDSS_ErrorHandler()
 
     @silent
@@ -48,9 +49,9 @@ class DSS_Handle:
         """
         logging.info(f"opening dss file {self.file_path}")
         fp = str(self.file_path).encode()
-        success = self.dll.hec_dss_open(fp, ct.byref(self.file_table))
-        if success != 0:
-            self.handler.resolve(success)
+        result = self.dll.hec_dss_open(fp, ct.byref(self.file_table))
+        if result != 0:
+            self.handler.resolve(result)
         self.open = True
 
         return self
@@ -62,9 +63,9 @@ class DSS_Handle:
         in pythons context manager pattern.
         """
         logging.info(f"closing dss file {self.file_path}")
-        success = self.dll.hec_dss_close(self.file_table)
-        if success != 0:
-            self.handler.resolve(success)
+        result = self.dll.hec_dss_close(self.file_table)
+        if result != 0:
+            self.handler.resolve(result)
         self.open = False
 
     @silent
@@ -147,7 +148,7 @@ class DSS_Handle:
         buffer_size = ct.c_int(10)
         units = ct.create_string_buffer(buffer_size.value)
         period_type = ct.create_string_buffer(buffer_size.value)
-        success = self.dll.hec_dss_tsRetrieveInfo(
+        result = self.dll.hec_dss_tsRetrieveInfo(
             self.file_table,
             path_bytes,
             units,
@@ -155,8 +156,8 @@ class DSS_Handle:
             period_type,
             buffer_size,
         )
-        if success != 0:
-            self.handler.resolve(success)
+        if result != 0:
+            self.handler.resolve(result)
 
         return units.value.decode(), period_type.value.decode()
 
@@ -197,7 +198,7 @@ class DSS_Handle:
             full_set = ct.c_int(1)
         else:
             full_set = ct.c_int(0)
-        success = self.dll.hec_dss_tsGetDateTimeRange(
+        result = self.dll.hec_dss_tsGetDateTimeRange(
             self.file_table,
             path,
             full_set,
@@ -206,8 +207,8 @@ class DSS_Handle:
             ct.byref(end_julian),
             ct.byref(end_seconds),
         )
-        if success != 0:
-            self.handler.resolve(success)
+        if result != 0:
+            self.handler.resolve(result)
         logging.debug(
             "{}: start JD-{} T-{}, end JD-{} T-{}".format(
                 path,
@@ -261,7 +262,7 @@ class DSS_Handle:
         time_len = ct.c_int()
         quality_len = ct.c_int()
         # Call
-        success = self.dll.hec_dss_tsGetSizes(
+        result = self.dll.hec_dss_tsGetSizes(
             self.file_table,
             path,
             start_date,
@@ -271,8 +272,8 @@ class DSS_Handle:
             ct.byref(time_len),
             ct.byref(quality_len),
         )
-        if success != 0:
-            self.handler.resolve(success)
+        if result != 0:
+            self.handler.resolve(result)
         logging.debug(f"number of times: {time_len.value}")
         logging.debug(f"number of quality: {quality_len.value}")
 
@@ -284,7 +285,7 @@ class DSS_Handle:
         self,
         path: str,
         full_set: bool = True,
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, ct.c_char_p, ct.c_char_p]:
         """Wraps `hec_dss_tsRetrieve` and associated functions to read timeseries data
         from a DSS file.
 
@@ -311,7 +312,7 @@ class DSS_Handle:
         start, end = get_datetime_range_pyobj(*date_range_julian)
         start_date, start_time = datetime_encode(start)
         end_date, end_time = datetime_encode(end)
-        time_len, quality_len = self._get_ts_sizes(
+        time_len, quality_width = self._get_ts_sizes(
             path_bytes,
             start_date,
             start_time,
@@ -319,7 +320,7 @@ class DSS_Handle:
             end_time,
         )
         logging.info(
-            f"size to read: {time_len.value} (quality table width = {quality_len.value})"
+            f"size to read: {time_len.value} (quality table width = {quality_width.value})"
         )
         buffer_size = 20  # magic number from hec-dss-python library by USACE
         logging.info(f"retrieving data for {path}")
@@ -327,7 +328,7 @@ class DSS_Handle:
         period_type = ct.create_string_buffer(buffer_size)
         # Places to store data
         array_size = int(time_len.value)
-        quality_size = array_size * quality_len.value
+        quality_size = array_size * quality_width.value
         times = (ct.c_int * array_size)()
         values = (ct.c_double * array_size)()
         quality = (ct.c_int * quality_size)()
@@ -339,7 +340,7 @@ class DSS_Handle:
         time_resolution = ct.c_int(0)
 
         logging.debug("retrieving data")
-        success = self.dll.hec_dss_tsRetrieve(
+        result = self.dll.hec_dss_tsRetrieve(
             self.file_table,
             path_bytes,
             start_date,
@@ -351,7 +352,7 @@ class DSS_Handle:
             time_len,
             ct.byref(values_read),
             quality,
-            quality_len,
+            quality_width,
             ct.byref(base_date),
             ct.byref(time_resolution),
             units,
@@ -359,16 +360,26 @@ class DSS_Handle:
             period_type,
             buffer_size,
         )
-        if success != 0:
-            self.handler.resolve(success)
+        if result != 0:
+            self.handler.resolve(result)
+        values = np.array(
+            values[: values_read.value],
+            dtype=np.int32,
+        )
+        quality = np.array(
+            quality[: values_read.value * quality_width.value],
+            dtype=np.float64,
+        )
+        quality = np.reshape(
+            quality,
+            newshape=(quality_width.value, values_read.value),
+        )
+        times = julian_array_to_date(
+            julian=np.array(times[: values_read.value]),
+            resolution=time_resolution.value,
+        )
 
-        values = np.int32(values[: values_read.value])
-        times = times[: values_read.value]
-        times = [
-            julian_to_date(ct.c_int(t), resolution=time_resolution.value) for t in times
-        ]
-
-        return values, times
+        return values, quality, times, units, period_type
 
     @silent
     @must_be_open
@@ -421,7 +432,7 @@ class DSS_Handle:
 
         save_as_float = ct.c_bool(save_as_float)
 
-        success = self.dll.hec_dss_tsStoreRegular(
+        result = self.dll.hec_dss_tsStoreRegular(
             self.file_table,
             path_bytes,
             start_date,
@@ -437,5 +448,5 @@ class DSS_Handle:
             period_type.encode("UTF-8"),
         )
 
-        if success != 0:
-            self.handler.resolve(success)
+        if result != 0:
+            self.handler.resolve(result)
