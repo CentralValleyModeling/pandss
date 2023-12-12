@@ -33,11 +33,11 @@ class suppress_stdout_stderr(object):
             os.close(fd)
 
 
-from . import catalog, reshape, timeseries
+from . import catalog, heclib, timeseries
 from .catalog import common_catalog, iter_common_catalog, read_catalog
 from .catalog_object import Catalog
-from .heclib import DSS_Handle
+from .heclib import DSS
 from .reshape import split_path
 from .timeseries import read_dss, write_dss
 
-__all__ = ["timeseries", "reshape"]
+__all__ = ["timeseries", "catalog"]
