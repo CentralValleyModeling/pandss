@@ -12,13 +12,15 @@ DLL_AVAIL = {
 
 
 @silent
-def get_file_version(dll: CDLL, dss_path: str) -> int:
+def get_file_version(dss_path: str | Path, dll: CDLL = None) -> int:
+    if dll is None:
+        dll = CDLL(DLL_AVAIL[7])
     if not Path(dss_path).exists():
         logging.warning("file not found, assuming version 7")
         return 7
     dll.hec_dss_getFileVersion.argtypes = (c_char_p,)
     dll.hec_dss_getFileVersion.restype = c_int
-    version = dll.hec_dss_getFileVersion(dss_path.encode())
+    version = dll.hec_dss_getFileVersion(str(dss_path).encode())
 
     return int(version)
 
@@ -65,8 +67,7 @@ def get_dll_by_version(version: int) -> CDLL:
 
 
 def get_compatible_dll(dss_path: str | Path) -> CDLL:
-    dll_default = CDLL(DLL_AVAIL[7])
-    version = get_file_version(dll_default, str(dss_path))
+    version = get_file_version(str(dss_path))
     if version == 0:
         raise FileNotFoundError(dss_path)
     logging.debug(f"version determined to be {version}")
