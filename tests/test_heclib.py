@@ -12,15 +12,7 @@ from pandss import DSS, heclib
 class Test_DSS(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        cls.dss_file_6 = Path(
-            r"C:\Users\zroy\Documents\_Modeling\_2023DCR\_studies\_cartridges\0525-Nile\Adjusted\SV\DCR2023_SV_Nile_Adj_v14.dss"
-        )  # Path(__file__).parent / "test.dss"
-        cls.dss_file = cls.dss_file_6.with_suffix(".7.dss")
-
-    def test_convert_version(self):
-        if self.dss_file.exists():
-            remove(self.dss_file)
-        heclib.dll.convert_to_version_7(self.dss_file_6, self.dss_file)
+        cls.dss_file = Path(__file__).parent / "test.dss"
 
     def test_open_close(self):
         try:
@@ -88,6 +80,35 @@ class Test_DSS(unittest.TestCase):
         self.assertIsInstance(values, np.ndarray)
         self.assertIsInstance(dates, np.ndarray)
         self.assertEqual(len(values), 1200)
+
+    def test_ts_retrieve_no_date_in_path(self):
+        with DSS(self.dss_file) as dss:
+            paths, record_types = dss.catalog()
+            a, b, c, d, e, f = paths[0].strip("/").split('/')
+            p = f"/{a}/{b}/{c}//{e}/{f}/"
+            values, q, dates, u, pt = dss.ts_retrieve(p, full_set=True)
+
+        self.assertIsInstance(values, np.ndarray)
+        self.assertIsInstance(dates, np.ndarray)
+        self.assertEqual(len(dates), 1200)
+    
+    def test_ts_retrieve_zero_items(self):
+        with self.assertRaises(heclib.NoDataError):
+            with DSS(self.dss_file) as dss:
+                paths, record_types = dss.catalog()
+                a, b, c, d, e, f = paths[0].strip("/").split('/')
+                p = f"/{a}/{b}/{c}//{e}/{f}/"
+                # No date specified, and full_set=False
+                values, q, dates, u, pt = dss.ts_retrieve(p, full_set=False)
+
+    def test_ts_retrieve_bad_path(self):
+        with self.assertRaises(heclib.NoDataError):
+            with DSS(self.dss_file) as dss:
+                paths, record_types = dss.catalog()
+                a, b, c, d, e, f = paths[0].strip("/").split('/')
+                # garbled path
+                p = f"/{b}/{a}/{f}/{d}/{e}/{c}/"
+                values, q, dates, u, pt = dss.ts_retrieve(p, full_set=True)
 
     def test_ts_store(self):
         with self.assertRaises(NotImplementedError):

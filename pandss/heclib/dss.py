@@ -10,7 +10,7 @@ from .dates import (datetime_encode, get_datetime_range_pyobj,
                     julian_array_to_date)
 from .decorators import must_be_open, silent
 from .dll import get_compatible_dll
-from .errors import HECDSS_ErrorHandler
+from .errors import HECDSS_ErrorHandler, NoDataError
 
 
 class DSS:
@@ -362,6 +362,8 @@ class DSS:
         )
         if result != 0:
             self.handler.resolve(result)
+        if values_read.value == 0:
+            raise NoDataError(f"No data read for path: {path}")
         values = np.array(
             values[: values_read.value],
             dtype=np.int32,
