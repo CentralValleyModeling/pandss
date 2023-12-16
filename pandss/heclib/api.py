@@ -143,6 +143,6 @@ class DLL_API:
                 func.restype = signature.restype
                 logging.debug(f"api added for {function}")
             except AttributeError:
-                logging.warn(f"DLL has no function `{function}`")
+                logging.warning(f"DLL has no function `{function}`")
 
         return dll
