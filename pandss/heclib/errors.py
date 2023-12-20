@@ -27,7 +27,7 @@ class HECDSS_ErrorHandler:
 
     def __call__(self, code: c_int) -> tuple[str, Callable]:
         code = int(code)
-        msg, action = self.severity[code]
+        msg, action = self.severity.get(code, self.severity[-1])
         return msg, action
 
     def resolve(self, code: c_int) -> None:
