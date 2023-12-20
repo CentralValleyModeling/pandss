@@ -298,8 +298,8 @@ class DSS:
 
         Returns
         -------
-        tuple[np.ndarray, np.ndarray]
-            The values and and times read for the timeseries
+        tuple[np.ndarray, np.ndarray, np.ndarray, c_char_p, c_char_p]
+            The values, times, quality, units, and period_type read
 
         Raises
         ------
@@ -366,7 +366,7 @@ class DSS:
             raise NoDataError(f"No data read for path: {path}")
         values = np.array(
             values[: values_read.value],
-            dtype=np.int32,
+            dtype=np.float64,
         )
         quality = np.array(
             quality[: values_read.value * quality_width.value],
