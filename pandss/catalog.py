@@ -5,10 +5,10 @@ from warnings import warn
 
 from pandas import DataFrame
 
-from . import silent_std_out
+from . import suppress_stdout_stderr
 from .paths import PathLike
 
-with silent_std_out():
+with suppress_stdout_stderr():
     import pyhecdss
 
 COMPARE_ON = ["A", "B", "C", "E", "D"]

@@ -4,10 +4,10 @@ from typing import Iterable, Union
 
 import pandas as pd
 
-from . import silent_std_out
+from . import suppress_stdout_stderr
 from .paths import PathLike
 
-with silent_std_out():
+with suppress_stdout_stderr():
     import pyhecdss
 
 

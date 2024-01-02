@@ -1,51 +1,43 @@
 import os
-import sys
-from contextlib import contextmanager
 
 
-@contextmanager
-def null_io():
-    """Create a TextIOWrapper object pointing to os.devnull"""
-    try:
-        with open(os.devnull, "w") as null:
-            yield null
-    finally:
-        pass
-
-
-@contextmanager
-def silent_std_out():
-    """Small context manager to ignore stdout, even from FORTRAN subroutines.
-
-    Does not re-map stderr or stdin. Re-maps the system level stdout found
-    using `sys.__stdout__`. The following will produce no outputs to appear on
-    the screen:
-
-    >>> with silent_std_out():
-    ...    print("Hello World")
-    ...    call_noisy_subroutine()
-    ...
+# Define a context manager to suppress stdout and stderr.
+class suppress_stdout_stderr(object):
     """
-    # Clear pending, we want to see these
-    sys.__stdout__.flush()
-    STD_OUT_FD = 1
-    PLACEHOLDER_FD = 11
-    with null_io() as null:
-        try:
-            os.dup2(sys.__stdout__.fileno(), PLACEHOLDER_FD)
-            os.dup2(null.fileno(), STD_OUT_FD)
-            yield None
-        finally:
-            # Clear pending, we do not want to see these
-            null.flush()
-            os.dup2(PLACEHOLDER_FD, STD_OUT_FD)
-            os.close(PLACEHOLDER_FD)
+    A context manager for doing a "deep suppression" of stdout and stderr in
+    Python, i.e. will suppress all print, even if the print originates in a
+    compiled C/Fortran sub-function.
+       This will not suppress raised exceptions, since exceptions are printed
+    to stderr just before a script exits, and after the context manager has
+    exited (at least, I think that is why it lets exceptions through).
+
+    """
+
+    def __init__(self):
+        # Open a pair of null files
+        self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
+        # Save the actual stdout (1) and stderr (2) file descriptors.
+        self.save_fds = [os.dup(1), os.dup(2)]
+
+    def __enter__(self):
+        # Assign the null pointers to stdout and stderr.
+        os.dup2(self.null_fds[0], 1)
+        os.dup2(self.null_fds[1], 2)
+
+    def __exit__(self, *_):
+        # Re-assign the real stdout/stderr back to (1) and (2)
+        os.dup2(self.save_fds[0], 1)
+        os.dup2(self.save_fds[1], 2)
+        # Close all file descriptors
+        for fd in self.null_fds + self.save_fds:
+            os.close(fd)
 
 
-from . import catalog, reshape, timeseries
+from . import catalog, heclib, timeseries
 from .catalog import common_catalog, iter_common_catalog, read_catalog
 from .catalog_object import Catalog
+from .heclib import DSS
 from .reshape import split_path
 from .timeseries import read_dss, write_dss
 
-__all__ = ["timeseries", "reshape"]
+__all__ = ["timeseries", "catalog"]

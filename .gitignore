@@ -5,6 +5,7 @@
 # Do not track large binary assets
 *\assets
 *.dll
+!hecdss.dll
 *.lib
 *.zip
 *.dss
