@@ -31,7 +31,7 @@ class DSS:
         """Wraps DLL function `hec_dss_open` and enables the use of this class
         in pythons context manager pattern.
 
-        with DSS_Handle(path_to_dss_file) as DSS:
+        with DSS(path_to_dss_file) as DSS_File:
             # read/write data in DSS file
             ...
         # hec_dss_close automatically called.
