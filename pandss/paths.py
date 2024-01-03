@@ -1,18 +1,22 @@
-import logging
-import shutil
-import tempfile
-from pathlib import Path
-from typing import TypeVar, Union
-
-PathLike = TypeVar("PathLike", bound=Union[Path, str])
+from dataclasses import dataclass
+from typing import Self
 
 
-def is_path_like(p) -> bool:
-    return isinstance(p, (Path, str))
+@dataclass(kw_only=True, frozen=True, slots=True, eq=True)
+class DatasetPath:
+    a: str
+    b: str
+    c: str
+    d: str
+    e: str
+    f: str
 
+    @staticmethod
+    def from_str(path: str) -> Self:
+        a, b, c, d, e, f = path.strip("/").split("/")
+        return DatasetPath(a=a, b=b, c=c, d=d, e=e, f=f)
 
-def create_temp(p: PathLike, new_loc: Path) -> Path:
-    temp_f = tempfile.mktemp(dir=new_loc, suffix=p.suffix)
-    shutil.copy(p, temp_f)
-
-    return temp_f
+    def __str__(self):
+        parts = ("a", "b", "c", "d", "e", "f")
+        kwargs = {attr: getattr(self, attr) for attr in parts}
+        return "/{a}/{b}/{c}/{d}/{e}/{f}/".format(**kwargs)
