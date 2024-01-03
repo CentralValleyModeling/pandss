@@ -51,7 +51,9 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertEqual(rts.path, p)
             self.assertIsInstance(rts.values, np.ndarray)
             self.assertIsInstance(rts.dates, list)
-            self.assertIn(rts.period_type, pdss.keywords.PeriodTypes)
+            self.assertIn(
+                rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
+            )
 
 
 if __name__ == "__main__":
