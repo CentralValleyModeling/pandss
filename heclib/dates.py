@@ -65,7 +65,7 @@ def julian_array_to_date(
     date = JULIAN_ANCHOR_NP + step(julian)
     if seconds is not None:
         date = date + np.timedelta64(seconds, "s")
-    
+
     logging.debug(f"converted array of julian ints to dates, {len(date)} items")
 
     return date
