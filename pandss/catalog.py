@@ -1,28 +1,28 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Self
 
-from .paths import DatasetPath
+from .paths import DatasetPath, DatasetPathCollection
 
 
-@dataclass(kw_only=True, slots=True)
-class Catalog:
-    paths: list[DatasetPath] = field(default_factory=list)
+@dataclass(
+    kw_only=True,
+    frozen=True,
+    slots=True,
+    eq=True,
+)
+class Catalog(DatasetPathCollection):
+    src: Path
 
-    def __post_init__(self):
-        bad_type = [obj for obj in self.paths if not isinstance(obj, DatasetPath)]
-        if bad_type:
-            n = len(bad_type)
-            bad_types = set([type(obj) for obj in bad_type])
-            raise ValueError(
-                f"paths must be given as `{DatasetPath.__name__}` objects, {n} bad items given, seen types: {bad_types}"
-            )
+    @classmethod
+    def from_strs(cls, paths: list[str], src: Path) -> Self:
+        paths = set(DatasetPath.from_str(p) for p in paths)
+        if any(p.has_wildcard for p in paths):
+            raise ValueError(f"{cls.__name__} cannot be created with wildcard paths")
+        return cls(
+            paths=paths,
+            src=src,
+        )
 
-    def __len__(self):
-        return len(self.paths)
-
-    def append(self):
-        raise NotImplementedError()
-
-    @staticmethod
-    def from_strs(paths: list[str]) -> Self:
-        return Catalog(paths=[DatasetPath.from_str(p) for p in paths])
+    def findall(self, path: DatasetPath) -> DatasetPathCollection:
+        return super(Catalog, self).findall(path)
