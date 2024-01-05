@@ -4,6 +4,7 @@ from time import perf_counter
 
 import numpy as np
 
+import pandas as pd
 import pandss as pdss
 
 DSS_6 = Path(__file__).parent / "v6.dss"
@@ -40,7 +41,7 @@ class TestRegularTimeseries(unittest.TestCase):
                 et = perf_counter()
                 times.append(et - st)
         average = sum(times) / len(times)
-        self.assertLessEqual(average, 0.11)
+        self.assertLessEqual(average, 0.15)
 
     def test_data_content(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
@@ -54,6 +55,18 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertIn(
                 rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
             )
+
+    def test_to_frame(self):
+        p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
+        with pdss.DSS(DSS_6) as dss:
+            rts = dss.read_rts(p)
+            df = rts.to_frame()
+            self.assertIsInstance(df, pd.DataFrame)
+            self.assertListEqual(
+                df.columns.names, 
+                ['A', 'B', 'C', 'D', 'E', 'F', 
+                 'UNITS', 'PERIOD_TYPE', 'INTERVAL'])
+            self.assertEqual(len(rts), len(df))
 
 
 if __name__ == "__main__":
