@@ -1,6 +1,6 @@
 from dataclasses import dataclass, fields
-from typing import Any, Self
 from datetime import datetime, time, timedelta
+from typing import Any, Self
 
 import numpy as np
 from pandas import DataFrame, MultiIndex
@@ -46,18 +46,18 @@ class RegularTimeseries:
         dates = kwargs["dates"]
         interval = kwargs["interval"]
         # Only fix for intervals greater gte 1 day
-        if interval >= (60 * 60 * 24): 
+        if interval >= (60 * 60 * 24):
             fixed_dates = list()
             for date in dates:
                 # Midnight in HEC-DSS belongs to the day prior, which differs
                 # from the datetime module. Offset by 1 second to compensate.
-                if (date.time() == time(0, 0)):  
+                if date.time() == time(0, 0):
                     date = date - timedelta(seconds=1)
                 fixed_dates.append(date)
             kwargs["dates"] = fixed_dates
-        
+
         return RegularTimeseries(**kwargs)
-    
+
     def to_frame(self) -> DataFrame:
         header = dict(self.path.items())
         header["UNITS"] = self.units
@@ -65,13 +65,8 @@ class RegularTimeseries:
         header["INTERVAL"] = self.interval
         header = {k.upper(): (v,) for k, v in header.items()}
         columns = MultiIndex.from_arrays(
-            tuple(header.values()),
-            names=tuple(header.keys())
+            tuple(header.values()), names=tuple(header.keys())
         )
-        df = DataFrame(
-            index=self.dates, 
-            data=self.values,
-            columns=columns
-        )
-        
+        df = DataFrame(index=self.dates, data=self.values, columns=columns)
+
         return df
