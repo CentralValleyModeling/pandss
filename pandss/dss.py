@@ -8,6 +8,15 @@ from .paths import DatasetPath
 from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
 
+def must_be_open(method):
+    def works_on_open_file(obj, *args, **kwargs):
+        if obj.open is False:
+            raise IOError(f"file must be open to call {method}")
+        else:
+            return method(obj, *args, **kwargs)
+
+    return works_on_open_file
+
 
 class DSS:
     """Wrapper class exposing functionality in pydsstools"""
@@ -59,11 +68,8 @@ class DSS:
         self._open = False
         self._wrapped = None
 
+    @must_be_open
     def read_catalog(self) -> Catalog:
-        if not self.open:
-            raise ValueError(
-                "Called `read_catalog()` without file open, try using in a `with` statement."
-            )
         logging.info(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             paths: list[str] = self._wrapped.getPathnameList("", sort=1)
@@ -72,6 +78,7 @@ class DSS:
 
         return catalog
 
+    @must_be_open
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         if not self.open:
             raise ValueError(
