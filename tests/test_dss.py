@@ -16,7 +16,7 @@ class TestDSS(unittest.TestCase):
                 self.assertIsInstance(rts, pdss.RegularTimeseries)
                 matched_timeseries += 1
             self.assertEqual(matched_timeseries, 2)
-        
+
         p = pdss.DatasetPath.from_str("/CALSIM/MO.*DAYS/.*/.*/.*/.*/")
         for src in (DSS_6, DSS_7):
             matched_timeseries = 0
