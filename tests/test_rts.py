@@ -3,8 +3,8 @@ from pathlib import Path
 from time import perf_counter
 
 import numpy as np
-
 import pandas as pd
+
 import pandss as pdss
 
 DSS_6 = Path(__file__).parent / "v6.dss"
@@ -15,7 +15,7 @@ class TestRegularTimeseries(unittest.TestCase):
     def test_read_type(self):
         for src in (DSS_6, DSS_7):
             catalog = pdss.read_catalog(src)
-            p = catalog.paths[0]
+            p = catalog.paths.pop()
             rts = pdss.read_rts(src, p)
             self.assertIsInstance(rts, pdss.RegularTimeseries)
 
@@ -63,9 +63,9 @@ class TestRegularTimeseries(unittest.TestCase):
             df = rts.to_frame()
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
-                df.columns.names, 
-                ['A', 'B', 'C', 'D', 'E', 'F', 
-                 'UNITS', 'PERIOD_TYPE', 'INTERVAL'])
+                df.columns.names,
+                ["A", "B", "C", "D", "E", "F", "UNITS", "PERIOD_TYPE", "INTERVAL"],
+            )
             self.assertEqual(len(rts), len(df))
 
 
