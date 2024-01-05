@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 from typing import Any, Self
+from datetime import datetime, time, timedelta
+
+import numpy as np
+from pandas import DataFrame
 
 from .paths import DatasetPath
 
@@ -12,8 +16,8 @@ from .paths import DatasetPath
 )
 class RegularTimeseries:
     path: DatasetPath
-    values: list[float]
-    dates: list[str]
+    values: np.ndarray
+    dates: list[datetime]
     period_type: str
     units: str
     interval: str
@@ -34,7 +38,33 @@ class RegularTimeseries:
             "interval": "interval",
         }
         kwargs = {L: getattr(obj, R) for L, R in attr_map.items()}
+        # Add the path object to the keyword argument dict
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         kwargs["path"] = path
+        # Adjust the way pydsstools interprets dates in HEC-DSS files.
+        dates = kwargs["dates"]
+        interval = kwargs["interval"]
+        # Only fix for intervals greater gte 1 day
+        if interval >= (60 * 60 * 24): 
+            fixed_dates = list()
+            for date in dates:
+                # Midnight in HEC-DSS belongs to the day prior, which differs
+                # from the datetime module. Offset by 1 minute to compensate.
+                if (date.time() == time(0, 0)):  
+                    date = date - timedelta(minutes=1)
+                fixed_dates.append(date)
+            kwargs["dates"] = fixed_dates
+        
         return RegularTimeseries(**kwargs)
+    
+    def to_frame(self) -> DataFrame:
+        df = DataFrame(
+            index=self.dates, 
+            data=self.values,
+            columns=[
+                tuple(self.path)
+            ]
+        )
+        
+        return df
