@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Self
 
 
@@ -17,6 +17,13 @@ class DatasetPath:
         return DatasetPath(a=a, b=b, c=c, d=d, e=e, f=f)
 
     def __str__(self):
-        parts = ("a", "b", "c", "d", "e", "f")
-        kwargs = {attr: getattr(self, attr) for attr in parts}
+        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
         return "/{a}/{b}/{c}/{d}/{e}/{f}/".format(**kwargs)
+
+    def items(self):
+        for f in fields(self):
+            yield f.name, getattr(self, f.name)
+    
+    def __iter__(self):
+        for f in fields(self):
+            yield getattr(self, f.name)
