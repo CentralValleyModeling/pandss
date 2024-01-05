@@ -68,6 +68,18 @@ class TestRegularTimeseries(unittest.TestCase):
             )
             self.assertEqual(len(rts), len(df))
 
+    def test_multiple_to_frame(self):
+        p = pdss.DatasetPath.from_str("/CALSIM/.*/.*/.*/.*/.*/")
+        with pdss.DSS(DSS_6) as dss:
+            p = dss.resolve_wildcard(p)
+            frames = [obj.to_frame() for obj in dss.read_multiple_rts(p)]
+            df = pd.concat(frames)
+            self.assertIsInstance(df, pd.DataFrame)
+            self.assertListEqual(
+                df.columns.names,
+                ["A", "B", "C", "D", "E", "F", "UNITS", "PERIOD_TYPE", "INTERVAL"],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
