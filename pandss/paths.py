@@ -30,8 +30,8 @@ class DatasetPath:
     e: str
     f: str
 
-    @staticmethod
-    def from_str(path: str) -> Self:
+    @classmethod
+    def from_str(cls, path: str) -> Self:
         if path.startswith("/"):
             path = path[1:]
         if path.endswith("/"):
@@ -42,7 +42,7 @@ class DatasetPath:
                 "wildcards must follow python regex patterns, empty parts (eg //) will not match anything, use '/.*/' instead",
                 Warning,
             )
-        return DatasetPath(a=a, b=b, c=c, d=d, e=e, f=f)
+        return cls(a=a, b=b, c=c, d=d, e=e, f=f)
 
     def __str__(self):
         kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
