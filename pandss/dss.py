@@ -3,10 +3,11 @@ from pathlib import Path
 from typing import Iterator
 
 from .catalog import Catalog
+from .engines import EngineABC, get_engine
+from .errors import WildcardError
 from .paths import DatasetPath, DatasetPathCollection
 from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
-from .engines import get_engine, EngineABC
 
 
 def must_be_open(method):
@@ -19,6 +20,7 @@ def must_be_open(method):
     return works_on_open_file
 
 
+# TODO: Move the must_be_open decorator to the engine subclass
 class DSS:
     """Class representing an open DSS file. Binds to various other python based
     HEC-DSS file readers through an "engine". The Engine classes wrap the other
@@ -34,7 +36,7 @@ class DSS:
         elif not isinstance(engine, EngineABC):
             raise ValueError(f"engine type not recognized: {type(engine)=}")
         logging.info(f"using engine {engine}")
-        self.engine = engine(self.src)
+        self.engine: EngineABC = engine(self.src)
 
     @silent
     def __enter__(self):
@@ -72,10 +74,12 @@ class DSS:
         self.engine.close()
 
     @must_be_open
-    def read_catalog(self) -> Catalog:
+    def read_catalog(self, drop_date: bool = True) -> Catalog:
         logging.info(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             catalog = self.engine.read_catalog()
+        if drop_date:
+            catalog = catalog.collapse_dates()
         logging.info(f"catalog read, size is {len(catalog)}")
         return catalog
 
@@ -83,7 +87,9 @@ class DSS:
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         logging.info(f"reading regular time series, {path}")
         if path.has_wildcard:
-            raise ValueError("path has wildcard, use `read_multiple_rts` method")
+            raise WildcardError(
+                f"path has wildcard, use `read_multiple_rts` method, {path=}"
+            )
         with suppress_stdout_stderr():
             return self.engine.read_rts(path)
 
@@ -93,9 +99,7 @@ class DSS:
         paths: DatasetPath | DatasetPathCollection,
         drop_date: bool = True,
     ) -> Iterator[RegularTimeseries]:
-        if hasattr(self.engine, "read_multiple_rts") and callable(
-            self.engine.read_multiple_rts
-        ):
+        if hasattr(self.engine, "read_multiple_rts"):
             yield from self.engine.read_multiple_rts(paths, drop_date)
         else:  # If the engine doesn't optimize this, we can just iterate one at a time
             # If passed a single path, check for wildcard that might expand it
@@ -115,19 +119,24 @@ class DSS:
             # When expanding wildcards, paths might be specific to a single chunk,
             # use the special method here to re-combine the paths (combine D-parts)
             if drop_date is True:
-                paths = paths.drop_date()
+                paths = paths.collapse_dates()
             # Read each individually
             for p in paths:
                 yield self.read_rts(p)
 
     @must_be_open
-    def resolve_wildcard(self, path: DatasetPath) -> DatasetPathCollection:
+    def resolve_wildcard(
+        self, path: DatasetPath, drop_date: bool = False
+    ) -> DatasetPathCollection:
         logging.info("resolving wildcards")
         if not path.has_wildcard:
             return DatasetPathCollection(paths={path})
         if self.engine.catalog is None:
             self.engine.read_catalog()
-        return self.engine.catalog.findall(path)
+        collection = self.engine.catalog.findall(path)
+        if drop_date:
+            collection = collection.collapse_dates()
+        return collection
 
     @property
     def is_open(self):

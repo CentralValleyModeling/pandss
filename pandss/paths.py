@@ -32,24 +32,19 @@ class DatasetPath:
 
     @classmethod
     def from_str(cls, path: str) -> Self:
-        if path.startswith("/"):
-            path = path[1:]
-        if path.endswith("/"):
-            path = path[:-1]
-        a, b, c, d, e, f = path.split("/")
-        if "" in (a, b, c, e, f):
-            warn(
-                "wildcards must follow python regex patterns, empty parts (eg //) will not match anything, use '/.*/' instead",
-                Warning,
-            )
-        return cls(a=a, b=b, c=c, d=d, e=e, f=f)
+        _, *args, _ = path.split("/")
+        for bad_wild in ("", "*"):
+            args = tuple(val if val != bad_wild else ".*" for val in args)
+
+        return cls(*args)
+
+    def drop_date(self) -> Self:
+        kwargs = {k: v for k, v in self.items() if k != "d"}
+        kwargs["d"] = ".*"
+        return self.__class__(**kwargs)
 
     def __str__(self):
-        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
-        kwargs = {k: (v if v != "" else "*") for k, v in kwargs.items()}
-        s = "/{a}/{b}/{c}/{d}/{e}/{f}/".format(**kwargs)
-
-        return s
+        return f"/{self.a}/{self.b}/{self.c}/{self.d}/{self.e}/{self.f}/"
 
     def __dict__(self) -> dict[str, str]:
         return dict(self.items())
@@ -64,12 +59,14 @@ class DatasetPath:
 
     @property
     def has_wildcard(self) -> bool:
-        return bool(WILDCARD_PATTERN.findall(str(self)))
+        """Bool, does not check D-Part"""
+        s = f"/{self.a}/{self.b}/{self.c}//{self.e}/{self.f}/"
+        return bool(WILDCARD_PATTERN.findall(s))
 
-    def drop_date(self) -> Self:
-        kwargs = {k: v for k, v in self.items() if k != "d"}
-        kwargs["d"] = ""
-        return DatasetPath(**kwargs)
+    @property
+    def has_any_wildcard(self) -> dict[str, bool]:
+        """Bool, includes D-part"""
+        return bool(WILDCARD_PATTERN.findall(str(self)))
 
 
 @dataclass(
@@ -135,6 +132,11 @@ class DatasetPathCollection:
 
     def findall(self, path: DatasetPath) -> Self:
         logging.info(f"finding paths that match {path}")
+        if any(p.has_any_wildcard for p in self.paths):
+            warn(
+                f"paths in {self.__class__.__name__} have wildcards, these may not match pattern provided!",
+                Warning,
+            )
         regex = compile(str(path))
         logging.debug(f"{regex=}")
         buffer = "\n".join(str(p) for p in self.paths)
@@ -145,6 +147,11 @@ class DatasetPathCollection:
             paths=set(DatasetPath(*p.split("/")) for p in matched)
         )
 
-    def drop_date(self) -> Self:
-        new_paths = {p.drop_date() for p in self.paths}
-        return DatasetPathCollection(paths=new_paths)
+    def collapse_dates(self) -> Self:
+        logging.info("collapsing dates")
+        # get the kwargs needed to re-build the class
+        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        # set construction removes duplicates automatically, so drop the dates
+        # in each of the paths in the current object
+        kwargs["paths"] = {p.drop_date() for p in self.paths}
+        return self.__class__(**kwargs)  # Maintain subclasses by calling __class__
