@@ -60,6 +60,19 @@ class RegularTimeseries:
 
         return RegularTimeseries(**kwargs)
 
+    def from_pyhecdss(obj: Any, path: str | DatasetPath) -> Self:
+        attr_map = {
+            "period_type": "type",
+            "units": "units",
+        }
+        kwargs = {L: getattr(obj, R) for L, R in attr_map.items()}
+        # Add the path object to the keyword argument dict
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
+        kwargs["path"] = path
+        print(obj)
+        return RegularTimeseries(**kwargs)
+
     def to_frame(self) -> DataFrame:
         header = dict(self.path.items())
         header["UNITS"] = self.units
