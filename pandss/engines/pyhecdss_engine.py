@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from typing import Self
 
+import numpy as np
 import pandas as pd
 import pyhecdss
 
@@ -65,6 +66,9 @@ class PyHecDssEngine(EngineABC):
         else:
             with suppress_stdout_stderr():
                 data = self._object.read_rts(str(path))
+        mask = data.data.values == -3.4028234663852886e+38
+        data.data.loc[mask] = np.nan
+        data.data.dropna(inplace=True)
 
         return self._convert_to_pandss_rts(data, path)
 
@@ -86,7 +90,7 @@ class PyHecDssEngine(EngineABC):
             dates = dates.end_time
         if not isinstance(dates, pd.DatetimeIndex):
             raise ValueError(f"unknown datetype in pyhecdss object: {type(dates)}")
-        kwargs["dates"] = dates.values
+        kwargs["dates"] = dates.values.astype("datetime64[s]")
         kwargs["interval"] = None
         # Add the path object to the keyword argument dict
         if isinstance(path, str):
