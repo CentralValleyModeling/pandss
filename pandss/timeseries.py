@@ -42,6 +42,8 @@ class RegularTimeseries:
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         kwargs["path"] = path
+        # Replace no-data with nan
+        kwargs["values"][obj.nodata] = np.nan
         # Adjust the way pydsstools interprets dates in HEC-DSS files.
         dates = kwargs["dates"]
         interval = kwargs["interval"]
