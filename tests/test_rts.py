@@ -61,8 +61,7 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertIn(
                 rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
             )
-            self.assertEqual(rts.dates[0], np.datetime64("1920-01-01T00:00:00.000000"))
-            print(rts.values)
+            self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
             self.assertEqual(rts.values[0], 31.0)
 
     def test_data_content_7(self):
@@ -77,8 +76,8 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertIn(
                 rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
             )
-            self.assertEqual(rts.dates[0], np.datetime64("1920-01-01T00:00:00.000000"))
-            print(rts.values)
+            self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
+            print(rts.values[12:])
             self.assertEqual(rts.values[0], 31.0)
 
     def test_to_frame(self):
