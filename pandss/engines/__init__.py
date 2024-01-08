@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from ..catalog import Catalog
-from ..paths import DatasetPath, DatasetPathCollection
+from ..paths import DatasetPath
 from ..timeseries import RegularTimeseries
 
 
@@ -52,9 +52,10 @@ class EngineABC:
 def get_engine(engine_name: str) -> EngineABC:
     if engine_name.lower() == "pyhecdss":
         from .pyhecdss_engine import PyHecDssEngine
+
         return PyHecDssEngine
     elif engine_name.lower() == "pydsstools":
         from .pydsstools_engine import PyDssToolsEngine
+
         return PyDssToolsEngine
     raise ValueError(f"engine_name not recognized: `{engine_name}`")
-    
