@@ -99,7 +99,6 @@ class TestRegularTimeseries(unittest.TestCase):
                 df.columns.names,
                 ["A", "B", "C", "D", "E", "F", "UNITS", "PERIOD_TYPE", "INTERVAL"],
             )
-        print(df)
         et = perf_counter()
         tt = et - st
         self.assertLessEqual(tt, 20.0)
