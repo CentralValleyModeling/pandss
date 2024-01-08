@@ -66,6 +66,7 @@ class PyHecDssEngine(EngineABC):
         else:
             with suppress_stdout_stderr():
                 data = self._object.read_rts(str(path))
+        # magic number that is returned by the library in some cases
         mask = data.data.values == -3.4028234663852886e+38
         data.data.loc[mask] = np.nan
         data.data.dropna(inplace=True)
