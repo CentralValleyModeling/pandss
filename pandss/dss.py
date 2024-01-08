@@ -29,7 +29,7 @@ class DSS:
 
     __slots__ = ["src", "engine"]
 
-    def __init__(self, src: str | Path, engine: str | EngineABC = "pydsstools"):
+    def __init__(self, src: str | Path, engine: str | EngineABC = "pyhecdss"):
         self.src: Path = Path(src).resolve()
         if isinstance(engine, str):
             engine = get_engine(engine)
