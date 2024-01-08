@@ -26,7 +26,7 @@ class DSS:
     __slots__ = ["src", "_open", "_wrapped", "_catalog"]
 
     def __init__(self, src: str | Path):
-        self.src: Path = Path(src)
+        self.src: Path = Path(src).resolve()
         self._open = False
         self._wrapped: HecDss.Open = None
         self._catalog = None
@@ -56,6 +56,8 @@ class DSS:
         RuntimeError
             Generic error for error opening DSS file
         """
+        if not self.src.exists():
+            raise FileNotFoundError(self.src)
         logging.info(f"opening dss file {self.src}")
         self._wrapped = HecDss.Open(str(self.src))
         self._open = True
