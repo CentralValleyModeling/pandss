@@ -5,7 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
-from .dates import datetime_encode, get_datetime_range_pyobj, julian_array_to_date
+from .dates import (datetime_encode, get_datetime_range_pyobj,
+                    julian_array_to_date)
 from .decorators import must_be_open, silent, suppress_stdout_stderr
 from .dll import get_compatible_dll
 from .errors import HECDSS_ErrorHandler, NoDataError
