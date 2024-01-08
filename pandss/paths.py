@@ -46,6 +46,7 @@ class DatasetPath:
 
     def __str__(self):
         kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        kwargs = {k: (v if v != "" else "*") for k, v in kwargs.items()}
         s = "/{a}/{b}/{c}/{d}/{e}/{f}/".format(**kwargs)
 
         return s
