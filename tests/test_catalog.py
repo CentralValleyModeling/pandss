@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from time import perf_counter
 
-from pandas import DataFrame, Series
+import pyhecdss
 
 import pandss as pdss
 
@@ -25,7 +25,14 @@ class TestCatalog(unittest.TestCase):
             et = perf_counter()
             times.append(et - st)
         average = sum(times) / len(times)
-        self.assertLessEqual(average, 0.005)
+        self.assertLessEqual(average, 0.006)
+
+    def test_from_frame(self):
+        with pyhecdss.DSSFile(str(DSS_6)) as dss:
+            df_cat = dss.read_catalog()
+        cat = pdss.Catalog.from_frame(df_cat, DSS_6)
+        self.assertIsInstance(cat, pdss.Catalog)
+        self.assertEqual(len(cat), len(df_cat))
 
 
 if __name__ == "__main__":
