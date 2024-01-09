@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pandss as pdss
 
-DSS_6 = Path(__file__).parent / "v6.dss"
-DSS_7 = Path(__file__).parent / "v7.dss"
+DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
+DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
+DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
 
 
 class TestDSS(unittest.TestCase):
@@ -72,6 +73,14 @@ class TestDSS(unittest.TestCase):
             self.assertEqual(len(catalog), 2)
             for rts in dss.read_multiple_rts(catalog):
                 self.assertIsInstance(rts, pdss.RegularTimeseries)
+    
+    def test_multiple_open_close(self):
+        dss_1 = pdss.DSS(DSS_6)
+        dss_2 = pdss.DSS(DSS_6)
+        with dss_1 as foo, dss_2 as bar:
+            pass
+        self.assertFalse(dss_1.is_open)
+        self.assertFalse(dss_2.is_open)
 
 
 if __name__ == "__main__":
