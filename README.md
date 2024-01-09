@@ -36,6 +36,7 @@ with pdss.DSS(file) as dss:
 ### Read Regular Timeseries
 
 Read data, knowing the full name ahead of time:
+
 ```
 import pandss as pdss
 
@@ -46,6 +47,7 @@ regular_time_series = pdss.read_rts(file, path)
 ```
 
 Read data, with wildcards:
+
 ```
 import pandss as pdss
 
@@ -57,6 +59,7 @@ for regular_time_series in pdss.read_multiple_rts(file, path):
 ```
 
 Read all data from a DSS file:
+
 ```
 import pandss as pdss
 
@@ -66,6 +69,27 @@ with pdss.DSS(file) as dss:
     for regular_time_series in dss.read_multiple_rts(catalog):
         ...
 ```
+
+Copy data between DSS files:
+
+```
+old_dss = "old.dss"
+old_paths = (
+    "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
+    "/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/",
+)
+new_dss = "new.dss"
+new_paths = (
+    "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",  # Same name ok
+    "/CALSIM/PPT_OROV_NEW/PRECIP//1MON/L2020A/",  # Changed name ok too
+)
+pdss.copy_multiple_rts(
+    old_dss, 
+    new_dss, 
+    zip(p_old, p_new),
+)
+```
+
 ## Objects and their attributes
 ### `pdss.RegularTimeseries`
 
