@@ -19,7 +19,7 @@ class RegularTimeseries:
     dates: NDArray[datetime64]
     period_type: str
     units: str
-    interval: str
+    interval: int
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}(path={str(self.path)}, len={len(self)})"
