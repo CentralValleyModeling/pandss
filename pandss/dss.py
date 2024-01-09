@@ -42,14 +42,7 @@ class DSS:
         -------
         self
             Returns a DSS object.
-
-        Raises
-        ------
-        RuntimeError
-            Generic error for error opening DSS file
         """
-        if not self.src.exists():
-            raise FileNotFoundError(self.src)
         logging.info(f"opening dss file {self.src}")
         self.engine.open()
         return self
@@ -109,6 +102,13 @@ class DSS:
             # Read each individually
             for p in paths:
                 yield self.read_rts(p)
+
+    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+        logging.info(f"writing regular time series, {path}")
+        if path.has_wildcard:
+            raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
+        with suppress_stdout_stderr():
+            return self.engine.write_rts(path, rts)
 
     def resolve_wildcard(
         self, path: DatasetPath, drop_date: bool = False

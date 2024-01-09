@@ -20,15 +20,19 @@ class PyHecDssEngine(EngineABC):
         self._is_open = False
         self.src = Path(src).resolve()
         _, file_version = pyhecdss.get_version(str(self.src))
-        if file_version != 6:
+        if file_version not in [6, -1]:
             raise FileVersionError(
-                f"pyhecdss cannot interact with version 7 DSS-Files, {file_version=}"
+                f"pyhecdss con only interact with version 6 DSS-Files, {file_version=}"
             )
         self._object: pyhecdss.DSSFile = None
+        self._create_new = True
 
     def open(self) -> Self:
         """Opens the underlying DSS file"""
-        self._object = pyhecdss.DSSFile(str(self.src))
+        self._object = pyhecdss.DSSFile(
+            str(self.src),
+            create_new=self._create_new,
+        )
         self._is_open = True
 
     @must_be_open
@@ -70,11 +74,20 @@ class PyHecDssEngine(EngineABC):
             with suppress_stdout_stderr():
                 data = self._object.read_rts(str(path))
         # magic number that is returned by the library in some cases
-        mask = data.data.values == -3.4028234663852886e+38
+        mask = data.data.values == -3.4028234663852886e38
         data.data.loc[mask] = np.nan
         data.data.dropna(inplace=True)
 
         return self._convert_to_pandss_rts(data, path)
+
+    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+        periods = pd.DatetimeIndex(rts.dates).to_period() 
+        df = pd.DataFrame(
+            data=rts.values,
+            index=periods,
+        )
+        p = f"/{path.a}/{path.b}/{path.c}//{path.e}/{path.f}/"
+        self._object.write_rts(p, df, rts.units, rts.period_type)
 
     @staticmethod
     def _convert_to_pandss_rts(

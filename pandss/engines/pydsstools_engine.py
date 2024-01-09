@@ -19,6 +19,7 @@ class PyDssToolsEngine(EngineABC):
         self._is_open = False
         self.src = Path(src).resolve()
         self._object: HecDss.Open = None
+        self._create_new = False
 
     def open(self) -> Self:
         """Opens the underlying DSS file"""

@@ -9,7 +9,6 @@ from .paths import DatasetPath
 
 @dataclass(
     kw_only=True,
-    frozen=True,
     eq=True,
     slots=True,
 )

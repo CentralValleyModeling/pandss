@@ -8,9 +8,10 @@ from ..timeseries import RegularTimeseries
 
 class EngineABC:
     src: Path
-    _catalog: Catalog = None
-    _is_open: bool = False
-    _object: Any = None
+    _catalog: Catalog
+    _is_open: bool
+    _object: Any
+    _create_new: bool
 
     def __init__(self, src: str | Path):
         raise NotImplementedError(
@@ -35,6 +36,12 @@ class EngineABC:
         """Reads a single regular timeseries from a DSS file."""
         raise NotImplementedError(
             f"read_rts not implemented on {self.__class__.__name__}"
+        )
+
+    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+        """Writes a single regular timeseries to a DSS file."""
+        raise NotImplementedError(
+            f"write_rts not implemented on {self.__class__.__name__}"
         )
 
     @property
