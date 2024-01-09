@@ -1,5 +1,8 @@
 import unittest
+from os import remove
 from pathlib import Path
+from random import choice
+from string import ascii_letters
 from time import perf_counter
 
 import numpy as np
@@ -7,12 +10,21 @@ import pandas as pd
 
 import pandss as pdss
 
-DSS_6 = Path(__file__).parent.resolve() / "v6.dss"
-DSS_7 = Path(__file__).parent.resolve() / "v7.dss"
-DSS_LARGE = Path(__file__).parent.resolve() / "large_v6.dss"
+DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
+DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
+DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
 
 
 class TestRegularTimeseries(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not DSS_6.exists():
+            raise FileNotFoundError(DSS_6)
+        if not DSS_7.exists():
+            raise FileNotFoundError(DSS_7)
+        if not DSS_LARGE.exists():
+            raise FileNotFoundError(DSS_LARGE)
+
     def test_read_type_6(self):
         catalog = pdss.read_catalog(DSS_6)
         p = catalog.paths.pop()
@@ -122,18 +134,76 @@ class TestRegularTimeseries(unittest.TestCase):
         tt = et - st
         self.assertLessEqual(tt, 20.0)
 
+
+class TestRegularTimeseriesWriting(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.created = list()
+
+    def setUp(self):
+        def random_name():
+            return "".join(choice(ascii_letters) for _ in range(10))
+
+        self.src_6 = DSS_6
+        self.dst_6 = DSS_6.parent.parent / f"created/{random_name()}.dss"
+        self.created.append(self.dst_6)
+        self.src_7 = DSS_7
+        self.dst_7 = DSS_7.parent.parent / f"created/{random_name()}.dss"
+        self.created.append(self.dst_7)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        for dss in cls.created:
+            if dss.exists():
+                remove(dss)
+        if cls.created:
+            for obj in cls.created[0].parent.iterdir():
+                if obj.suffix in [".dsd", ".dsc", ".dsk"]:
+                    attempts = 0
+                    while (obj.exists()) and (attempts < 100):
+                        try:
+                            remove(obj)
+                        except PermissionError as e:
+                            attempts += 1
+
     def test_write_rts_6(self):
         p_old = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
-        with pdss.DSS(DSS_6) as dss:
+        with pdss.DSS(self.src_6) as dss:
             rts = dss.read_rts(p_old)
         rts.values = rts.values + 1
         p_new = pdss.DatasetPath.from_str(
             "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/"
         )
-        with pdss.DSS(DSS_6.with_name("v6_new")) as dss_new:
+        with pdss.DSS(self.dst_6) as dss_new:
             dss_new.write_rts(p_new, rts)
             catalog = dss_new.read_catalog()
         self.assertEqual(len(catalog), 1)
+
+    def test_copy_rts_6(self):
+        p_old = pdss.DatasetPath.from_str(
+            "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
+        )
+        p_new = pdss.DatasetPath.from_str(
+            "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/",
+        )
+        pdss.copy_rts(self.src_6, self.dst_6, (p_old, p_new))
+        self.assertTrue(self.dst_6.exists())
+        catalog = pdss.read_catalog(self.dst_6)
+        self.assertEqual(len(catalog), 1)
+
+    def test_copy_multiple_rts_6(self):
+        p_old = (
+            "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
+            "/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/",
+        )
+        p_new = (
+            "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
+            "/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/",
+        )
+        pdss.copy_multiple_rts(self.src_6, self.dst_6, tuple(zip(p_old, p_new)))
+        self.assertTrue(self.dst_6.exists())
+        catalog = pdss.read_catalog(self.dst_6)
+        self.assertEqual(len(catalog), 2)
 
 
 if __name__ == "__main__":
