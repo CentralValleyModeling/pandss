@@ -8,6 +8,7 @@ from .catalog import Catalog
 from .dss import DSS
 from .paths import DatasetPath, DatasetPathCollection
 from .timeseries import RegularTimeseries
-from .utils import read_catalog, read_multiple_rts, read_rts, copy_rts
+from .utils import (copy_multiple_rts, copy_rts, read_catalog,
+                    read_multiple_rts, read_rts)
 
 __all__ = ["read_catalog", "read_rts"]

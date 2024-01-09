@@ -44,3 +44,21 @@ def copy_rts(
 
     with DSS(src) as SRC, DSS(dst) as DST:
         DST.write_rts(dst_path, SRC.read_rts(src_path))
+
+
+def copy_multiple_rts(
+    src: str | Path,
+    dst: str | Path,
+    paths: Iterator[tuple[DatasetPath | str, DatasetPath | str]],
+):
+    with DSS(src) as SRC, DSS(dst) as DST:
+        for src_path, dst_path in paths:
+            if isinstance(src_path, str):
+                src_path = DatasetPath.from_str(src_path)
+            if isinstance(dst_path, str):
+                dst_path = DatasetPath.from_str(dst_path)
+            if src_path.has_wildcard or dst_path.has_wildcard:
+                raise WildcardError(
+                    f"Cannot write paths with wildcards: {src_path}, {dst_path}"
+                )
+            DST.write_rts(dst_path, SRC.read_rts(src_path))
