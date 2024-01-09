@@ -6,8 +6,9 @@ import pyhecdss
 
 import pandss as pdss
 
-DSS_6 = Path(__file__).parent / "v6.dss"
-DSS_7 = Path(__file__).parent / "v7.dss"
+DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
+DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
+DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
 
 
 class TestCatalog(unittest.TestCase):
