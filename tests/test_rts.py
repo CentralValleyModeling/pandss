@@ -105,7 +105,7 @@ class TestRegularTimeseries(unittest.TestCase):
             )
 
     @unittest.skip("skipping long test, only run if targeted individually")
-    def test_large_dss_to_frame(self):
+    def test_large_dss_to_frame_6(self):
         p = pdss.DatasetPath.from_str("/CALSIM/.*/.*/.*/1MON/.*/")
         st = perf_counter()
         with pdss.DSS(DSS_LARGE) as dss:
@@ -121,6 +121,19 @@ class TestRegularTimeseries(unittest.TestCase):
         et = perf_counter()
         tt = et - st
         self.assertLessEqual(tt, 20.0)
+
+    def test_write_rts_6(self):
+        p_old = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
+        with pdss.DSS(DSS_6) as dss:
+            rts = dss.read_rts(p_old)
+        rts.values = rts.values + 1
+        p_new = pdss.DatasetPath.from_str(
+            "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/"
+        )
+        with pdss.DSS(DSS_6.with_name("v6_new")) as dss_new:
+            dss_new.write_rts(p_new, rts)
+            catalog = dss_new.read_catalog()
+        self.assertEqual(len(catalog), 1)
 
 
 if __name__ == "__main__":
