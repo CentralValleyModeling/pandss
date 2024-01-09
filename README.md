@@ -78,7 +78,7 @@ class RegularTimeseries:
     dates: NDArray[datetime64]
     period_type: str
     units: str
-    interval: str
+    interval: int
 
     to_frame() -> pandas.DataFrame:
 ```
@@ -100,6 +100,7 @@ class Catalog:
 ### `pdss.DatasetPath`
 
 This object represents the path to a single dataset in a DSS file. It is made up of A-F parts. Each of the parts may contain regular expressions that could be used to search a collection containing many `DatasetPath` objects for matching patterns. Two attributes on this object determine if the object uses wildcards:
+
 - `has_wildcard`: `True` if any part (other than the D part) uses wildcards, `False` otherwise.
 - `has_any_wildcard`: `True` if any part uses wildcards, `False` otherwise.
 
