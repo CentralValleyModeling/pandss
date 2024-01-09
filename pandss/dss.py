@@ -10,17 +10,6 @@ from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
 
 
-def must_be_open(method):
-    def works_on_open_file(obj, *args, **kwargs):
-        if obj.is_open is False:
-            raise IOError(f"file must be open to call {method}")
-        else:
-            return method(obj, *args, **kwargs)
-
-    return works_on_open_file
-
-
-# TODO: Move the must_be_open decorator to the engine subclass
 class DSS:
     """Class representing an open DSS file. Binds to various other python based
     HEC-DSS file readers through an "engine". The Engine classes wrap the other
@@ -73,7 +62,6 @@ class DSS:
         logging.info(f"closing dss file {self.src}")
         self.engine.close()
 
-    @must_be_open
     def read_catalog(self, drop_date: bool = True) -> Catalog:
         logging.info(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
@@ -83,7 +71,6 @@ class DSS:
         logging.info(f"catalog read, size is {len(catalog)}")
         return catalog
 
-    @must_be_open
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         logging.info(f"reading regular time series, {path}")
         if path.has_wildcard:
@@ -93,7 +80,6 @@ class DSS:
         with suppress_stdout_stderr():
             return self.engine.read_rts(path)
 
-    @must_be_open
     def read_multiple_rts(
         self,
         paths: DatasetPath | DatasetPathCollection,
@@ -124,7 +110,6 @@ class DSS:
             for p in paths:
                 yield self.read_rts(p)
 
-    @must_be_open
     def resolve_wildcard(
         self, path: DatasetPath, drop_date: bool = False
     ) -> DatasetPathCollection:

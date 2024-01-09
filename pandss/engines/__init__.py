@@ -59,3 +59,13 @@ def get_engine(engine_name: str) -> EngineABC:
 
         return PyDssToolsEngine
     raise ValueError(f"engine_name not recognized: `{engine_name}`")
+
+
+def must_be_open(method):
+    def works_on_open_file(obj, *args, **kwargs):
+        if obj._is_open is False:
+            raise IOError(f"file must be open to call {method}")
+        else:
+            return method(obj, *args, **kwargs)
+
+    return works_on_open_file

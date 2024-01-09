@@ -11,7 +11,7 @@ from ..errors import FileVersionError
 from ..paths import WILDCARD_PATTERN, DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
-from . import EngineABC
+from . import EngineABC, must_be_open
 
 
 class PyHecDssEngine(EngineABC):
@@ -31,11 +31,13 @@ class PyHecDssEngine(EngineABC):
         self._object = pyhecdss.DSSFile(str(self.src))
         self._is_open = True
 
+    @must_be_open
     def close(self):
         """Closes the underlying DSS file"""
         self._object.close()
         self._is_open = False
 
+    @must_be_open
     def read_catalog(self) -> Catalog:
         """Reads the DSS catalog to a pandss.Catalog object."""
         logging.info(f"reading catalog, {self.src=}")
@@ -49,6 +51,7 @@ class PyHecDssEngine(EngineABC):
         self._catalog = catalog
         return catalog
 
+    @must_be_open
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         """Reads a single regular timeseries from a DSS file."""
         logging.info(f"reading regular time series, {path}")

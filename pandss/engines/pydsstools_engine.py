@@ -10,7 +10,7 @@ from ..catalog import Catalog
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
-from . import EngineABC
+from . import EngineABC, must_be_open
 
 
 class PyDssToolsEngine(EngineABC):
@@ -25,11 +25,13 @@ class PyDssToolsEngine(EngineABC):
         self._object = HecDss.Open(str(self.src))
         self._is_open = True
 
+    @must_be_open
     def close(self):
         """Closes the underlying DSS file"""
         self._object.close()
         self._is_open = False
 
+    @must_be_open
     def read_catalog(self) -> Catalog:
         """Reads the DSS catalog to a pandss.Catalog object."""
         logging.info(f"reading catalog, {self.src=}")
@@ -43,6 +45,7 @@ class PyDssToolsEngine(EngineABC):
         self._catalog = catalog
         return catalog
 
+    @must_be_open
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         """Reads a single regular timeseries from a DSS file."""
         logging.info(f"reading regular time series, {path}")
