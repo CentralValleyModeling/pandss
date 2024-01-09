@@ -1,43 +1,13 @@
-import os
+"""pandss - Interact with HEC DSS files in a pandas to CSV like API.
 
+Zachary Roy, DWR
+June 2023
+"""
+from . import keywords
+from .catalog import Catalog
+from .dss import DSS
+from .paths import DatasetPath, DatasetPathCollection
+from .timeseries import RegularTimeseries
+from .utils import read_catalog, read_multiple_rts, read_rts
 
-# Define a context manager to suppress stdout and stderr.
-class suppress_stdout_stderr(object):
-    """
-    A context manager for doing a "deep suppression" of stdout and stderr in
-    Python, i.e. will suppress all print, even if the print originates in a
-    compiled C/Fortran sub-function.
-       This will not suppress raised exceptions, since exceptions are printed
-    to stderr just before a script exits, and after the context manager has
-    exited (at least, I think that is why it lets exceptions through).
-
-    """
-
-    def __init__(self):
-        # Open a pair of null files
-        self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
-        # Save the actual stdout (1) and stderr (2) file descriptors.
-        self.save_fds = [os.dup(1), os.dup(2)]
-
-    def __enter__(self):
-        # Assign the null pointers to stdout and stderr.
-        os.dup2(self.null_fds[0], 1)
-        os.dup2(self.null_fds[1], 2)
-
-    def __exit__(self, *_):
-        # Re-assign the real stdout/stderr back to (1) and (2)
-        os.dup2(self.save_fds[0], 1)
-        os.dup2(self.save_fds[1], 2)
-        # Close all file descriptors
-        for fd in self.null_fds + self.save_fds:
-            os.close(fd)
-
-
-from . import catalog, heclib, timeseries
-from .catalog import common_catalog, iter_common_catalog, read_catalog
-from .catalog_object import Catalog
-from .heclib import DSS
-from .reshape import split_path
-from .timeseries import read_dss, write_dss
-
-__all__ = ["timeseries", "catalog"]
+__all__ = ["read_catalog", "read_rts"]

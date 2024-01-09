@@ -37,5 +37,6 @@ class HECDSS_ErrorHandler:
         else:
             action(msg)
 
+
 class NoDataError(Exception):
     ...
