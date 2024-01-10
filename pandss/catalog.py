@@ -42,3 +42,7 @@ class Catalog(DatasetPathCollection):
 
     def resolve_wildcard(self, path: DatasetPath) -> DatasetPathCollection:
         return super(Catalog, self).resolve_wildcard(path)
+
+    def find(self, path: DatasetPath) -> DatasetPathCollection:
+        """Alias for Catalog.resolve_wildcard"""
+        return self.resolve_wildcard(path)
