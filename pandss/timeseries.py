@@ -26,6 +26,20 @@ class RegularTimeseries:
     def __len__(self) -> int:
         return len(self.values)
 
+    def __eq__(self, __other: object) -> bool:
+        if not isinstance(__other, self.__class__):
+            return False
+        for f in fields(self):
+            if not hasattr(__other, f.name):
+                return False
+            elif hasattr(getattr(self, f.name), "__iter__"):
+                for l, r in zip(getattr(self, f.name), getattr(__other, f.name)):
+                    if l != r:
+                        return False
+            elif getattr(self, f.name) != getattr(__other, f.name):
+                return False
+        return True
+
     def to_frame(self) -> DataFrame:
         header = dict(self.path.items())
         header["UNITS"] = self.units
