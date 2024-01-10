@@ -1,8 +1,10 @@
 import logging
 from dataclasses import dataclass, field, fields
-from re import compile
+from re import IGNORECASE, compile
 from typing import Iterator, Self
 from warnings import warn
+
+from .errors import DatasetPathParseError
 
 WILDCARD_PATTERN = compile(r"\.\*")
 
@@ -32,7 +34,10 @@ class DatasetPath:
 
     @classmethod
     def from_str(cls, path: str) -> Self:
-        _, *args, _ = path.split("/")
+        try:
+            _, *args, _ = path.split("/")
+        except Exception as e:
+            raise DatasetPathParseError(f"couldn't parse {path} as path") from e
         for bad_wild in ("", "*"):
             args = tuple(val if val != bad_wild else ".*" for val in args)
 
@@ -137,7 +142,7 @@ class DatasetPathCollection:
                 f"paths in {self.__class__.__name__} have wildcards, these may not match pattern provided!",
                 Warning,
             )
-        regex = compile(str(path))
+        regex = compile(str(path), flags=IGNORECASE)
         logging.debug(f"{regex=}")
         buffer = "\n".join(str(p) for p in self.paths)
         matched = regex.findall(buffer)
