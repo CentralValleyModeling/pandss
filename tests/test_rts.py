@@ -1,3 +1,4 @@
+import pickle
 import unittest
 from os import remove
 from pathlib import Path
@@ -10,9 +11,11 @@ import pandas as pd
 
 import pandss as pdss
 
-DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
-DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
-DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
+ASSETS = Path().resolve() / "tests/assets"
+TEST_CREATED = ASSETS / "created"
+DSS_6 = ASSETS / "existing/v6.dss"
+DSS_7 = ASSETS / "existing/v7.dss"
+DSS_LARGE = ASSETS / "existing/large_v6.dss"
 
 
 class TestRegularTimeseries(unittest.TestCase):
@@ -70,6 +73,7 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertEqual(len(rts.values), len(rts.dates))
             self.assertEqual(rts.path, p)
             self.assertIsInstance(rts.values, np.ndarray)
+            self.assertIsInstance(rts.values[0], np.float64)
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
                 rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
@@ -147,10 +151,10 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
             return "".join(choice(ascii_letters) for _ in range(10))
 
         self.src_6 = DSS_6
-        self.dst_6 = DSS_6.parent.parent / f"created/{random_name()}.dss"
+        self.dst_6 = TEST_CREATED / f"{random_name()}.dss"
         self.created.append(self.dst_6)
         self.src_7 = DSS_7
-        self.dst_7 = DSS_7.parent.parent / f"created/{random_name()}.dss"
+        self.dst_7 = TEST_CREATED / f"{random_name()}.dss"
         self.created.append(self.dst_7)
 
     @classmethod
@@ -206,6 +210,17 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
         self.assertTrue(self.dst_6.exists())
         catalog = pdss.read_catalog(self.dst_6)
         self.assertEqual(len(catalog), 2)
+
+    def test_pickle_rts_6(self):
+        pickle_location = TEST_CREATED / "month_days.pkl"
+        p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
+        with pdss.DSS(DSS_6) as dss:
+            rts = dss.read_rts(p)
+        with open(pickle_location, "wb") as OUT:
+            pickle.dump(rts, OUT)
+        with open(pickle_location, "rb") as IN:
+            rts_salty = pickle.load(IN)
+        self.assertEqual(rts, rts_salty)
 
 
 if __name__ == "__main__":
