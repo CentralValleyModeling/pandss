@@ -62,7 +62,7 @@ class TestDSS(unittest.TestCase):
 
     def test_pydsstools_engine_6(self):
         with pdss.DSS(DSS_6, engine="pydsstools") as dss:
-            catalog = dss.read_catalog()
+            catalog = dss.read_catalog(drop_date=True)
             self.assertIsInstance(catalog, pdss.Catalog)
             self.assertEqual(len(catalog), 2)
             for rts in dss.read_multiple_rts(catalog):
@@ -70,7 +70,7 @@ class TestDSS(unittest.TestCase):
 
     def test_pydsstools_engine_7(self):
         with pdss.DSS(DSS_7, engine="pydsstools") as dss:
-            catalog = dss.read_catalog()
+            catalog = dss.read_catalog(drop_date=True)
             self.assertIsInstance(catalog, pdss.Catalog)
             self.assertEqual(len(catalog), 2)
             for rts in dss.read_multiple_rts(catalog):

@@ -55,7 +55,7 @@ class DSS:
         logging.info(f"closing dss file {self.src}")
         self.engine.close()
 
-    def read_catalog(self, drop_date: bool = True) -> Catalog:
+    def read_catalog(self, drop_date: bool = False) -> Catalog:
         logging.info(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             catalog = self.engine.read_catalog()
