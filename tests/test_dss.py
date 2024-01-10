@@ -75,7 +75,7 @@ class TestDSS(unittest.TestCase):
             self.assertEqual(len(catalog), 2)
             for rts in dss.read_multiple_rts(catalog):
                 self.assertIsInstance(rts, pdss.RegularTimeseries)
-    
+
     def test_multiple_open_close(self):
         dss_1 = pdss.DSS(DSS_6)
         dss_2 = pdss.DSS(DSS_6)

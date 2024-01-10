@@ -56,8 +56,6 @@ class TestCatalog(unittest.TestCase):
         cat = pdss.Catalog.from_frame(df_cat, DSS_7)
         self.assertIsInstance(cat, pdss.Catalog)
         self.assertEqual(len(cat), len(df_cat))
-    
-
 
 
 if __name__ == "__main__":
