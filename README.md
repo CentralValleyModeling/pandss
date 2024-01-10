@@ -104,7 +104,9 @@ class RegularTimeseries:
     units: str
     interval: int
 
-    to_frame() -> pandas.DataFrame:
+    # methods
+    def to_frame() -> pandas.DataFrame:
+        ...
 ```
 
 ### `pdss.Catalog`
@@ -116,9 +118,15 @@ class Catalog:
     src: Path
     paths: set(DatasetPath)
 
-    from_strs()
-    from_frame()
-    findall() -> DatasetPathCollection
+    # methods
+    @classmethod
+    def from_strs() -> Catalog:
+        ...
+    @classmethod
+    def from_frame() -> Catalog:
+        ...
+    def findall() -> DatasetPathCollection:
+        ...
 ```
 
 ### `pdss.DatasetPath`
@@ -137,8 +145,15 @@ class DatasetPath:
     e: str
     f: str
 
-    has_wildcard: bool
-    has_any_wildcard: bool 
-
-    drop_date() -> DatasetPath
+    # properties
+    @property
+    def has_wildcard() -> bool:
+        ...
+    @property
+    def has_any_wildcard() -> bool:
+        ... 
+    
+    # methods
+    def drop_date() -> DatasetPath:
+        ...
 ```
