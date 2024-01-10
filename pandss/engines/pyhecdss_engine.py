@@ -4,7 +4,6 @@ from typing import Self
 
 import numpy as np
 import pandas as pd
-import pyhecdss
 
 from ..catalog import Catalog
 from ..errors import FileVersionError
@@ -12,6 +11,9 @@ from ..paths import WILDCARD_PATTERN, DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
 from . import EngineABC, must_be_open
+
+with suppress_stdout_stderr():
+    import pyhecdss
 
 
 class PyHecDssEngine(EngineABC):
@@ -101,7 +103,7 @@ class PyHecDssEngine(EngineABC):
         }
         kwargs = {L: getattr(data, R) for L, R in attr_map.items()}
         # Add values and dates
-        kwargs["values"] = data.data.values
+        kwargs["values"] = data.data.iloc[:, 0].values
         # Sometimes indexes are PeriodIndexes, other times they are DatetimeIndex
         dates = data.data.index
         if isinstance(dates, pd.PeriodIndex):
