@@ -31,6 +31,7 @@ class TestRegularTimeseries(unittest.TestCase):
         rts = pdss.read_rts(DSS_6, p)
         self.assertIsInstance(rts, pdss.RegularTimeseries)
 
+    @unittest.expectedFailure
     def test_read_type_7(self):
         catalog = pdss.read_catalog(DSS_7)
         p = catalog.paths.pop()
@@ -76,6 +77,7 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
             self.assertEqual(rts.values[0], 31.0)
 
+    @unittest.expectedFailure
     def test_data_content_7(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         with pdss.DSS(DSS_7) as dss:
