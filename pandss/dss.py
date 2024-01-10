@@ -118,7 +118,7 @@ class DSS:
             return DatasetPathCollection(paths={path})
         if self.engine.catalog is None:
             self.engine.read_catalog()
-        collection = self.engine.catalog.findall(path)
+        collection = self.engine.catalog.resolve_wildcard(path)
         if drop_date:
             collection = collection.collapse_dates()
         return collection

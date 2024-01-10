@@ -57,7 +57,7 @@ class TestPath(unittest.TestCase):
             catalog = dss.read_catalog()
             catalog = catalog.collapse_dates()
             with self.assertWarns(Warning):
-                catalog.findall(star)
+                catalog.resolve_wildcard(star)
 
 
 if __name__ == "__main__":

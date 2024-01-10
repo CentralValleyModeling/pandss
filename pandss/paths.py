@@ -130,7 +130,7 @@ class DatasetPathCollection:
     def from_strs(cls, paths: list[str]) -> Self:
         return cls(paths=set(DatasetPath.from_str(p) for p in paths))
 
-    def findall(self, path: DatasetPath) -> Self:
+    def resolve_wildcard(self, path: DatasetPath) -> Self:
         logging.info(f"finding paths that match {path}")
         if any(p.has_any_wildcard for p in self.paths):
             warn(

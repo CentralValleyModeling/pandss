@@ -65,7 +65,7 @@ class PyHecDssEngine(EngineABC):
         if path.d == ".*":
             with suppress_stdout_stderr():
                 data = [
-                    self._object.read_rts(str(p)) for p in self.catalog.findall(path)
+                    self._object.read_rts(str(p)) for p in self.catalog.resolve_wildcard(path)
                 ]
                 df = pd.concat(d.data for d in data)
                 data = pyhecdss.DSSData(df, data[0].units, data[0].period_type)

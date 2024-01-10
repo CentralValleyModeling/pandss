@@ -40,5 +40,5 @@ class Catalog(DatasetPathCollection):
             raise ValueError(f"{cls.__name__} cannot be created with wildcard paths")
         return cls(paths=paths, src=src)
 
-    def findall(self, path: DatasetPath) -> DatasetPathCollection:
-        return super(Catalog, self).findall(path)
+    def resolve_wildcard(self, path: DatasetPath) -> DatasetPathCollection:
+        return super(Catalog, self).resolve_wildcard(path)
