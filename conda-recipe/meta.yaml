@@ -1,6 +1,6 @@
 package:
   name: pandss
-  version: 0.3
+  version: 0.4.1
 
 source:
   path: ../pandss
@@ -17,4 +17,4 @@ requirements:
     - pandas
 
 about:
-  home: http://dwrrhapp0179.ad.water.ca.gov/gitea/zachary.roy/pandss
+  home: https://github.com/CentralValleyModeling/pandss
