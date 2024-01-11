@@ -2,7 +2,7 @@ from dataclasses import dataclass, fields
 
 from numpy import datetime64, float64
 from numpy.typing import NDArray
-from pandas import DataFrame, DatetimeIndex, MultiIndex, PeriodIndex
+from pandas import DataFrame, MultiIndex
 
 from .paths import DatasetPath
 
@@ -33,8 +33,8 @@ class RegularTimeseries:
             if not hasattr(__other, f.name):
                 return False
             elif hasattr(getattr(self, f.name), "__iter__"):
-                for l, r in zip(getattr(self, f.name), getattr(__other, f.name)):
-                    if l != r:
+                for left, right in zip(getattr(self, f.name), getattr(__other, f.name)):
+                    if left != right:
                         return False
             elif getattr(self, f.name) != getattr(__other, f.name):
                 return False
