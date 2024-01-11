@@ -1,4 +1,5 @@
 import unittest
+from importlib.util import find_spec
 from pathlib import Path
 
 import pandss as pdss
@@ -6,6 +7,8 @@ import pandss as pdss
 DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
 DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
 DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
+
+HAS_PYDSSTOOLS = find_spec("pydsstools") is not None
 
 
 class TestDSS(unittest.TestCase):
@@ -60,6 +63,7 @@ class TestDSS(unittest.TestCase):
             for rts in dss.read_multiple_rts(catalog):
                 self.assertIsInstance(rts, pdss.RegularTimeseries)
 
+    @unittest.skipUnless(HAS_PYDSSTOOLS, "pydsstools is an optional dependency")
     def test_pydsstools_engine_6(self):
         with pdss.DSS(DSS_6, engine="pydsstools") as dss:
             catalog = dss.read_catalog(drop_date=True)
@@ -68,6 +72,7 @@ class TestDSS(unittest.TestCase):
             for rts in dss.read_multiple_rts(catalog):
                 self.assertIsInstance(rts, pdss.RegularTimeseries)
 
+    @unittest.skipUnless(HAS_PYDSSTOOLS, "pydsstools is an optional dependency")
     def test_pydsstools_engine_7(self):
         with pdss.DSS(DSS_7, engine="pydsstools") as dss:
             catalog = dss.read_catalog(drop_date=True)
@@ -79,8 +84,9 @@ class TestDSS(unittest.TestCase):
     def test_multiple_open_close(self):
         dss_1 = pdss.DSS(DSS_6)
         dss_2 = pdss.DSS(DSS_6)
-        with dss_1 as foo, dss_2 as bar:
-            pass
+        with dss_1 as obj_1, dss_2 as obj_2:
+            self.assertIsInstance(obj_1, pdss.DSS)
+            self.assertIsInstance(obj_2, pdss.DSS)
         self.assertFalse(dss_1.is_open)
         self.assertFalse(dss_2.is_open)
 
