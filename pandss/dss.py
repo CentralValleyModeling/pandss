@@ -87,7 +87,8 @@ class DSS:
                     paths = self.resolve_wildcard(paths)
                 else:
                     logging.debug(
-                        "`read_multiple_rts` called with only one path with no wildcards"
+                        "`read_multiple_rts` called with only one path,"
+                        + " path contains no wildcards to expand"
                     )
                     paths = DatasetPathCollection(paths={paths})
             else:

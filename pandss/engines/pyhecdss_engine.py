@@ -7,7 +7,7 @@ import pandas as pd
 
 from ..catalog import Catalog
 from ..errors import FileVersionError
-from ..paths import WILDCARD_PATTERN, DatasetPath
+from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
 from . import EngineABC, must_be_open

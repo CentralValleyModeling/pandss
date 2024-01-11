@@ -91,10 +91,11 @@ class DatasetPathCollection:
             if not isinstance(obj, DatasetPath):
                 bad_types.append(obj)
         if bad_types:
-            n = len(bad_types)
             bad_types = set([type(obj) for obj in bad_types])
             raise ValueError(
-                f"paths must be given as `{DatasetPath.__name__}` objects, {n} bad items given, seen types: {bad_types}"
+                f"paths must be given as `{DatasetPath.__name__}` objects,"
+                + f" {len(bad_types)} bad items given,"
+                + " seen types: {bad_types}"
             )
 
     def __iter__(self) -> Iterator[DatasetPath]:
@@ -139,7 +140,8 @@ class DatasetPathCollection:
         logging.info(f"finding paths that match {path}")
         if any(p.has_any_wildcard for p in self.paths):
             warn(
-                f"paths in {self.__class__.__name__} have wildcards, these may not match pattern provided!",
+                "some paths in the searched collection contain wildcards,"
+                + " matching might not return expected results.",
                 Warning,
             )
         regex = compile(str(path), flags=IGNORECASE)
