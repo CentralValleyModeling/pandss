@@ -17,4 +17,6 @@ tests.log
 # VS Code files
 .vscode
 # Do not track build artifacts
-dst/*
+dist/*
+build/*
+record.txt 
