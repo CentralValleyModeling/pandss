@@ -1,9 +1,15 @@
+{% set data = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
+
+
 package:
   name: pandss
-  version: 0.4.2
+  version: {{ data['project']['version'] }}
 
 source:
-  path: ../pandss
+  path: ..
+
+build:
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv"
 
 requirements:
   build:
