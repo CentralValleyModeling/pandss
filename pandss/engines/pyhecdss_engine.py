@@ -111,7 +111,7 @@ class PyHecDssEngine(EngineABC):
         if not isinstance(dates, pd.DatetimeIndex):
             raise ValueError(f"unknown datetype in pyhecdss object: {type(dates)}")
         kwargs["dates"] = dates.values.astype("datetime64[s]")
-        kwargs["interval"] = None
+        kwargs["interval"] = "UNKNOWN"
         # Add the path object to the keyword argument dict
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
