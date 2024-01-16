@@ -5,7 +5,7 @@ June 2023
 """
 from importlib.metadata import PackageNotFoundError, version
 
-from . import errors, keywords
+from . import errors, keywords, quiet
 from .catalog import Catalog
 from .dss import DSS
 from .paths import DatasetPath, DatasetPathCollection
