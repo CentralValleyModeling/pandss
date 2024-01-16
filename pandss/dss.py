@@ -16,7 +16,7 @@ class DSS:
     libraries, creating one API that this class uses.
     """
 
-    __slots__ = ["src", "engine"]
+    __slots__ = ["src", "engine", "_opened"]
 
     def __init__(self, src: str | Path, engine: str | EngineABC = "pyhecdss"):
         self.src: Path = Path(src).resolve()
@@ -26,6 +26,7 @@ class DSS:
             raise ValueError(f"engine type not recognized: {type(engine)=}")
         logging.info(f"using engine {engine}")
         self.engine: EngineABC = engine(self.src)
+        self._opened = 0
 
     @silent
     def __enter__(self):
@@ -43,8 +44,10 @@ class DSS:
         self
             Returns a DSS object.
         """
-        logging.info(f"opening dss file {self.src}")
-        self.engine.open()
+        if self._opened <= 0:
+            logging.info(f"opening dss file {self.src}")
+            self.engine.open()
+        self._opened += 1
         return self
 
     @silent
@@ -52,8 +55,11 @@ class DSS:
         """Wraps Engine `close()` and enables the use of this class
         in pythons context manager pattern.
         """
-        logging.info(f"closing dss file {self.src}")
-        self.engine.close()
+        self._opened += -1
+        if self._opened <= 0:
+            logging.info(f"closing dss file {self.src}")
+            self.engine.close()
+            self._opened = 0
 
     def read_catalog(self, drop_date: bool = False) -> Catalog:
         logging.info(f"reading catalog, {self.src=}")
