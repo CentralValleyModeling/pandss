@@ -12,3 +12,7 @@ class DatasetNotFound(Exception):
 
 class DatasetPathParseError(Exception):
     ...
+
+
+class ClosedDSSError(Exception):
+    ...

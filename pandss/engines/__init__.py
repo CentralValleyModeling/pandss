@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Self
 
 from ..catalog import Catalog
+from ..errors import ClosedDSSError
 from ..paths import DatasetPath
 from ..timeseries import RegularTimeseries
 
@@ -71,7 +72,7 @@ def get_engine(engine_name: str) -> EngineABC:
 def must_be_open(method):
     def works_on_open_file(obj, *args, **kwargs):
         if obj._is_open is False:
-            raise IOError(f"file must be open to call {method}")
+            raise ClosedDSSError(f"file must be open to call {method}")
         else:
             return method(obj, *args, **kwargs)
 
