@@ -90,6 +90,14 @@ class TestDSS(unittest.TestCase):
         self.assertFalse(dss_1.is_open)
         self.assertFalse(dss_2.is_open)
 
+    def test_stacked_wtih(self):
+        dss = pdss.DSS(DSS_6)
+        with dss:
+            with dss:
+                pass
+            self.assertIsInstance(dss, pdss.DSS)
+            self.assertTrue(dss.is_open)
+
 
 if __name__ == "__main__":
     unittest.main()
