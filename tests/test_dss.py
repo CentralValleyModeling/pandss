@@ -98,6 +98,19 @@ class TestDSS(unittest.TestCase):
             self.assertIsInstance(dss, pdss.DSS)
             self.assertTrue(dss.is_open)
 
+    def test_stacked_with_error_handling(self):
+        dss = pdss.DSS(DSS_6)
+        with self.assertRaises(ZeroDivisionError):
+            with dss:
+                try:
+                    with dss:
+                        self.assertEqual(dss._opened, 2)
+                        _ = 1 / 0
+                finally:
+                    self.assertEqual(dss._opened, 1)
+                    self.assertTrue(dss.is_open)
+        self.assertFalse(dss.is_open)
+
 
 if __name__ == "__main__":
     unittest.main()
