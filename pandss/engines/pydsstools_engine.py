@@ -10,11 +10,13 @@ from ..catalog import Catalog
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
+from ..units import Quantity
 from . import EngineABC, must_be_open
 
 
 class PyDssToolsEngine(EngineABC):
-    def __init__(self, src: str | Path):
+    def __init__(self, src: str | Path, use_units: bool = True):
+        self.use_units = use_units
         self._catalog = None
         self._is_open = False
         self.src = Path(src).resolve()
@@ -62,8 +64,7 @@ class PyDssToolsEngine(EngineABC):
 
         return self._convert_to_pandss_rts(data, path)
 
-    @staticmethod
-    def _convert_to_pandss_rts(data: Any, path: DatasetPath) -> RegularTimeseries:
+    def _convert_to_pandss_rts(self, data: Any, path: DatasetPath) -> RegularTimeseries:
         attr_map = {
             "values": "values",
             "dates": "pytimes",
@@ -78,6 +79,8 @@ class PyDssToolsEngine(EngineABC):
         kwargs["path"] = path
         # Replace no-data with nan
         kwargs["values"][data.nodata] = np.nan
+        if self.use_units:
+            kwargs["values"] = Quantity(kwargs["values"], kwargs["units"].lower())
         # Adjust the way pydsstools interprets dates in HEC-DSS files.
         interval = kwargs["interval"]
         # Only fix for intervals greater gte 1 day

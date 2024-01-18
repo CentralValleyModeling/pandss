@@ -9,12 +9,13 @@ from ..timeseries import RegularTimeseries
 
 class EngineABC:
     src: Path
+    use_units: bool = True
     _catalog: Catalog
     _is_open: bool
     _object: Any
     _create_new: bool
 
-    def __init__(self, src: str | Path):
+    def __init__(self, src: str | Path, use_units: bool = True):
         raise NotImplementedError(
             f"cannot initialize abstract base class {self.__class__.__name__}"
         )

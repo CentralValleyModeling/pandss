@@ -12,7 +12,7 @@ from ..errors import FileVersionError
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
-from ..units import ureg
+from ..units import Quantity
 from . import EngineABC, must_be_open
 
 with suppress_stdout_stderr():
@@ -20,7 +20,8 @@ with suppress_stdout_stderr():
 
 
 class PyHecDssEngine(EngineABC):
-    def __init__(self, src: str | Path):
+    def __init__(self, src: str | Path, use_units: bool = True):
+        self.use_units = use_units
         self._catalog = None
         self._is_open = False
         self.src = Path(src).resolve()
@@ -96,9 +97,8 @@ class PyHecDssEngine(EngineABC):
         p = f"/{path.a}/{path.b}/{path.c}//{path.e}/{path.f}/"
         self._object.write_rts(p, df, rts.units, rts.period_type)
 
-    @staticmethod
     def _convert_to_pandss_rts(
-        data: pyhecdss.DSSData, path: DatasetPath
+        self, data: pyhecdss.DSSData, path: DatasetPath
     ) -> RegularTimeseries:
         # Convert to RegularTimeseries
         attr_map = {
@@ -108,8 +108,9 @@ class PyHecDssEngine(EngineABC):
         kwargs = {L: getattr(data, R) for L, R in attr_map.items()}
         # Add values and dates
         values = data.data.iloc[:, 0].values
-        unit_aware_values = ureg.Quantity(values, data.units.lower())
-        kwargs["values"] = unit_aware_values
+        if self.use_units:
+            values = Quantity(values, kwargs["units"].lower())
+        kwargs["values"] = values
         # Sometimes indexes are PeriodIndexes, other times they are DatetimeIndex
         dates = data.data.index
         if isinstance(dates, pd.PeriodIndex):
