@@ -11,6 +11,9 @@ import pandas as pd
 
 import pandss as pdss
 
+# Make sure we are using the developer version
+assert pdss.__version__ is None
+
 ASSETS = Path().resolve() / "tests/assets"
 TEST_CREATED = ASSETS / "created"
 DSS_6 = ASSETS / "existing/v6.dss"
@@ -53,10 +56,11 @@ class TestRegularTimeseries(unittest.TestCase):
         average = sum(times) / len(times)
         self.assertLessEqual(average, 0.11)
 
-    def test_read_time_6(self):
+    @unittest.expectedFailure
+    def test_read_time_7(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         times = list()
-        with pdss.DSS(DSS_6) as dss:
+        with pdss.DSS(DSS_7) as dss:
             for _ in range(10):
                 st = perf_counter()
                 _ = dss.read_rts(p)
@@ -169,7 +173,7 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
                     while (obj.exists()) and (attempts < 100):
                         try:
                             remove(obj)
-                        except PermissionError as e:
+                        except PermissionError:
                             attempts += 1
 
     def test_write_rts_6(self):

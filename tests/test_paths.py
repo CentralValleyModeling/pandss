@@ -3,6 +3,9 @@ from pathlib import Path
 
 import pandss as pdss
 
+# Make sure we are using the developer version
+assert pdss.__version__ is None
+
 DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
 DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
 DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
