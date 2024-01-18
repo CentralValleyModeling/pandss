@@ -15,7 +15,7 @@ from .paths import DatasetPath
 )
 class RegularTimeseries:
     path: DatasetPath
-    values: Quantity
+    values: Quantity | NDArray
     dates: NDArray[datetime64]
     period_type: str
     units: str
