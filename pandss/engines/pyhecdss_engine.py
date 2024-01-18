@@ -1,9 +1,11 @@
 import logging
 from pathlib import Path
 from typing import Self
+from warnings import catch_warnings
 
 import numpy as np
 import pandas as pd
+from pint import UnitStrippedWarning
 
 from ..catalog import Catalog
 from ..errors import FileVersionError
@@ -86,10 +88,11 @@ class PyHecDssEngine(EngineABC):
 
     def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
         periods = pd.DatetimeIndex(rts.dates).to_period()
-        df = pd.DataFrame(
-            data=rts.values,
-            index=periods,
-        )
+        with catch_warnings(category=UnitStrippedWarning, action="ignore"):
+            df = pd.DataFrame(
+                data=rts.values,
+                index=periods,
+            )
         p = f"/{path.a}/{path.b}/{path.c}//{path.e}/{path.f}/"
         self._object.write_rts(p, df, rts.units, rts.period_type)
 
