@@ -54,8 +54,9 @@ class TestCatalog(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_from_frame_7(self):
-        with pyhecdss.DSSFile(str(DSS_7)) as dss:
-            df_cat = dss.read_catalog()
+        with pdss.quiet.suppress_stdout_stderr():
+            with pyhecdss.DSSFile(str(DSS_7)) as dss:
+                df_cat = dss.read_catalog()
         cat = pdss.Catalog.from_frame(df_cat, DSS_7)
         self.assertIsInstance(cat, pdss.Catalog)
         self.assertEqual(len(cat), len(df_cat))
