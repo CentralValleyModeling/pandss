@@ -5,11 +5,14 @@ from pathlib import Path
 from random import choice
 from string import ascii_letters
 from time import perf_counter
+from warnings import catch_warnings
 
 import numpy as np
 import pandas as pd
+from pint.errors import UnitStrippedWarning
 
 import pandss as pdss
+from pandss import units
 
 # Make sure we are using the developer version
 assert pdss.__version__ is None
@@ -76,14 +79,19 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertEqual(len(rts), len(rts.values))
             self.assertEqual(len(rts.values), len(rts.dates))
             self.assertEqual(rts.path, p)
-            self.assertIsInstance(rts.values, np.ndarray)
-            self.assertIsInstance(rts.values[0], np.float64)
+            self.assertTrue(hasattr(rts.values, "__array_ufunc__"))
+            self.assertTrue(hasattr(rts.values, "__array_function__"))
+            value = rts.values[0]
+            self.assertIsInstance(value, units.ureg.Quantity)
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
-                rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
+                rts.period_type,
+                pdss.keywords.PeriodTypes.__members__.values(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
-            self.assertEqual(rts.values[0], 31.0)
+            if hasattr(value, "magnitude"):
+                value = value.magnitude  # Unpack pint.Quantity
+            self.assertEqual(value, 31.0)
 
     @unittest.expectedFailure
     def test_data_content_7(self):
@@ -93,20 +101,26 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertEqual(len(rts), len(rts.values))
             self.assertEqual(len(rts.values), len(rts.dates))
             self.assertEqual(rts.path, p)
-            self.assertIsInstance(rts.values, np.ndarray)
-            self.assertIsInstance(rts.dates, list)
+            self.assertTrue(hasattr(rts.values, "__array_ufunc__"))
+            self.assertTrue(hasattr(rts.values, "__array_function__"))
+            value = rts.values[0]
+            self.assertIsInstance(value, units.ureg.Quantity)
+            self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
-                rts.period_type, pdss.keywords.PeriodTypes.__members__.values()
+                rts.period_type,
+                pdss.keywords.PeriodTypes.__members__.values(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
-            print(rts.values[12:])
-            self.assertEqual(rts.values[0], 31.0)
+            if hasattr(value, "magnitude"):
+                value = value.magnitude  # Unpack pint.Quantity
+            self.assertEqual(value, 31.0)
 
     def test_to_frame(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         with pdss.DSS(DSS_6) as dss:
             rts = dss.read_rts(p)
-            df = rts.to_frame()
+            with self.assertWarns(UnitStrippedWarning):
+                df = rts.to_frame()
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
                 df.columns.names,
@@ -118,7 +132,8 @@ class TestRegularTimeseries(unittest.TestCase):
         p = pdss.DatasetPath.from_str("/CALSIM/.*/.*/.*/.*/.*/")
         with pdss.DSS(DSS_6) as dss:
             p = dss.resolve_wildcard(p)
-            frames = [obj.to_frame() for obj in dss.read_multiple_rts(p)]
+            with self.assertWarns(UnitStrippedWarning):
+                frames = [obj.to_frame() for obj in dss.read_multiple_rts(p)]
             df = pd.concat(frames)
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
@@ -134,7 +149,8 @@ class TestRegularTimeseries(unittest.TestCase):
             p = dss.resolve_wildcard(p)
             self.assertEqual(len(p), 18_700)
             p = pdss.DatasetPathCollection(paths=set(list(p.paths)[:100]))
-            df = pd.concat(obj.to_frame() for obj in dss.read_multiple_rts(p))
+            with self.assertWarns(UnitStrippedWarning):
+                df = pd.concat(obj.to_frame() for obj in dss.read_multiple_rts(p))
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
                 df.columns.names,
@@ -180,7 +196,7 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
         p_old = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         with pdss.DSS(self.src_6) as dss:
             rts = dss.read_rts(p_old)
-        rts.values = rts.values + 1
+        rts.values = rts.values + pdss.units.ureg.Quantity(1, "day")
         p_new = pdss.DatasetPath.from_str(
             "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/"
         )
@@ -196,7 +212,8 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
         p_new = pdss.DatasetPath.from_str(
             "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/",
         )
-        pdss.copy_rts(self.src_6, self.dst_6, (p_old, p_new))
+        with catch_warnings(action="error"):
+            pdss.copy_rts(self.src_6, self.dst_6, (p_old, p_new))
         self.assertTrue(self.dst_6.exists())
         catalog = pdss.read_catalog(self.dst_6)
         self.assertEqual(len(catalog), 1)
@@ -210,7 +227,8 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
             "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
             "/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/",
         )
-        pdss.copy_multiple_rts(self.src_6, self.dst_6, tuple(zip(p_old, p_new)))
+        with catch_warnings(action="error"):
+            pdss.copy_multiple_rts(self.src_6, self.dst_6, tuple(zip(p_old, p_new)))
         self.assertTrue(self.dst_6.exists())
         catalog = pdss.read_catalog(self.dst_6)
         self.assertEqual(len(catalog), 2)
