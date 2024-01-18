@@ -1,8 +1,9 @@
 from dataclasses import dataclass, fields
 
-from numpy import datetime64, float64
+from numpy import datetime64
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
+from pint import Quantity
 
 from .paths import DatasetPath
 
@@ -14,7 +15,7 @@ from .paths import DatasetPath
 )
 class RegularTimeseries:
     path: DatasetPath
-    values: NDArray[float64]
+    values: Quantity
     dates: NDArray[datetime64]
     period_type: str
     units: str
@@ -49,6 +50,10 @@ class RegularTimeseries:
         columns = MultiIndex.from_arrays(
             tuple(header.values()), names=tuple(header.keys())
         )
-        df = DataFrame(index=self.dates, data=self.values, columns=columns)
+        df = DataFrame(
+            index=self.dates,
+            data=self.values,
+            columns=columns,
+        )
 
         return df
