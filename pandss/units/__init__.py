@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import pint
 
+here = Path(__file__)
 ureg = pint.UnitRegistry()
-ureg.load_definitions(r".\pandss\units\pandss_units.pint")
+ureg.load_definitions(here.parent / r"pandss_units.pint")
 
 # Unpack so the pdss.units.Quantity object belongs to the correct registry
 Quantity = ureg.Quantity
