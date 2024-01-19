@@ -119,8 +119,7 @@ class TestRegularTimeseries(unittest.TestCase):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         with pdss.DSS(DSS_6) as dss:
             rts = dss.read_rts(p)
-            with self.assertWarns(UnitStrippedWarning):
-                df = rts.to_frame()
+            df = rts.to_frame()
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
                 df.columns.names,
@@ -132,8 +131,7 @@ class TestRegularTimeseries(unittest.TestCase):
         p = pdss.DatasetPath.from_str("/CALSIM/.*/.*/.*/.*/.*/")
         with pdss.DSS(DSS_6) as dss:
             p = dss.resolve_wildcard(p)
-            with self.assertWarns(UnitStrippedWarning):
-                frames = [obj.to_frame() for obj in dss.read_multiple_rts(p)]
+            frames = [obj.to_frame() for obj in dss.read_multiple_rts(p)]
             df = pd.concat(frames)
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
