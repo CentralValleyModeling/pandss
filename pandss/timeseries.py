@@ -1,9 +1,11 @@
 from dataclasses import dataclass, fields
+from warnings import catch_warnings
 
 from numpy import datetime64
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
 from pint import Quantity
+from pint.errors import UnitStrippedWarning
 
 from .paths import DatasetPath
 
@@ -50,10 +52,11 @@ class RegularTimeseries:
         columns = MultiIndex.from_arrays(
             tuple(header.values()), names=tuple(header.keys())
         )
-        df = DataFrame(
-            index=self.dates,
-            data=self.values,
-            columns=columns,
-        )
+        with catch_warnings(action="ignore", category=UnitStrippedWarning):
+            df = DataFrame(
+                index=self.dates,
+                data=self.values,
+                columns=columns,
+            )
 
         return df
