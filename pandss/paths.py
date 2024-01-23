@@ -137,7 +137,7 @@ class DatasetPathCollection:
         return cls(paths=set(DatasetPath.from_str(p) for p in paths))
 
     def resolve_wildcard(self, path: DatasetPath) -> Self:
-        logging.info(f"finding paths that match {path}")
+        logging.debug(f"finding paths that match {path}")
         if any(p.has_any_wildcard for p in self.paths):
             warn(
                 "some paths in the searched collection contain wildcards,"
@@ -155,7 +155,7 @@ class DatasetPathCollection:
         )
 
     def collapse_dates(self) -> Self:
-        logging.info("collapsing dates")
+        logging.debug("collapsing dates")
         # get the kwargs needed to re-build the class
         kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
         # set construction removes duplicates automatically, so drop the dates

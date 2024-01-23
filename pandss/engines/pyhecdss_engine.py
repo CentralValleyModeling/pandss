@@ -50,21 +50,21 @@ class PyHecDssEngine(EngineABC):
     @must_be_open
     def read_catalog(self) -> Catalog:
         """Reads the DSS catalog to a pandss.Catalog object."""
-        logging.info(f"reading catalog, {self.src=}")
+        logging.debug(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             df = self._object.read_catalog()
         catalog = Catalog.from_frame(
             df=df,
             src=self.src,
         )
-        logging.info(f"catalog read, size is {len(catalog)}")
+        logging.debug(f"catalog read, size is {len(catalog)}")
         self._catalog = catalog
         return catalog
 
     @must_be_open
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
         """Reads a single regular timeseries from a DSS file."""
-        logging.info(f"reading regular time series, {path}")
+        logging.debug(f"reading regular time series, {path}")
         if path.has_wildcard:
             raise ValueError("path has wildcard, use `read_multiple_rts` method")
         # If the date is a wildcard, pyhecdss needs to request each and combine

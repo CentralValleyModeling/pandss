@@ -5,8 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .dates import (datetime_encode, get_datetime_range_pyobj,
-                    julian_array_to_date)
+from .dates import datetime_encode, get_datetime_range_pyobj, julian_array_to_date
 from .decorators import must_be_open, silent, suppress_stdout_stderr
 from .dll import get_compatible_dll
 from .errors import HECDSS_ErrorHandler, NoDataError
@@ -46,7 +45,7 @@ class DSS:
         RuntimeError
             Generic error for error opening DSS file
         """
-        logging.info(f"opening dss file {self.file_path}")
+        logging.debug(f"opening dss file {self.file_path}")
         fp = str(self.file_path).encode()
         result = self.dll.hec_dss_open(fp, ct.byref(self.file_table))
         if result != 0:
@@ -61,7 +60,7 @@ class DSS:
         """Wraps DLL function `hec_dss_close` and enables the use of this class
         in pythons context manager pattern.
         """
-        logging.info(f"closing dss file {self.file_path}")
+        logging.debug(f"closing dss file {self.file_path}")
         result = self.dll.hec_dss_close(self.file_table)
         if result != 0:
             self.handler.resolve(result)
@@ -93,7 +92,7 @@ class DSS:
         tuple[np.ndarray, np.ndarray]
             char array of catalog paths, and an array of matching record types
         """
-        logging.info(f"getting catalog from dss {self.file_path}")
+        logging.debug(f"getting catalog from dss {self.file_path}")
         path_filter = path_filter.encode("ascii")
         # Determine sizes of arrays
         count = self.dll.hec_dss_record_count(self.file_table)
@@ -142,7 +141,7 @@ class DSS:
         RuntimeError
             Generic error for error reading info from the DSS file
         """
-        logging.info(f"getting units and period_type for {path}")
+        logging.debug(f"getting units and period_type for {path}")
         path_bytes = path.encode("UTF-8")
         buffer_size = ct.c_int(10)
         units = ct.create_string_buffer(buffer_size.value)
@@ -318,11 +317,12 @@ class DSS:
             end_date,
             end_time,
         )
-        logging.info(
-            f"size to read: {time_len.value} (quality table width = {quality_width.value})"
+        logging.debug(
+            f"size to read: {time_len.value} "
+            + f"(quality table width = {quality_width.value})"
         )
         buffer_size = 20  # magic number from hec-dss-python library by USACE
-        logging.info(f"retrieving data for {path}")
+        logging.debug(f"retrieving data for {path}")
         units = ct.create_string_buffer(buffer_size)
         period_type = ct.create_string_buffer(buffer_size)
         # Places to store data

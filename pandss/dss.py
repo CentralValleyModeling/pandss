@@ -24,7 +24,7 @@ class DSS:
             engine = get_engine(engine)
         elif not isinstance(engine, EngineABC):
             raise ValueError(f"engine type not recognized: {type(engine)=}")
-        logging.info(f"using engine {engine}")
+        logging.debug(f"using engine {engine}")
         self.engine: EngineABC = engine(self.src)
         self._opened = 0
 
@@ -45,7 +45,7 @@ class DSS:
             Returns a DSS object.
         """
         if self._opened <= 0:
-            logging.info(f"opening dss file {self.src}")
+            logging.debug(f"opening dss file {self.src}")
             self.engine.open()
         self._opened += 1
         return self
@@ -57,21 +57,21 @@ class DSS:
         """
         self._opened += -1
         if self._opened <= 0:
-            logging.info(f"closing dss file {self.src}")
+            logging.debug(f"closing dss file {self.src}")
             self.engine.close()
             self._opened = 0
 
     def read_catalog(self, drop_date: bool = False) -> Catalog:
-        logging.info(f"reading catalog, {self.src=}")
+        logging.debug(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             catalog = self.engine.read_catalog()
         if drop_date:
             catalog = catalog.collapse_dates()
-        logging.info(f"catalog read, size is {len(catalog)}")
+        logging.debug(f"catalog read, size is {len(catalog)}")
         return catalog
 
     def read_rts(self, path: DatasetPath) -> RegularTimeseries:
-        logging.info(f"reading regular time series, {path}")
+        logging.debug(f"reading regular time series, {path}")
         if path.has_wildcard:
             raise WildcardError(
                 f"path has wildcard, use `read_multiple_rts` method, {path=}"
@@ -111,7 +111,7 @@ class DSS:
                 yield self.read_rts(p)
 
     def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
-        logging.info(f"writing regular time series, {path}")
+        logging.debug(f"writing regular time series, {path}")
         if path.has_wildcard:
             raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
         with suppress_stdout_stderr():
@@ -120,7 +120,7 @@ class DSS:
     def resolve_wildcard(
         self, path: DatasetPath, drop_date: bool = False
     ) -> DatasetPathCollection:
-        logging.info("resolving wildcards")
+        logging.debug("resolving wildcards")
         if not path.has_wildcard:
             return DatasetPathCollection(paths={path})
         if self.engine.catalog is None:
