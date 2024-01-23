@@ -1,0 +1,2 @@
+global-include *.pint
+recursive-include pandss *.py
