@@ -10,7 +10,7 @@ from ..catalog import Catalog
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
-from ..units import Quantity
+from ..units import Quantity, ureg
 from . import EngineABC, must_be_open
 
 
@@ -79,7 +79,7 @@ class PyDssToolsEngine(EngineABC):
         kwargs["path"] = path
         # Replace no-data with nan
         kwargs["values"][data.nodata] = np.nan
-        if self.use_units:
+        if self.use_units and (kwargs["units"].lower() in ureg):
             kwargs["values"] = Quantity(kwargs["values"], kwargs["units"].lower())
         # Adjust the way pydsstools interprets dates in HEC-DSS files.
         interval = kwargs["interval"]

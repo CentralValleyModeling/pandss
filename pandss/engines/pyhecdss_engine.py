@@ -12,7 +12,7 @@ from ..errors import FileVersionError
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import RegularTimeseries
-from ..units import Quantity
+from ..units import Quantity, ureg
 from . import EngineABC, must_be_open
 
 with suppress_stdout_stderr():
@@ -108,7 +108,7 @@ class PyHecDssEngine(EngineABC):
         kwargs = {L: getattr(data, R) for L, R in attr_map.items()}
         # Add values and dates
         values = data.data.iloc[:, 0].values
-        if self.use_units:
+        if self.use_units and (kwargs["units"].lower() in ureg):
             values = Quantity(values, kwargs["units"].lower())
         kwargs["values"] = values
         # Sometimes indexes are PeriodIndexes, other times they are DatetimeIndex
