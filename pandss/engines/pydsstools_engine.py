@@ -81,6 +81,7 @@ class PyDssToolsEngine(EngineABC):
         kwargs["values"][data.nodata] = np.nan
         array_units = kwargs["units"].lower()
         if array_units not in ureg:
+            logging.warning(f"units of {path}: `{array_units}` are not recognized.")
             array_units = "unrecognized"
         if self.use_units:
             kwargs["values"] = Quantity(kwargs["values"], array_units)

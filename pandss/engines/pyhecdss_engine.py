@@ -110,6 +110,7 @@ class PyHecDssEngine(EngineABC):
         values = data.data.iloc[:, 0].values
         array_units = kwargs["units"].lower()
         if array_units not in ureg:
+            logging.warning(f"units of {path}: `{array_units}` are not recognized.")
             array_units = "unrecognized"
         if self.use_units:
             values = Quantity(values, array_units)
