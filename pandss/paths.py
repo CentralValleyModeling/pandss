@@ -23,6 +23,8 @@ def enforce_similar_type(method):
 @dataclass(
     frozen=True,
     slots=True,
+    eq=True,
+    order=True,
 )
 class DatasetPath:
     a: str
@@ -99,7 +101,7 @@ class DatasetPathCollection:
             )
 
     def __iter__(self) -> Iterator[DatasetPath]:
-        yield from self.paths
+        yield from sorted(list(self.paths))
 
     def __len__(self) -> int:
         return len(self.paths)
