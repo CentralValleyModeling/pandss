@@ -10,7 +10,9 @@ cubic_foot_per_second = cubic_foot / second = cfs
 
 # Logical, unitless
 logical = []
-undefined = [] = undefine = unknown = none
+none = []
+undefined = [undefined] = undefine = unknown
+unrecognized = [unrecognized]
 
 @context(interval=0) regular_time_series = rts
     [volume] / [time] -> [volume]: value * interval
