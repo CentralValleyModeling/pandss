@@ -79,8 +79,11 @@ class PyDssToolsEngine(EngineABC):
         kwargs["path"] = path
         # Replace no-data with nan
         kwargs["values"][data.nodata] = np.nan
-        if self.use_units and (kwargs["units"].lower() in ureg):
-            kwargs["values"] = Quantity(kwargs["values"], kwargs["units"].lower())
+        array_units = kwargs["units"].lower()
+        if array_units not in ureg:
+            array_units = "unrecognized"
+        if self.use_units:
+            kwargs["values"] = Quantity(kwargs["values"], array_units)
         # Adjust the way pydsstools interprets dates in HEC-DSS files.
         interval = kwargs["interval"]
         # Only fix for intervals greater gte 1 day

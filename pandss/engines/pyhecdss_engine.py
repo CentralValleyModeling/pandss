@@ -108,8 +108,11 @@ class PyHecDssEngine(EngineABC):
         kwargs = {L: getattr(data, R) for L, R in attr_map.items()}
         # Add values and dates
         values = data.data.iloc[:, 0].values
-        if self.use_units and (kwargs["units"].lower() in ureg):
-            values = Quantity(values, kwargs["units"].lower())
+        array_units = kwargs["units"].lower()
+        if array_units not in ureg:
+            array_units = "unrecognized"
+        if self.use_units:
+            values = Quantity(values, array_units)
         kwargs["values"] = values
         # Sometimes indexes are PeriodIndexes, other times they are DatetimeIndex
         dates = data.data.index
