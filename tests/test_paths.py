@@ -63,6 +63,19 @@ class TestPath(unittest.TestCase):
             with self.assertWarns(Warning):
                 catalog.resolve_wildcard(star)
 
+    def test_path_ordering(self):
+        a = pdss.DatasetPath.from_str(r"/A/A/A/A/A/A/")
+        z = pdss.DatasetPath.from_str(r"/Z/Z/Z/Z/Z/Z/")
+        self.assertGreater(z, a)
+        ab = pdss.DatasetPath.from_str(r"/A/A/A/A/A/B/")
+        ba = pdss.DatasetPath.from_str(r"/B/A/A/A/A/A/")
+        self.assertGreater(ba, ab)
+        sorted_paths = sorted([ba, ab, z, a])
+        self.assertListEqual(sorted_paths, [a, ab, ba, z])
+        collection = pdss.DatasetPathCollection(paths=set((z, a, ab, ba)))
+        list_collection = list(collection)
+        self.assertListEqual(list_collection, [a, ab, ba, z])
+
 
 if __name__ == "__main__":
     unittest.main()
