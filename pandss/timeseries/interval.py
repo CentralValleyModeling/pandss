@@ -2,6 +2,9 @@ import json
 from functools import total_ordering
 from pathlib import Path
 
+from packaging.version import Version
+from pandas import __version__ as pandas_version
+
 
 class EPartStandard:
     def __init__(self):
@@ -12,6 +15,7 @@ class EPartStandard:
             self.e_to_sec: dict[str, int | None] = json.load(J)
         with open(here / "interval_to_period_offset.json", "r") as J:
             self.e_to_period_offset: dict[str, int | None] = json.load(J)
+        self.pandas_version = Version(pandas_version)
 
     @property
     def valid_e(self) -> set:
@@ -28,7 +32,10 @@ class EPartStandard:
     def get_period_offset(self, e: str) -> str:
         if e not in self.e_to_period_offset:
             raise ValueError(f"{e=} not recognized, must be one of {self.valid_e}")
-        return self.e_to_period_offset[e]
+        offset: str = self.e_to_period_offset[e]
+        if self.pandas_version < Version("2.2"):
+            offset = offset.replace("ME", "M").replace("YE", "Y")
+        return offset
 
 
 @total_ordering
@@ -71,3 +78,7 @@ class Interval:
     @property
     def offset(self) -> str:
         return self._lookup.get_period_offset(self.e)
+
+    @property
+    def freq(self) -> str:
+        return self.offset
