@@ -71,6 +71,12 @@ class Interval:
     def __hash__(self):
         return hash(self.e)
 
+    def __str__(self) -> str:
+        return self.e
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} {self.e}>"
+
     @property
     def seconds(self) -> int:
         return self._lookup.get_seconds(self.e)
