@@ -7,7 +7,7 @@ from pandas import DataFrame, MultiIndex
 from pint import Quantity
 from pint.errors import UnitStrippedWarning
 
-from .paths import DatasetPath
+from ..paths import DatasetPath
 
 
 @dataclass(
