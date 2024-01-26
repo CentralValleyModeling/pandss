@@ -9,6 +9,7 @@ from pint import UnitStrippedWarning
 
 from .. import Catalog, DatasetPath, RegularTimeseries, quiet, units
 from ..errors import FileVersionError
+from ..timeseries import Interval
 from . import EngineABC, must_be_open
 
 with quiet.suppress_stdout_stderr():
@@ -118,7 +119,7 @@ class PyHecDssEngine(EngineABC):
         if not isinstance(dates, pd.DatetimeIndex):
             raise ValueError(f"unknown datetype in pyhecdss object: {type(dates)}")
         kwargs["dates"] = dates.values.astype("datetime64[s]")
-        kwargs["interval"] = "UNKNOWN"
+        kwargs["interval"] = Interval(e=path.e)
         # Add the path object to the keyword argument dict
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
