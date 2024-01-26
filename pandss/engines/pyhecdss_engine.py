@@ -7,15 +7,11 @@ import numpy as np
 import pandas as pd
 from pint import UnitStrippedWarning
 
-from ..catalog import Catalog
+from .. import Catalog, DatasetPath, RegularTimeseries, quiet, units
 from ..errors import FileVersionError
-from ..paths import DatasetPath
-from ..quiet import suppress_stdout_stderr
-from ..timeseries import RegularTimeseries
-from ..units import Quantity, ureg
 from . import EngineABC, must_be_open
 
-with suppress_stdout_stderr():
+with quiet.suppress_stdout_stderr():
     import pyhecdss
 
 
@@ -51,7 +47,7 @@ class PyHecDssEngine(EngineABC):
     def read_catalog(self) -> Catalog:
         """Reads the DSS catalog to a pandss.Catalog object."""
         logging.debug(f"reading catalog, {self.src=}")
-        with suppress_stdout_stderr():
+        with quiet.suppress_stdout_stderr():
             df = self._object.read_catalog()
         catalog = Catalog.from_frame(
             df=df,
@@ -69,7 +65,7 @@ class PyHecDssEngine(EngineABC):
             raise ValueError("path has wildcard, use `read_multiple_rts` method")
         # If the date is a wildcard, pyhecdss needs to request each and combine
         if path.d == ".*":
-            with suppress_stdout_stderr():
+            with quiet.suppress_stdout_stderr():
                 data = [
                     self._object.read_rts(str(p))
                     for p in self.catalog.resolve_wildcard(path)
@@ -78,7 +74,7 @@ class PyHecDssEngine(EngineABC):
                 data = pyhecdss.DSSData(df, data[0].units, data[0].period_type)
         # Otherwise just read the single timeseries
         else:
-            with suppress_stdout_stderr():
+            with quiet.suppress_stdout_stderr():
                 data = self._object.read_rts(str(path))
         # magic number that is returned by the library in some cases
         mask = data.data.values == -3.4028234663852886e38
@@ -109,11 +105,11 @@ class PyHecDssEngine(EngineABC):
         # Add values and dates
         values = data.data.iloc[:, 0].values
         array_units = kwargs["units"].lower()
-        if array_units not in ureg:
+        if array_units not in units.ureg:
             logging.warning(f"units of {path}: `{array_units}` are not recognized.")
             array_units = "unrecognized"
         if self.use_units:
-            values = Quantity(values, array_units)
+            values = units.Quantity(values, array_units)
         kwargs["values"] = values
         # Sometimes indexes are PeriodIndexes, other times they are DatetimeIndex
         dates = data.data.index
