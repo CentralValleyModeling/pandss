@@ -53,3 +53,10 @@ class TestInterval(unittest.TestCase):
             freq=Interval("1MON").freq,
         )
         self.assertListEqual(list(periods.days_in_month), [28, 29])
+
+    def test_frame_matches_interval_object(self):
+        p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
+        rts = pdss.read_rts(DSS_6, p)
+        frame = rts.to_frame()
+        self.assertEqual(str(rts.interval), "1MON")
+        self.assertEqual(frame.columns.get_level_values("INTERVAL"), str(rts.interval))
