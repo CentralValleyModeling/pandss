@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
 
+import pandas as pd
+
 import pandss as pdss
 from pandss.timeseries.interval import Interval
 
@@ -34,3 +36,20 @@ class TestInterval(unittest.TestCase):
         yearly = Interval(e="1Year")  # version 7 style
         with self.assertRaises(AttributeError):
             yearly.foo = None
+
+    def test_single_period(self):
+        period = pd.Period(
+            value=pd.to_datetime("2023-01-01"),
+            freq=Interval("1MON").freq,
+        )
+        self.assertEqual(period.days_in_month, 31)
+
+    def test_period_index(self):
+        periods = pd.PeriodIndex(
+            data=(
+                pd.to_datetime("2023-02-01"),
+                pd.to_datetime("2024-02-01"),
+            ),
+            freq=Interval("1MON").freq,
+        )
+        self.assertListEqual(list(periods.days_in_month), [28, 29])
