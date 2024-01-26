@@ -55,7 +55,7 @@ class RegularTimeseries:
         header = dict(self.path.items())
         header["UNITS"] = self.units
         header["PERIOD_TYPE"] = self.period_type
-        header["INTERVAL"] = self.interval
+        header["INTERVAL"] = str(self.interval)
         header = {k.upper(): (v,) for k, v in header.items()}
         columns = MultiIndex.from_arrays(
             tuple(header.values()), names=tuple(header.keys())
