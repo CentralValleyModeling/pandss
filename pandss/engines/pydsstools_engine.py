@@ -9,7 +9,7 @@ from pydsstools.heclib.dss import HecDss
 from ..catalog import Catalog
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
-from ..timeseries import RegularTimeseries
+from ..timeseries import Interval, RegularTimeseries
 from ..units import Quantity, ureg
 from . import EngineABC, must_be_open
 
@@ -98,4 +98,6 @@ class PyDssToolsEngine(EngineABC):
                 fixed_dates.append(date)
             kwargs["dates"] = fixed_dates
         kwargs["dates"] = np.array(kwargs["dates"], dtype="datetime64")
+        # use interval object
+        kwargs["interval"] = Interval(path.e)
         return RegularTimeseries(**kwargs)
