@@ -33,6 +33,14 @@ class EPartStandard:
 
 @total_ordering
 class Interval:
+    """The interval of a timeseries object.
+
+    See Also
+    --------
+    Interval.seconds: The number of seconds in the interval.
+    Interval.offset: The pandas Period Offset Alias for the interval.
+    """
+
     __slots__ = ("e", "_lookup")
 
     def __init__(self, e: str):
@@ -45,19 +53,19 @@ class Interval:
 
     def __eq__(self, __other) -> bool:
         if isinstance(__other, Interval):
-            __other = __other.interval
-        return self.interval == __other
+            __other = __other.seconds
+        return self.seconds == __other
 
     def __lt__(self, __other) -> bool:
         if isinstance(__other, Interval):
-            __other = __other.interval
-        return self.interval < __other
+            __other = __other.seconds
+        return self.seconds < __other
 
     def __hash__(self):
         return hash(self.e)
 
     @property
-    def interval(self) -> int:
+    def seconds(self) -> int:
         return self._lookup.get_seconds(self.e)
 
     @property

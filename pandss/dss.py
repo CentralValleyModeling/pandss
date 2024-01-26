@@ -14,6 +14,24 @@ class DSS:
     """Class representing an open DSS file. Binds to various other python based
     HEC-DSS file readers through an "engine". The Engine classes wrap the other
     libraries, creating one API that this class uses.
+
+    Parameters
+    ----------
+    src: pathlib.Path
+        The path to the DSS file on disk.
+    engine: str | EngineABC, default "pyhecdss"
+        The engine object that handles the DSS interactions. Available engines:
+            - pyhecdss
+            - pydsstools
+
+    See Also
+    --------
+    DSS.read_catalog: Read the DSS and return a pandss.Catalog object
+    DSS.reaf_rts: Read a single regular timeseries from the DSS and return a
+        pandss.RegularTimeseries object.
+    DSS.read_multiple_rts: Read multiple regular timeseries from the DSS and
+        return a iterator of pandss.RegularTimeseries objects.
+    DSS.write_rts: Write a pandss.RegularTimeseries object to a DSS file.
     """
 
     __slots__ = ["src", "engine", "_opened"]

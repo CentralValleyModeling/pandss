@@ -17,6 +17,13 @@ from .interval import Interval
     slots=True,
 )
 class RegularTimeseries:
+    """A regular timeseries within a DSS file.
+
+    See Also
+    --------
+    RegularTimeseries.to_frame: Render this object to a pandas.DataFrame.
+    """
+
     path: DatasetPath
     values: Quantity | NDArray
     dates: NDArray[datetime64]

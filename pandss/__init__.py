@@ -1,4 +1,4 @@
-"""pandss - Interact with HEC DSS files in a pandas to CSV like API.
+"""pandss - Interact with HEC DSS files in a pandas like API.
 
 Zachary Roy, DWR
 June 2023

@@ -34,6 +34,8 @@ class suppress_stdout_stderr(object):
 
 
 def silent(method):
+    """Decorated function or method does not have access to STDOUT or STDERR."""
+
     def silent_method(*args, **kwargs):
         with suppress_stdout_stderr():
             return method(*args, **kwargs)

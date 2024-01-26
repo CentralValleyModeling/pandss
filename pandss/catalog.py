@@ -14,6 +14,22 @@ from .paths import DatasetPath, DatasetPathCollection
     eq=True,
 )
 class Catalog(DatasetPathCollection):
+    """Collection of DatasetPath objects, specific to the collection present in
+    one DSS file.
+
+    Parameters
+    ----------
+    paths : set[DatasetPath]
+        The paths present in the DSS Catalog.
+    src: pathlib.Path
+        The path to the DSS file on disk.
+
+    See Also
+    --------
+    Catalog.from_frame: Constructor from pandas.DataFrame.
+    Catalog.resolve_wildcards: Find a sub-collection of DatasetPaths.
+    """
+
     src: Path
 
     @classmethod

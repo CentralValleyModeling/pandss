@@ -10,9 +10,17 @@ WILDCARD_PATTERN = compile(r"\.\*")
 
 
 def enforce_similar_type(method):
+    """Decorator for ensuring that binary operators are acting on objects of
+    the same class inheritance.
+
+    Raises
+    ------
+    TypeError: Error raised if the objects are not of the same class.
+    """
+
     def enforce_similar_type_inner(obj, __other):
         if not isinstance(__other, type(obj)):
-            raise ValueError(
+            raise TypeError(
                 f"cannot {method.__name__} {type(obj)} with {type(__other)}"
             )
         return method(obj, __other)
@@ -27,6 +35,8 @@ def enforce_similar_type(method):
     order=True,
 )
 class DatasetPath:
+    """Representation of a single DSS dataset path, made of five parts, A-F."""
+
     a: str
     b: str
     c: str
@@ -83,6 +93,10 @@ class DatasetPath:
     eq=True,
 )
 class DatasetPathCollection:
+    """Representation of multiple pandss.DatasetPath objects. Acts similarly to
+    and ordered set of DatasetPath objects.
+    """
+
     paths: set[DatasetPath] = field(default_factory=set)
 
     def __post_init__(self):
