@@ -12,7 +12,8 @@ import pandas as pd
 from pint.errors import UnitStrippedWarning
 
 import pandss as pdss
-from pandss import units
+from pandss import timeseries, units
+from pandss.timeseries.period_type import PeriodTypeStandard
 
 # Make sure we are using the developer version
 assert pdss.__version__ is None
@@ -86,7 +87,7 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
                 rts.period_type,
-                pdss.keywords.PeriodTypes.__members__.values(),
+                PeriodTypeStandard(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
             if hasattr(value, "magnitude"):
@@ -108,12 +109,20 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
                 rts.period_type,
-                pdss.keywords.PeriodTypes.__members__.values(),
+                PeriodTypeStandard(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
             if hasattr(value, "magnitude"):
                 value = value.magnitude  # Unpack pint.Quantity
             self.assertEqual(value, 31.0)
+
+    def test_interval_6(self):
+        p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
+        interval = pdss.timeseries.Interval(e="1MON")
+        with pdss.DSS(DSS_6) as dss:
+            rts = dss.read_rts(p)
+            self.assertIsInstance(rts.interval, timeseries.Interval)
+            self.assertEqual(rts.interval, interval)
 
     def test_to_frame(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
