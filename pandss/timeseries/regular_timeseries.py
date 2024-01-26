@@ -8,6 +8,7 @@ from pint import Quantity
 from pint.errors import UnitStrippedWarning
 
 from ..paths import DatasetPath
+from .interval import Interval
 
 
 @dataclass(
@@ -21,7 +22,7 @@ class RegularTimeseries:
     dates: NDArray[datetime64]
     period_type: str
     units: str
-    interval: int
+    interval: Interval
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}(path={str(self.path)}, len={len(self)})"
