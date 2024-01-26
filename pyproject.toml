@@ -11,5 +11,4 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["pandss", "pandss.engines", "pandss.units"]
 include-package-data = true
