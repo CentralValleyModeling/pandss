@@ -26,9 +26,9 @@ class TestInterval(unittest.TestCase):
 
     def test_seconds(self):
         yearly = Interval(e="1Year")  # version 7 style
-        self.assertEqual(yearly.interval, 365 * 24 * 60 * 60)
+        self.assertEqual(yearly.seconds, 365 * 24 * 60 * 60)
         monthly = Interval(e="1MON")  # version 6 style
-        self.assertEqual(monthly.interval, 30 * 24 * 60 * 60)
+        self.assertEqual(monthly.seconds, 30 * 24 * 60 * 60)
 
     def test_slots(self):
         yearly = Interval(e="1Year")  # version 7 style
