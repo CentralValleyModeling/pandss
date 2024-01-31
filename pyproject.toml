@@ -8,6 +8,7 @@ version = "0.6.7"
 dependencies = [
     "pyhecdss",
     "pandas",
+    "pint"
 ]
 
 [tool.setuptools]
