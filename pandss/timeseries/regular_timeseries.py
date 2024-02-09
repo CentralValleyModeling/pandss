@@ -6,7 +6,7 @@ from numpy import datetime64, intersect1d
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
 from pint import Quantity
-from pint.errors import UnitStrippedWarning
+from pint.errors import DimensionalityError, UnitStrippedWarning
 
 from ..paths import DatasetPath
 from .interval import Interval
@@ -64,11 +64,6 @@ class RegularTimeseries:
                 f"Cannot perform arithmatic {self.__class__.__name__} "
                 + f"with {type(__other)}"
             )
-        if __other.units != self.units:
-            raise ValueError(
-                f"Cannot perform arithmatic between {self.__class__.__name__} with"
-                + f"differing units: {self.units}, {__other.units}"
-            )
         for attr in ("interval", "period_type"):
             s = getattr(self, attr)
             o = getattr(__other, attr)
@@ -99,7 +94,10 @@ class RegularTimeseries:
         mask_right = [date in new_dates for date in __other.dates]
         values_right = __other.values[mask_right]
         method = getattr(values_left, method_name)
-        new_values = method(values_right)
+        try:
+            new_values = method(values_right)
+        except DimensionalityError as e:
+            raise ValueError(f"Cannot {method} values with incompatible units") from e
 
         kwargs = dict(
             path=new_path,
