@@ -114,6 +114,12 @@ class TestDSS(unittest.TestCase):
                     self.assertTrue(dss.is_open)
         self.assertFalse(dss.is_open)
 
+    def test_path_as_string(self):
+        p = "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/"
+        with pdss.DSS(DSS_6) as dss:
+            rts = dss.read_rts(p)
+            self.assertIsInstance(rts, pdss.RegularTimeseries)
+
 
 if __name__ == "__main__":
     unittest.main()
