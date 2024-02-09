@@ -2,7 +2,7 @@ from dataclasses import dataclass, fields
 from typing import Self
 from warnings import catch_warnings
 
-from numpy import datetime64
+from numpy import datetime64, intersect1d
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
 from pint import Quantity
@@ -53,13 +53,11 @@ class RegularTimeseries:
         return True
 
     def __add__(self, __other: Self) -> Self:
-        df, kwargs = self._prepare_for_arithmetic(__other)
-        df = df.sum(axis=1)
-        new_values = Quantity(df.values, kwargs["units"])
+        kwargs = self._do_arithmatic(__other, "__add__")
 
-        return RegularTimeseries(values=new_values, **kwargs)
+        return RegularTimeseries(**kwargs)
 
-    def _prepare_for_arithmetic(self, __other: Self) -> tuple[DataFrame, dict]:
+    def _do_arithmatic(self, __other: Self, method_name: str) -> dict:
         # Validate action
         if not isinstance(__other, self.__class__):
             raise ValueError(
@@ -94,18 +92,24 @@ class RegularTimeseries:
         if self.path == __other.path:  # Rare case of adding identical paths
             new_path_kwargs["b"] = f"{self.path.b}+{__other.path.b}"
         new_path = DatasetPath(**new_path_kwargs)
-        df_self = self.to_frame()
-        df_other = __other.to_frame()
-        df_combined = df_self.join(df_other, how="left", rsuffix="_OTHER")
+
+        new_dates = intersect1d(self.dates, __other.dates)
+        mask_left = [date in new_dates for date in self.dates]
+        values_left = self.values[mask_left]
+        mask_right = [date in new_dates for date in __other.dates]
+        values_right = __other.values[mask_right]
+        method = getattr(values_left, method_name)
+        new_values = method(values_right)
 
         kwargs = dict(
             path=new_path,
-            dates=df_combined.index.values,
+            values=new_values,
+            dates=new_dates,
             units=new_units,
             period_type=self.period_type,
             interval=self.interval,
         )
-        return df_combined, kwargs
+        return kwargs
 
     def to_frame(self) -> DataFrame:
         header = dict(self.path.items())
