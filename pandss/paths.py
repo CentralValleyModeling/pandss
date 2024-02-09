@@ -37,12 +37,12 @@ def enforce_similar_type(method):
 class DatasetPath:
     """Representation of a single DSS dataset path, made of five parts, A-F."""
 
-    a: str
-    b: str
-    c: str
-    d: str
-    e: str
-    f: str
+    a: str = ".*"
+    b: str = ".*"
+    c: str = ".*"
+    d: str = ".*"
+    e: str = ".*"
+    f: str = ".*"
 
     @classmethod
     def from_str(cls, path: str) -> Self:
