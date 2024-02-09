@@ -25,7 +25,7 @@ def read_catalog(src: str | Path) -> Catalog:
         return dss.read_catalog()
 
 
-def read_rts(src: str | Path, path: DatasetPath) -> RegularTimeseries:
+def read_rts(src: str | Path, path: DatasetPath | str) -> RegularTimeseries:
     """Read the DSS file for a single regular timeseries, and return a
     pandss.RegularTimeseries object.
 

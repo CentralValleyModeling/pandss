@@ -88,8 +88,10 @@ class DSS:
         logging.debug(f"catalog read, size is {len(catalog)}")
         return catalog
 
-    def read_rts(self, path: DatasetPath) -> RegularTimeseries:
+    def read_rts(self, path: DatasetPath | str) -> RegularTimeseries:
         logging.debug(f"reading regular time series, {path}")
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         if path.has_wildcard:
             raise WildcardError(
                 f"path has wildcard, use `read_multiple_rts` method, {path=}"
@@ -115,11 +117,16 @@ class DSS:
                         + " path contains no wildcards to expand"
                     )
                     paths = DatasetPathCollection(paths={paths})
-            else:
+            elif isinstance(paths, DatasetPathCollection):
                 # If passed multple paths, expand any of them with wildcards
                 if any(p.has_wildcard for p in paths):
                     for p in paths:
                         paths = paths & self.resolve_wildcard(p)
+            else:
+                raise ValueError(
+                    "paths must be given as DatasetPath or DatasetPathCollection"
+                    + " so wildcards can be correctly resolved"
+                )
             # When expanding wildcards, paths might be specific to a single chunk,
             # use the special method here to re-combine the paths (combine D-parts)
             if drop_date is True:
@@ -128,7 +135,9 @@ class DSS:
             for p in paths:
                 yield self.read_rts(p)
 
-    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+    def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         logging.debug(f"writing regular time series, {path}")
         if path.has_wildcard:
             raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
@@ -136,8 +145,12 @@ class DSS:
             return self.engine.write_rts(path, rts)
 
     def resolve_wildcard(
-        self, path: DatasetPath, drop_date: bool = False
+        self,
+        path: DatasetPath | str,
+        drop_date: bool = False,
     ) -> DatasetPathCollection:
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         logging.debug("resolving wildcards")
         if not path.has_wildcard:
             return DatasetPathCollection(paths={path})
