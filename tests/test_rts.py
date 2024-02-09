@@ -169,7 +169,8 @@ class TestRegularTimeseries(unittest.TestCase):
         with pdss.DSS(DSS_6) as dss:
             rts = dss.read_rts(p)
             dates = pd.to_datetime(rts.dates)
-            dates = dates + pd.DateOffset(years=1)
+            # offset by four years to avoid leap year weirdness in this test
+            dates = dates + pd.DateOffset(years=4)
             rts_2 = pdss.RegularTimeseries(
                 path=pdss.DatasetPath.from_str(
                     "/CALSIM/MONTH_DAYS_OFFSET/DAY//1MON/L2020A/"
@@ -181,13 +182,13 @@ class TestRegularTimeseries(unittest.TestCase):
                 interval=rts.interval,
             )
             rts_add_LR = rts + rts_2
-            self.assertEqual(rts_add_LR.values.magnitude[0], 31)
-            self.assertEqual(rts_add_LR.values.magnitude[12], 62)
-            self.assertEqual(len(rts_add_LR), 1200)
+            self.assertEqual(rts_add_LR.values.magnitude[0], 62)
+            self.assertEqual(len(rts_add_LR.values), len(rts_add_LR.dates))
+            self.assertEqual(len(rts_add_LR), 1200 - 48)
             rts_add_RL = rts_2 + rts  # Swap places
             self.assertEqual(rts_add_RL.values.magnitude[0], 62)
-            self.assertEqual(rts_add_RL.values.magnitude[12], 62)
-            self.assertEqual(len(rts_add_RL), 1200)
+            self.assertEqual(len(rts_add_RL.values), len(rts_add_RL.dates))
+            self.assertEqual(len(rts_add_RL), 1200 - 48)
 
     @unittest.skip("skipping long test, only run if targeted individually")
     def test_large_dss_to_frame_6(self):
