@@ -12,6 +12,12 @@ DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
 
 
 class TestPath(unittest.TestCase):
+    def test_partial_construction(self):
+        p = pdss.DatasetPath(b="FOO")
+        self.assertEqual(p.b, "FOO")
+        self.assertEqual(p.c, ".*")
+        self.assertEqual(str(p), "/.*/FOO/.*/.*/.*/.*/")
+
     def test_wildcard_6(self):
         p = pdss.DatasetPath.from_str(r"/CALSIM/.*/.*/.*/.*/.*/")
         self.assertTrue(p.has_wildcard)
