@@ -53,15 +53,15 @@ class RegularTimeseries:
         return True
 
     def __add__(self, __other: Self) -> Self:
-        kwargs = self._do_arithmatic(__other, "__add__")
+        kwargs = self._do_arithmetic(__other, "__add__")
 
         return RegularTimeseries(**kwargs)
 
-    def _do_arithmatic(self, __other: Self, method_name: str) -> dict:
+    def _do_arithmetic(self, __other: Self, method_name: str) -> dict:
         # Validate action
         if not isinstance(__other, self.__class__):
             raise ValueError(
-                f"Cannot perform arithmatic {self.__class__.__name__} "
+                f"Cannot perform arithmetic {self.__class__.__name__} "
                 + f"with {type(__other)}"
             )
         for attr in ("interval", "period_type"):
