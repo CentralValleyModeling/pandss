@@ -46,6 +46,9 @@ class DSS:
         self.engine: EngineABC = engine(self.src)
         self._opened = 0
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.src})"
+
     @silent
     def __enter__(self):
         """Wraps Engine class `open` and enables the use of engine classes in
