@@ -7,6 +7,7 @@ import numpy as np
 from pydsstools.heclib.dss import HecDss
 
 from ..catalog import Catalog
+from ..errors import DatasetNotFound, WildcardError
 from ..paths import DatasetPath
 from ..quiet import suppress_stdout_stderr
 from ..timeseries import Interval, RegularTimeseries
@@ -53,14 +54,17 @@ class PyDssToolsEngine(EngineABC):
         """Reads a single regular timeseries from a DSS file."""
         logging.debug(f"reading regular time series, {path}")
         if path.has_wildcard:
-            raise ValueError("path has wildcard, use `read_multiple_rts` method")
+            raise WildcardError("path has wildcard, use `read_multiple_rts` method")
         # pydsstools uses a single "*"" char for wildcards in D-parts
         p = str(path)
         if path.d == ".*":
             p = p.replace(".*", "*")
         # read data from file
         with suppress_stdout_stderr():
-            data = self._object.read_ts(p)
+            try:
+                data = self._object.read_ts(p)
+            except ValueError:
+                raise DatasetNotFound(p)
 
         return self._convert_to_pandss_rts(data, path)
 
