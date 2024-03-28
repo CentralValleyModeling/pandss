@@ -194,6 +194,14 @@ class TestRegularTimeseries(unittest.TestCase):
         tt = et - st
         self.assertLessEqual(tt, 20.0)
 
+    def test_read_single_with_wildcard(self):
+        p1 = pdss.DatasetPath(b="MONTH_DAYS")
+        rts = pdss.read_rts(DSS_6, p1)
+        self.assertIsInstance(rts, pdss.RegularTimeseries)
+        with self.assertRaises(pdss.errors.UnexpectedDSSReturn):
+            p2 = pdss.DatasetPath(f="L2020A")
+            _ = pdss.read_rts(DSS_6, p2)
+
 
 class TestRegularTimeseriesWriting(unittest.TestCase):
     @classmethod

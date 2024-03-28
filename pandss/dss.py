@@ -4,7 +4,7 @@ from typing import Iterator
 
 from .catalog import Catalog
 from .engines import EngineABC, get_engine
-from .errors import WildcardError
+from .errors import UnexpectedDSSReturn, WildcardError
 from .paths import DatasetPath, DatasetPathCollection
 from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
@@ -91,14 +91,29 @@ class DSS:
         logging.debug(f"catalog read, size is {len(catalog)}")
         return catalog
 
-    def read_rts(self, path: DatasetPath | str) -> RegularTimeseries:
+    def read_rts(
+        self,
+        path: DatasetPath | str,
+        expect_single: bool = True,
+        drop_date: bool = True,
+    ) -> RegularTimeseries:
         logging.debug(f"reading regular time series, {path}")
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         if path.has_wildcard:
-            raise WildcardError(
-                f"path has wildcard, use `read_multiple_rts` method, {path=}"
-            )
+            if expect_single:
+                rtss = tuple(self.read_multiple_rts(path, drop_date))
+                if len(rtss) != 1:
+                    raise UnexpectedDSSReturn(
+                        "expected path to resolve to single path, "
+                        + f"DSS returned {len(rtss)} items."
+                    )
+                else:
+                    return rtss[0]
+            else:
+                raise WildcardError(
+                    f"path has wildcard, use `read_multiple_rts` method, {path=}"
+                )
         with suppress_stdout_stderr():
             return self.engine.read_rts(path)
 
