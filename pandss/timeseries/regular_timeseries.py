@@ -1,12 +1,9 @@
 from dataclasses import dataclass, fields
 from typing import Self
-from warnings import catch_warnings
 
 from numpy import datetime64, intersect1d
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
-from pint import Quantity
-from pint.errors import DimensionalityError, UnitStrippedWarning
 
 from ..paths import DatasetPath
 from .interval import Interval
@@ -26,7 +23,7 @@ class RegularTimeseries:
     """
 
     path: DatasetPath
-    values: Quantity | NDArray
+    values: NDArray
     dates: NDArray[datetime64]
     period_type: str
     units: str
@@ -71,10 +68,7 @@ class RegularTimeseries:
                 raise ValueError(f"Cannot add differing {attr}: {s}, {o}")
         # Get kwargs for new instance
         # units
-        if isinstance(self.values, Quantity):
-            new_units = self.values.units
-        else:
-            new_units = self.units
+        new_units = self.units
         # path
         new_path_kwargs = dict()
         for part in ("a", "b", "c", "d", "e", "f"):
@@ -87,17 +81,14 @@ class RegularTimeseries:
         if self.path == __other.path:  # Rare case of adding identical paths
             new_path_kwargs["b"] = f"{self.path.b}+{__other.path.b}"
         new_path = DatasetPath(**new_path_kwargs)
-
+        # dates
         new_dates = intersect1d(self.dates, __other.dates)
         mask_left = [date in new_dates for date in self.dates]
         values_left = self.values[mask_left]
         mask_right = [date in new_dates for date in __other.dates]
         values_right = __other.values[mask_right]
         method = getattr(values_left, method_name)
-        try:
-            new_values = method(values_right)
-        except DimensionalityError as e:
-            raise ValueError(f"Cannot {method} values with incompatible units") from e
+        new_values = method(values_right)
 
         kwargs = dict(
             path=new_path,
@@ -118,11 +109,10 @@ class RegularTimeseries:
         columns = MultiIndex.from_arrays(
             tuple(header.values()), names=tuple(header.keys())
         )
-        with catch_warnings(action="ignore", category=UnitStrippedWarning):
-            df = DataFrame(
-                index=self.dates,
-                data=self.values,
-                columns=columns,
-            )
+        df = DataFrame(
+            index=self.dates,
+            data=self.values,
+            columns=columns,
+        )
 
         return df

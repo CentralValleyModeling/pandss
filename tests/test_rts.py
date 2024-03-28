@@ -9,10 +9,9 @@ from warnings import catch_warnings
 
 import numpy as np
 import pandas as pd
-from pint.errors import UnitStrippedWarning
 
 import pandss as pdss
-from pandss import timeseries, units
+from pandss import timeseries
 from pandss.timeseries.period_type import PeriodTypeStandard
 
 # Make sure we are using the developer version
@@ -83,15 +82,13 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertTrue(hasattr(rts.values, "__array_ufunc__"))
             self.assertTrue(hasattr(rts.values, "__array_function__"))
             value = rts.values[0]
-            self.assertIsInstance(value, units.ureg.Quantity)
+            self.assertIsInstance(value, np.float64)
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
                 rts.period_type,
                 PeriodTypeStandard(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
-            if hasattr(value, "magnitude"):
-                value = value.magnitude  # Unpack pint.Quantity
             self.assertEqual(value, 31.0)
 
     @unittest.expectedFailure
@@ -105,15 +102,13 @@ class TestRegularTimeseries(unittest.TestCase):
             self.assertTrue(hasattr(rts.values, "__array_ufunc__"))
             self.assertTrue(hasattr(rts.values, "__array_function__"))
             value = rts.values[0]
-            self.assertIsInstance(value, units.ureg.Quantity)
+            self.assertIsInstance(value, np.float64)
             self.assertIsInstance(rts.dates, np.ndarray)
             self.assertIn(
                 rts.period_type,
                 PeriodTypeStandard(),
             )
             self.assertEqual(rts.dates[0], np.datetime64("1921-10-31T23:59:59"))
-            if hasattr(value, "magnitude"):
-                value = value.magnitude  # Unpack pint.Quantity
             self.assertEqual(value, 31.0)
 
     def test_interval_6(self):
@@ -153,16 +148,7 @@ class TestRegularTimeseries(unittest.TestCase):
         with pdss.DSS(DSS_6) as dss:
             rts = dss.read_rts(p)
             double_month = rts + rts
-            self.assertEqual(double_month.values.magnitude[0], 62)
-
-    def test_add_inconsistent_units(self):
-        p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
-        p2 = pdss.DatasetPath.from_str("/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/")
-        with self.assertRaises(ValueError):
-            with pdss.DSS(DSS_6) as dss:
-                rts = dss.read_rts(p)
-                rts_2 = dss.read_rts(p2)
-                _ = rts + rts_2  # Should fail
+            self.assertEqual(double_month.values[0], 62)
 
     def test_add_with_misaligned_dates(self):
         p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
@@ -182,11 +168,11 @@ class TestRegularTimeseries(unittest.TestCase):
                 interval=rts.interval,
             )
             rts_add_LR = rts + rts_2
-            self.assertEqual(rts_add_LR.values.magnitude[0], 62)
+            self.assertEqual(rts_add_LR.values[0], 62)
             self.assertEqual(len(rts_add_LR.values), len(rts_add_LR.dates))
             self.assertEqual(len(rts_add_LR), 1200 - 48)
             rts_add_RL = rts_2 + rts  # Swap places
-            self.assertEqual(rts_add_RL.values.magnitude[0], 62)
+            self.assertEqual(rts_add_RL.values[0], 62)
             self.assertEqual(len(rts_add_RL.values), len(rts_add_RL.dates))
             self.assertEqual(len(rts_add_RL), 1200 - 48)
 
@@ -198,8 +184,7 @@ class TestRegularTimeseries(unittest.TestCase):
             p = dss.resolve_wildcard(p)
             self.assertEqual(len(p), 18_700)
             p = pdss.DatasetPathCollection(paths=set(list(p.paths)[:100]))
-            with self.assertWarns(UnitStrippedWarning):
-                df = pd.concat(obj.to_frame() for obj in dss.read_multiple_rts(p))
+            df = pd.concat(obj.to_frame() for obj in dss.read_multiple_rts(p))
             self.assertIsInstance(df, pd.DataFrame)
             self.assertListEqual(
                 df.columns.names,
@@ -245,7 +230,7 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
         p_old = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
         with pdss.DSS(self.src_6) as dss:
             rts = dss.read_rts(p_old)
-        rts.values = rts.values + pdss.units.ureg.Quantity(1, "day")
+        rts.values = rts.values + 1
         p_new = pdss.DatasetPath.from_str(
             "/CALSIM/MONTH_DAYS_PLUS_ONE/DAY//1MON/L2020A/"
         )
