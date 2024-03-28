@@ -104,6 +104,25 @@ class RegularTimeseries:
         )
         return kwargs
 
+    def update(self, **kwargs) -> Self:
+        values = kwargs.get("values", None)
+        dates = kwargs.get("dates", None)
+        if values or dates:
+            if values is None:
+                values = self.values
+            if dates is None:
+                dates = self.dates
+            if len(values) != len(dates):
+                raise ValueError(
+                    "new values/dates must match length:\n"
+                    + f"\t{len(values)=}\n"
+                    + f"\t{len(dates)=}"
+                )
+
+        new_obj_kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        new_obj_kwargs.update(**kwargs)
+        return self.__class__(**new_obj_kwargs)
+
     def to_frame(self) -> DataFrame:
         header = dict(self.path.items())
         header["UNITS"] = self.units
