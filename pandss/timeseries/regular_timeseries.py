@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass, fields
 from typing import Self
 
@@ -119,8 +120,9 @@ class RegularTimeseries:
                     + f"\t{len(dates)=}"
                 )
 
-        new_obj_kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        new_obj_kwargs = {f.name: deepcopy(getattr(self, f.name)) for f in fields(self)}
         new_obj_kwargs.update(**kwargs)
+
         return self.__class__(**new_obj_kwargs)
 
     def to_frame(self) -> DataFrame:

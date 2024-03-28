@@ -290,15 +290,21 @@ class TestRegularTimeseriesWriting(unittest.TestCase):
         p1 = pdss.DatasetPath(b="MONTH_DAYS")
         rts_1 = pdss.read_rts(DSS_6, p1)
         rts_2 = rts_1.update(units="MOON-DAY")
+        # Basic attr tests
         self.assertEqual(rts_1.path, rts_2.path)
         self.assertNotEqual(id(rts_1), id(rts_2))
         self.assertNotEqual(rts_1, rts_2)
         self.assertEqual(rts_1.units, "DAYS")
         self.assertEqual(rts_2.units, "MOON-DAY")
+        # Test bad update of values without update of dates
         with self.assertRaises(ValueError):
             rts_1.update(values=[0])
+        # Test update of values with same len dates
         rts_3 = rts_2.update(values=[31], dates=["2000-01-31"])
         self.assertEqual(rts_3.path, rts_2.path)
+        # Test changing values
+        rts_1.values[0] = -1000
+        self.assertNotEqual(rts_1.values[0], rts_2.values[0])
 
 
 if __name__ == "__main__":
