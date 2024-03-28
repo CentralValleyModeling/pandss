@@ -26,3 +26,9 @@ class ClosedDSSError(Exception):
     """Operation attempted to access a closed DSS file."""
 
     ...
+
+
+class UnexpectedDSSReturn(Exception):
+    """Operation returned an unexpected result from a DSS read operation."""
+
+    ...
