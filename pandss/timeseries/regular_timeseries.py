@@ -29,6 +29,10 @@ class RegularTimeseries:
     units: str
     interval: Interval
 
+    def __post_init__(self):
+        if not isinstance(self.interval, Interval):
+            self.interval = Interval(self.interval)
+
     def __str__(self) -> str:
         return f"{self.__class__.__name__}(path={str(self.path)}, len={len(self)})"
 

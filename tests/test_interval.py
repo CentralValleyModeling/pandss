@@ -60,3 +60,14 @@ class TestInterval(unittest.TestCase):
         frame = rts.to_frame()
         self.assertEqual(str(rts.interval), "1MON")
         self.assertEqual(frame.columns.get_level_values("INTERVAL"), str(rts.interval))
+
+    def test_create_rts_with_str_interval(self):
+        rts = pdss.RegularTimeseries(
+            path=None,
+            values=None,
+            dates=None,
+            period_type=None,
+            units=None,
+            interval="1MON",
+        )
+        self.assertIsInstance(rts.interval, Interval)
