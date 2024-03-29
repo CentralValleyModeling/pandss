@@ -14,8 +14,8 @@ import pandss as pdss
 from pandss import timeseries
 from pandss.timeseries.period_type import PeriodTypeStandard
 
-# Make sure we are using the developer version
-assert pdss.__version__ is None
+# Make sure we are using the installed version
+assert pdss.__version__ is not None
 
 ASSETS = Path().resolve() / "tests/assets"
 TEST_CREATED = ASSETS / "created"
