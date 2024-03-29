@@ -1,8 +1,6 @@
-# DSS interactions like Pandas
+# A simplified, unified DSS Library in Python
 
-Interact with data in DSS files like you're used to. A `pandas` like API for reading and writing data to DSS files.
-
-![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FCentralValleyModeling%2Fpandss%2Fblob%2Fmain%2Fcoverage.json&query=%24.totals.percent_covered&label=Test%20Coverage)
+Interact with data in DSS files like you're used to. This library sits on top of the giants that have come before us, and those that will come after. Learn the API in this library, and get the advantages of other DSS libraries like [pyhecdss](https://github.com/CADWRDeltaModeling/pyhecdss), [pydsstools](https://github.com/gyanz/pydsstools), or others.
 
 ## Supports
 
@@ -49,7 +47,7 @@ import pandss as pdss
 
 file = "example.dss"
 # You do not need to specify the D-part
-path = pdss.DatasetPath.from_str("/A/B/C//E/F/")
+path = pdss.DatasetPath(b="B")
 regular_time_series = pdss.read_rts(file, path)
 ```
 
@@ -60,7 +58,7 @@ import pandss as pdss
 
 file = "example.dss"
 # Use regular expressions that conform to the python re module to match paths
-path = pdss.DatasetPath.from_str("/A/.*/C//E/F/")
+path = pdss.DatasetPath(b=".*", c="C")
 for regular_time_series in pdss.read_multiple_rts(file, path):
     ...
 ```
