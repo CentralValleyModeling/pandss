@@ -21,7 +21,7 @@ requirements:
     - python=3.11
     - pyhecdss
     - pandas
-    - pint
+    - packaging
 
 about:
   home: https://github.com/CentralValleyModeling/pandss
