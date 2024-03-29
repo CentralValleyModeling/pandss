@@ -1,22 +1,97 @@
-# Standard python ignore
-*\__pycache__
-*.pyc
-*.egg-info
-# Do not track large binary assets
-*\assets
-*.dll
-!hecdss.dll
-*.lib
-*.zip
-*.dss
-*.dsk
-*.dsd
-*.dsc
-# Do not track the testing outputs
-tests.log
-# VS Code files
-.vscode
-# Do not track build artifacts
-dist/*
-build/*
-record.txt 
+# ======================================================================
+# Calsim flavored ignores
+run/=ILP=
+Results
+assets
+run/cvgroundwater/data/restart
+.vscode/
+# stubbed directories
+DSS/output/*
+!*.stub
+DSS/input/*
+!*.stub
+!CS3_L2020_INIT_v4.dss
+# misc files
+*.bak
+*.bin
+*.config
+*.config.ifs
+*.ds[skdc]
+*.out
+*.par
+*.pdf
+*.pkc
+*.prgss
+*.project
+*.sty
+*.xlsx
+CVGroundwater_Messages.out
+Error_evaluation.txt
+Error_solving.txt
+*/temp.py
+temp.py
+
+# ======================================================================
+# Python flavored ignores
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# pyenv python configuration file
+.python-version
