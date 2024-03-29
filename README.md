@@ -1,7 +1,10 @@
 # DSS interactions like Pandas
-Interact with data in DSS files like you're used to. A `pandas` like API for reading and writing data to DSS files. 
 
-## Supports:
+Interact with data in DSS files like you're used to. A `pandas` like API for reading and writing data to DSS files.
+
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FCentralValleyModeling%2Fpandss%2Fblob%2Fmain%2Fcoverage.json&query=%24.totals.percent_covered&label=Test%20Coverage)
+
+## Supports
 
 - DSS version 6, 7
 - Reading catalogs
@@ -13,10 +16,12 @@ In development:
 - Irregular timeseries
 
 ## Examples
+
 ### Read Catalog
 
 Read the file using the module-level utility function:
-```
+
+```python
 import pandss as pdss
 
 # Read the catalog and close the HEC-DSS file immediately
@@ -25,7 +30,8 @@ catalog = pdss.read_catalog(file)
 ```
 
 Read the cata log using the DSS context manager:
-```
+
+```python
 import pandss as pdss
 
 file = "example.dss"
@@ -33,11 +39,12 @@ with pdss.DSS(file) as dss:
     # Read the catalog, but the HEC-DSS file remains open
     catalog = dss.read_catalog()
 ```
+
 ### Read Regular Timeseries
 
 Read data, knowing the full name ahead of time:
 
-```
+```python
 import pandss as pdss
 
 file = "example.dss"
@@ -48,7 +55,7 @@ regular_time_series = pdss.read_rts(file, path)
 
 Read data, with wildcards:
 
-```
+```python
 import pandss as pdss
 
 file = "example.dss"
@@ -60,7 +67,7 @@ for regular_time_series in pdss.read_multiple_rts(file, path):
 
 Read all data from a DSS file:
 
-```
+```python
 import pandss as pdss
 
 file = "example.dss"
@@ -72,7 +79,7 @@ with pdss.DSS(file) as dss:
 
 Copy data between DSS files:
 
-```
+```python
 old_dss = "old.dss"
 old_paths = (
     "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/",
@@ -91,11 +98,12 @@ pdss.copy_multiple_rts(
 ```
 
 ## Objects and their attributes
+
 ### `pdss.RegularTimeseries`
 
-This object contains the information stored in a single Regular Timeseries in a DSS file. The values and dates are stored in `numpy.array` objects, and the other attributes are saved on the object. Some attributes are not supported by all engines. 
+This object contains the information stored in a single Regular Timeseries in a DSS file. The values and dates are stored in `numpy.array` objects, and the other attributes are saved on the object. Some attributes are not supported by all engines.
 
-```
+```python
 class RegularTimeseries:
     path: DatasetPath
     values: NDArray[float64]
@@ -113,7 +121,7 @@ class RegularTimeseries:
 
 This object represents the collection of all paths in a DSS file. It is a subclass of `pdss.DatasetPathCollection` which has the additional attribute of `src`. It is searchable via the `findall` method.
 
-```
+```python
 class Catalog:
     src: Path
     paths: set(DatasetPath)
@@ -136,7 +144,7 @@ This object represents the path to a single dataset in a DSS file. It is made up
 - `has_wildcard`: `True` if any part (other than the D part) uses wildcards, `False` otherwise.
 - `has_any_wildcard`: `True` if any part uses wildcards, `False` otherwise.
 
-```
+```python
 class DatasetPath:
     a: str
     b: str
