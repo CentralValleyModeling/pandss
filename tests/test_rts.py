@@ -220,6 +220,13 @@ class TestRegularTimeseries(unittest.TestCase):
         rts = pdss.RegularTimeseries.from_json(obj)
         self.assertEqual(rts.units, obj["units"])
 
+    def test_json_pipeline(self):
+        p1 = pdss.DatasetPath(b="MONTH_DAYS")
+        rts_1 = pdss.read_rts(DSS_6, p1)
+        rts_2 = pdss.RegularTimeseries.from_json(rts_1.to_json())
+        self.assertEqual(rts_1, rts_2)
+        self.assertNotEqual(id(rts_1), id(rts_2))
+
 
 class TestRegularTimeseriesWriting(unittest.TestCase):
     @classmethod
