@@ -6,8 +6,8 @@ import pandas as pd
 import pandss as pdss
 from pandss.timeseries.interval import Interval
 
-# Make sure we are using the installed version
-assert pdss.__version__ is not None
+# Make sure we are using the dev version
+assert pdss.__version__ is None
 
 DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
 DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"

@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pandss as pdss
 
-# Make sure we are using the installed version
-assert pdss.__version__ is not None
+# Make sure we are using the dev version
+assert pdss.__version__ is None
 
 DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
 DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
