@@ -2,12 +2,16 @@ from copy import deepcopy
 from dataclasses import dataclass, fields
 from typing import Self
 
-from numpy import datetime64, intersect1d
+from numpy import array, datetime64, datetime_as_string, intersect1d
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
 
 from ..paths import DatasetPath
 from .interval import Interval
+
+
+def decode_json_date_array(a: tuple[str]) -> NDArray[datetime64]:
+    return array(a, dtype="datetime64")
 
 
 @dataclass(
@@ -141,3 +145,38 @@ class RegularTimeseries:
         )
 
         return df
+
+    def to_json(self) -> dict:
+        json_obj = dict()
+        str_encode = ("path", "period_type", "units", "interval")
+        tuple_encode = {"values": float, "dates": datetime_as_string}
+        for f in fields(self):
+            if f.name in str_encode:
+                json_obj[f.name] = str(getattr(self, f.name))
+            elif f.name in tuple_encode:
+                encoder = tuple_encode[f.name]
+                json_obj[f.name] = tuple(encoder(i) for i in getattr(self, f.name))
+            else:
+                raise AttributeError(
+                    f"unrecognized field `{f}`, cannot encode {self.__class__} to JSON."
+                )
+        return json_obj
+
+    @classmethod
+    def from_json(cls, obj: dict):
+        missing = list()
+        for f in fields(cls):
+            if f.name not in obj:
+                missing.append(f.name)
+        if missing:
+            raise ValueError(f"missing the following attributes in JSON obj: {missing}")
+        decoders = {
+            "path": DatasetPath.from_str,
+            "values": array,
+            "dates": decode_json_date_array,
+        }
+        kwargs = dict()
+        for f in fields(cls):
+            decoder = decoders.get(f.name, str)
+            kwargs[f.name] = decoder(obj.get(f.name))
+        return cls(**kwargs)
