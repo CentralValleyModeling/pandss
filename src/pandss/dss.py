@@ -105,7 +105,7 @@ class DSS:
                 rtss = tuple(self.read_multiple_rts(path, drop_date))
                 if len(rtss) != 1:
                     raise UnexpectedDSSReturn(
-                        "expected path to resolve to single path, "
+                        f"expected {path} to resolve to single path, "
                         + f"DSS returned {len(rtss)} items."
                     )
                 else:
