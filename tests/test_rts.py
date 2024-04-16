@@ -14,8 +14,8 @@ import pandss as pdss
 from pandss import timeseries
 from pandss.timeseries.period_type import PeriodTypeStandard
 
-# Make sure we are using the installed version
-assert pdss.__version__ is not None
+# Make sure we are using the dev version
+assert pdss.__version__ is None
 
 ASSETS = Path().resolve() / "tests/assets"
 TEST_CREATED = ASSETS / "created"
@@ -201,6 +201,24 @@ class TestRegularTimeseries(unittest.TestCase):
         with self.assertRaises(pdss.errors.UnexpectedDSSReturn):
             p2 = pdss.DatasetPath(f="L2020A")
             _ = pdss.read_rts(DSS_6, p2)
+
+    def test_to_json(self):
+        p1 = pdss.DatasetPath(b="MONTH_DAYS")
+        rts = pdss.read_rts(DSS_6, p1)
+        j = rts.to_json()
+        self.assertEqual(j["path"], str(rts.path))
+
+    def test_from_json(self):
+        obj = dict(
+            path="/.*/MONTH_DAYS/",
+            values=(31, 28, 31),
+            dates=("1921-01-31", "1921-02-28", "1921-03-31"),
+            period_type="PER-CUM",
+            units="days",
+            interval="1MON",
+        )
+        rts = pdss.RegularTimeseries.from_json(obj)
+        self.assertEqual(rts.units, obj["units"])
 
 
 class TestRegularTimeseriesWriting(unittest.TestCase):
