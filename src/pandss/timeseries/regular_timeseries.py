@@ -2,7 +2,7 @@ from copy import deepcopy
 from dataclasses import dataclass, fields
 from typing import Self
 
-from numpy import array, datetime64, datetime_as_string, intersect1d
+from numpy import array, datetime64, datetime_as_string, intersect1d, ndarray
 from numpy.typing import NDArray
 from pandas import DataFrame, MultiIndex
 
@@ -27,7 +27,7 @@ class RegularTimeseries:
     RegularTimeseries.to_frame: Render this object to a pandas.DataFrame.
     """
 
-    path: DatasetPath
+    path: DatasetPath | str
     values: NDArray
     dates: NDArray[datetime64]
     period_type: str
@@ -35,6 +35,12 @@ class RegularTimeseries:
     interval: Interval
 
     def __post_init__(self):
+        if not isinstance(self.path, DatasetPath):
+            self.path = DatasetPath.from_str(self.path)
+        if not isinstance(self.dates, ndarray):
+            self.dates = array(self.dates, dtype=datetime64)
+        if not isinstance(self.values, ndarray):
+            self.values = array(self.values)
         if not isinstance(self.interval, Interval):
             self.interval = Interval(self.interval)
 
