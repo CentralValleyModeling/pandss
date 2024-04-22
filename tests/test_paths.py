@@ -54,8 +54,8 @@ class TestPath(unittest.TestCase):
         self.assertEqual(len(collection), 2)
 
     def test_replace_bad_wildcard(self):
-        blank = pdss.DatasetPath.from_str(r"///////")
-        star = pdss.DatasetPath.from_str(r"/*/*/*/*/*/*/")
+        blank = pdss.DatasetPath.from_str(r"/*/////*/")
+        star = pdss.DatasetPath.from_str(r"/.*/.*/.*/.*/.*/.*/")
         with pdss.DSS(DSS_6) as dss:
             blank = dss.resolve_wildcard(blank)
             star = dss.resolve_wildcard(star)
@@ -81,6 +81,25 @@ class TestPath(unittest.TestCase):
         collection = pdss.DatasetPathCollection(paths=set((z, a, ab, ba)))
         list_collection = list(collection)
         self.assertListEqual(list_collection, [a, ab, ba, z])
+
+    def test_bad_str(self):
+        with self.assertRaises(pdss.errors.DatasetPathParseError):
+            pdss.DatasetPath.from_str("/A/")
+
+    def test_optional_formatting(self):
+        strs = (
+            "A/B/C/D/E/F",
+            "/A/B/C/D/E/F",
+            "/A/B/C/D/E/F/",
+            "A/B/C//E/F",
+            "/A/B/C//E/F",
+            "/A/B/C//E/F/",
+        )
+        for s in strs:
+            p = pdss.DatasetPath.from_str(s)
+            self.assertIsInstance(p, pdss.DatasetPath)
+            self.assertEqual(p.a, "A")
+            self.assertEqual(p.f, "F")
 
 
 if __name__ == "__main__":
