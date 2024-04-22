@@ -63,11 +63,11 @@ class TestInterval(unittest.TestCase):
 
     def test_create_rts_with_str_interval(self):
         rts = pdss.RegularTimeseries(
-            path=None,
-            values=None,
-            dates=None,
-            period_type=None,
-            units=None,
+            path="/A/B/C//E/F/",
+            values=(1,),
+            dates=("2024-01-31",),
+            period_type="PER-CUM",
+            units="TAF",
             interval="1MON",
         )
         self.assertIsInstance(rts.interval, Interval)
