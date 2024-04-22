@@ -47,11 +47,18 @@ class DatasetPath:
     @classmethod
     def from_str(cls, path: str) -> Self:
         try:
-            _, *args, _ = path.split("/")
+            path = path.strip("/")
+            args = path.split("/")
         except Exception as e:
             raise DatasetPathParseError(f"couldn't parse {path} as path") from e
         for bad_wild in ("", "*"):
             args = tuple(val if val != bad_wild else ".*" for val in args)
+        if len(args) != len(cls.__annotations__):
+            raise DatasetPathParseError(
+                "not enough path parts given:\n"
+                + f"\t{path=}\n"
+                + f"\tparsed to:{args}"
+            )
 
         return cls(*args)
 
