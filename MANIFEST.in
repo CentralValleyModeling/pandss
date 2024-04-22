@@ -1,3 +1,2 @@
-global-include *.pint
-recursive-include pandss *.py
+ecursive-include pandss *.py
 recursive-include pandss *.json
