@@ -210,7 +210,7 @@ class TestRegularTimeseries(unittest.TestCase):
 
     def test_from_json(self):
         obj = dict(
-            path="/.*/MONTH_DAYS/",
+            path="/.*/MONTH_DAYS/.*//.*/.*/",
             values=(31, 28, 31),
             dates=("1921-01-31", "1921-02-28", "1921-03-31"),
             period_type="PER-CUM",
@@ -226,6 +226,31 @@ class TestRegularTimeseries(unittest.TestCase):
         rts_2 = pdss.RegularTimeseries.from_json(rts_1.to_json())
         self.assertEqual(rts_1, rts_2)
         self.assertNotEqual(id(rts_1), id(rts_2))
+
+    def test_fix_types(self):
+        obj = dict(
+            path="/.*/MONTH_DAYS/.*//.*/.*/",
+            values=(31, 28, 31),
+            dates=("1921-01-31", "1921-02-28", "1921-03-31"),
+            period_type="PER-CUM",
+            units="days",
+            interval="1MON",
+        )
+        rts = pdss.RegularTimeseries(**obj)
+        self.assertIsInstance(rts.values, np.ndarray)
+
+    def test_accept_path_as_str(self):
+        obj = dict(
+            path="/.*/MONTH_DAYS/.*//.*/.*/",
+            values=(31, 28, 31),
+            dates=("1921-01-31", "1921-02-28", "1921-03-31"),
+            period_type="PER-CUM",
+            units="days",
+            interval="1MON",
+        )
+        rts = pdss.RegularTimeseries(**obj)
+        self.assertIsInstance(rts.path, pdss.DatasetPath)
+        self.assertEqual(rts.path.b, "MONTH_DAYS")
 
 
 class TestRegularTimeseriesWriting(unittest.TestCase):
