@@ -6,8 +6,6 @@ from ..errors import ClosedDSSError
 from ..paths import DatasetPath
 from ..timeseries import RegularTimeseries
 
-default_engine = "pyhecdss"
-
 
 class EngineABC:
     src: Path
@@ -58,6 +56,16 @@ class EngineABC:
     @property
     def is_open(self):
         return self._is_open
+
+
+class ModuleEngine:
+    def __init__(self):
+        self.selected = "pyhecdss"
+
+    def set(self, __other: str | EngineABC):
+        if not isinstance(__other, str | EngineABC):
+            raise ValueError(f"engine type not recognized: {__other}:{type(__other)}")
+        self.selected = __other
 
 
 def get_engine(engine_name: str) -> EngineABC:

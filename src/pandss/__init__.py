@@ -8,8 +8,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from . import errors, quiet
 from .catalog import Catalog
-from .dss import DSS
-from .engines import default_engine
+from .dss import DSS, module_engine
 from .paths import DatasetPath, DatasetPathCollection
 from .timeseries import RegularTimeseries
 from .utils import (
