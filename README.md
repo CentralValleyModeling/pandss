@@ -1,17 +1,22 @@
-# A simplified, unified DSS Library in Python
+# pandss - any DSS
 
-Interact with data in DSS files like you're used to. This library sits on top of the giants that have come before us, and those that will come after. Learn the API in this library, and get the advantages of other DSS libraries like [pyhecdss](https://github.com/CADWRDeltaModeling/pyhecdss), [pydsstools](https://github.com/gyanz/pydsstools), or others.
+## A simplified, unified HEC-DSS Library for Python
+
+DSS interactions for DSS 6 and 7. This library sits on top of smarter packages that came before it. Learn the `pandss` API, and use the speed of other DSS libraries without neededing to switch APIs with every file. Engines currently supported include [pyhecdss](https://github.com/CADWRDeltaModeling/pyhecdss), and [pydsstools](https://github.com/gyanz/pydsstools).
 
 ## Supports
 
 - DSS version 6, 7
 - Reading catalogs
 - Reading regular timeseries
+- Writing regular timeseries
 
 In development:
 
-- Writing regular timeseries
 - Irregular timeseries
+
+> [!NOTE]
+> Do you want to add support for a new DSS engine? Add a module under `pandss.engines` that implements the methods on `pandss.engines.EngineABC`, and add a lookup in `get_engine` to your new module. Pull requests are encouraged.
 
 ## Examples
 
