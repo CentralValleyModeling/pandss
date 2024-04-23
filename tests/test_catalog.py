@@ -1,66 +1,45 @@
-import unittest
-from pathlib import Path
 from time import perf_counter
 
 import pyhecdss
 
 import pandss as pdss
 
-# Make sure we are using the dev version
-assert pdss.__version__ is None
 
-DSS_6 = Path().resolve() / "tests/assets/existing/v6.dss"
-DSS_7 = Path().resolve() / "tests/assets/existing/v7.dss"
-DSS_LARGE = Path().resolve() / "tests/assets/existing/large_v6.dss"
+def test_read_type_6(dss_6):
+    catalog = pdss.read_catalog(dss_6)
+    assert isinstance(catalog, pdss.Catalog)
 
 
-class TestCatalog(unittest.TestCase):
-    def test_read_type_6(self):
-        catalog = pdss.read_catalog(DSS_6)
-        self.assertIsInstance(catalog, pdss.Catalog)
-
-    @unittest.expectedFailure
-    def test_read_type_7(self):
-        catalog = pdss.read_catalog(DSS_7)
-        self.assertIsInstance(catalog, pdss.Catalog)
-
-    def test_read_time_6(self):
-        times = list()
-        for _ in range(100):
-            st = perf_counter()
-            _ = pdss.read_catalog(DSS_6)
-            et = perf_counter()
-            times.append(et - st)
-        average = sum(times) / len(times)
-        self.assertLessEqual(average, 0.02)
-
-    @unittest.expectedFailure
-    def test_read_time_7(self):
-        times = list()
-        for _ in range(100):
-            st = perf_counter()
-            _ = pdss.read_catalog(DSS_7)
-            et = perf_counter()
-            times.append(et - st)
-        average = sum(times) / len(times)
-        self.assertLessEqual(average, 0.02)
-
-    def test_from_frame_6(self):
-        with pyhecdss.DSSFile(str(DSS_6)) as dss:
-            df_cat = dss.read_catalog()
-        cat = pdss.Catalog.from_frame(df_cat, DSS_6)
-        self.assertIsInstance(cat, pdss.Catalog)
-        self.assertEqual(len(cat), len(df_cat))
-
-    @unittest.expectedFailure
-    def test_from_frame_7(self):
-        with pdss.quiet.suppress_stdout_stderr():
-            with pyhecdss.DSSFile(str(DSS_7)) as dss:
-                df_cat = dss.read_catalog()
-        cat = pdss.Catalog.from_frame(df_cat, DSS_7)
-        self.assertIsInstance(cat, pdss.Catalog)
-        self.assertEqual(len(cat), len(df_cat))
+def test_read_type_7(dss_7):
+    catalog = pdss.read_catalog(dss_7)
+    assert isinstance(catalog, pdss.Catalog)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_read_time_6(dss_6):
+    times = list()
+    for _ in range(100):
+        st = perf_counter()
+        _ = pdss.read_catalog(dss_6)
+        et = perf_counter()
+        times.append(et - st)
+    average = sum(times) / len(times)
+    assert average <= 0.02
+
+
+def test_read_time_7(dss_7):
+    times = list()
+    for _ in range(100):
+        st = perf_counter()
+        _ = pdss.read_catalog(dss_7)
+        et = perf_counter()
+        times.append(et - st)
+    average = sum(times) / len(times)
+    assert average <= 0.02
+
+
+def test_from_frame_6(dss_6):
+    with pyhecdss.DSSFile(str(dss_6)) as dss:
+        df_cat = dss.read_catalog()
+    cat = pdss.Catalog.from_frame(df_cat, dss_6)
+    assert isinstance(cat, pdss.Catalog)
+    assert len(cat) == len(df_cat)
