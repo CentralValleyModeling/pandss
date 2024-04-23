@@ -6,6 +6,8 @@ from ..errors import ClosedDSSError
 from ..paths import DatasetPath
 from ..timeseries import RegularTimeseries
 
+default_engine = "pyhecdss"
+
 
 class EngineABC:
     src: Path

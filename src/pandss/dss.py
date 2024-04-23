@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Iterator
 
 from .catalog import Catalog
-from .engines import EngineABC, get_engine
+from .engines import EngineABC, default_engine, get_engine
 from .errors import UnexpectedDSSReturn, WildcardError
 from .paths import DatasetPath, DatasetPathCollection
 from .quiet import silent, suppress_stdout_stderr
@@ -36,7 +36,9 @@ class DSS:
 
     __slots__ = ["src", "engine", "_opened"]
 
-    def __init__(self, src: str | Path, engine: str | EngineABC = "pyhecdss"):
+    def __init__(self, src: str | Path, engine: str | EngineABC = None):
+        if engine is None:
+            engine = default_engine
         self.src: Path = Path(src).resolve()
         if isinstance(engine, str):
             engine = get_engine(engine)

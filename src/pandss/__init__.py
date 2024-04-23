@@ -9,6 +9,7 @@ from importlib.metadata import PackageNotFoundError, version
 from . import errors, quiet
 from .catalog import Catalog
 from .dss import DSS
+from .engines import default_engine
 from .paths import DatasetPath, DatasetPathCollection
 from .timeseries import RegularTimeseries
 from .utils import (
@@ -24,6 +25,7 @@ try:
 except PackageNotFoundError:
     # pandss not installed, likely developer mode
     __version__ = None
+
 
 __all__ = [
     "DSS",
