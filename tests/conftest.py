@@ -38,13 +38,16 @@ def created_dir(assets) -> Path:
 
 
 @pytest.fixture(scope="function")
-def random_name() -> str:
+def random_name() -> Generator[str, None, None]:
     name = "".join(choice(ascii_letters) for _ in range(10))
     yield f"{name}.dss"
 
 
 @pytest.fixture(scope="function")
 def temporary_dss(created_dir: Path, random_name: str) -> Generator[Path, None, None]:
-    file = created_dir / random_name
+    file = Path(created_dir / random_name)
     yield file
     remove(file)
+    for f in file.parent.iterdir():
+        if f.stem == file.stem:
+            remove(f)

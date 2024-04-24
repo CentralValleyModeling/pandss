@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+from pytest import FixtureRequest
 
 import pandss as pdss
 from pandss.timeseries.interval import Interval
@@ -51,9 +52,11 @@ def test_period_index():
         assert L == R
 
 
-def test_frame_matches_interval_object(dss_6):
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
+def test_frame_matches_interval_object(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
     p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
-    rts = pdss.read_rts(dss_6, p)
+    rts = pdss.read_rts(dss, p)
     frame = rts.to_frame()
     assert str(rts.interval) == "1MON"
     assert frame.columns.get_level_values("INTERVAL") == str(rts.interval)

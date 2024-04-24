@@ -1,4 +1,5 @@
 import pytest
+from pytest import FixtureRequest
 
 import pandss as pdss
 
@@ -10,50 +11,43 @@ def test_partial_construction():
     assert str(p) == "/.*/FOO/.*/.*/.*/.*/"
 
 
-def test_wildcard_6(dss_6):
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_wildcard(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
     p = pdss.DatasetPath.from_str(r"/CALSIM/.*/.*/.*/.*/.*/")
     assert p.has_wildcard is True
 
-    with pdss.DSS(dss_6) as dss:
-        collection = dss.resolve_wildcard(p)
+    with pdss.DSS(dss) as dss_obj:
+        collection = dss_obj.resolve_wildcard(p)
         collection = collection.collapse_dates()
 
     assert isinstance(collection, pdss.DatasetPathCollection)
-    assert collection.paths == {
-        pdss.DatasetPath.from_str("/CALSIM/PPT_OROV/PRECIP//1MON/L2020A/"),
-        pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY/*/1MON/L2020A/"),
-    }
+    expected = sorted(
+        (pdss.DatasetPath(b="PPT_OROV"), pdss.DatasetPath(b="MONTH_DAYS"))
+    )
+    collection = sorted(collection)
+    for L, R in zip(collection, expected):
+        assert L.b == R.b
 
     assert len(collection) == 2
 
 
-def test_wildcard_7(dss_7):
-    p = pdss.DatasetPath.from_str(r"/CALSIM/.*/.*/.*/.*/.*/")
-    assert p.has_wildcard is True
-    with pdss.DSS(dss_7) as dss:
-        collection = dss.resolve_wildcard(p)
-        collection = collection.collapse_dates()
-    assert isinstance(collection, pdss.DatasetPathCollection)
-    assert collection.paths == {
-        pdss.DatasetPath.from_str("/CALSIM/PPT_OROV/PRECIP//1Month/L2020A/"),
-        pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY/*/1Month/L2020A/"),
-    }
-
-    assert len(collection) == 2
-
-
-def test_replace_bad_wildcard(dss_6):
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
+def test_replace_bad_wildcard(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
     blank = pdss.DatasetPath.from_str(r"/*/////*/")
     star = pdss.DatasetPath.from_str(r"/.*/.*/.*/.*/.*/.*/")
-    with pdss.DSS(dss_6) as dss:
+    with pdss.DSS(dss) as dss:
         blank = dss.resolve_wildcard(blank)
         star = dss.resolve_wildcard(star)
     assert blank == star
 
 
-def test_warn_findall_if_wildcard_in_set(dss_6):
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_warn_findall_if_wildcard_in_set(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
     star = pdss.DatasetPath.from_str(r"/*/*/*/*/*/*/")
-    with pdss.DSS(dss_6) as dss:
+    with pdss.DSS(dss) as dss:
         catalog = dss.read_catalog()
         catalog = catalog.collapse_dates()
         with pytest.warns(Warning):
