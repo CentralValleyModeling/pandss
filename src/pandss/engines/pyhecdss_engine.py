@@ -83,7 +83,10 @@ class PyHecDssEngine(EngineABC):
         return self._convert_to_pandss_rts(data, path)
 
     def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
-        periods = pd.DatetimeIndex(rts.dates).to_period()
+        if rts.period_type.startswith("PER"):
+            periods = pd.DatetimeIndex(rts.dates).to_period()
+        else:
+            periods = pd.DatetimeIndex(rts.dates)
         df = pd.DataFrame(
             data=rts.values,
             index=periods,

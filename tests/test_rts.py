@@ -1,5 +1,4 @@
 import pickle
-from pathlib import Path
 from time import perf_counter
 from warnings import catch_warnings
 
@@ -37,7 +36,6 @@ def test_read_time(dss, request: FixtureRequest):
     assert average <= 0.11
 
 
-@pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
 def test_data_content(dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
     p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
@@ -291,3 +289,6 @@ def test_update_rts(dss, request: FixtureRequest):
     # Test changing values
     rts_1.values[0] = -1000
     assert rts_1.values[0] != rts_2.values[0]
+
+
+# TODO: add tests for daily data
