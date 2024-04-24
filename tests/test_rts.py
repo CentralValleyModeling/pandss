@@ -36,6 +36,7 @@ def test_read_time(dss, request: FixtureRequest):
     assert average <= 0.11
 
 
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
 def test_data_content(dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
     p = pdss.DatasetPath.from_str("/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/")
@@ -289,6 +290,20 @@ def test_update_rts(dss, request: FixtureRequest):
     # Test changing values
     rts_1.values[0] = -1000
     assert rts_1.values[0] != rts_2.values[0]
+
+
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_read_write_daily_inst(dss, temporary_dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
+    p1 = pdss.DatasetPath(e="1DAY")
+    rts = pdss.read_rts(dss, p1)
+    assert str(rts.interval).upper() == "1DAY"
+    assert rts.period_type == "INST-VAL"
+    with pdss.DSS(temporary_dss) as dss_obj:
+        dss_obj.write_rts(rts.path, rts)
+    rts_2 = pdss.read_rts(temporary_dss, p1)
+    for L, R in zip(rts.dates, rts_2.dates):
+        assert L == R
 
 
 # TODO: add tests for daily data

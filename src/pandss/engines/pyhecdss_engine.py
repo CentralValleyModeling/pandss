@@ -91,6 +91,9 @@ class PyHecDssEngine(EngineABC):
             data=rts.values,
             index=periods,
         )
+        if not rts.period_type.startswith("PER"):
+            df.index.freq = rts.interval.freq  # trick pyhecdss
+
         p = f"/{path.a}/{path.b}/{path.c}//{path.e}/{path.f}/"
         self._object.write_rts(p, df, rts.units, rts.period_type)
 
