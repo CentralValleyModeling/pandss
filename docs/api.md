@@ -5,7 +5,7 @@
 This object is the core of interacting with timeseries data in pandss.
 
 ::: pandss.timeseries.regular_timeseries
-    options: 
+    options:
         filters: none
 
 ## DSS, and Catalog Objects
