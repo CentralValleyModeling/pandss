@@ -1,5 +1,6 @@
 # pandss documentation
 
-Documentation, and user guides for `pandss`
+Documentation, and user guides for `pandss`.
 
-[API Reference](api.md)
+- [API Reference](api.md)
+- [Examples](examples.md)
