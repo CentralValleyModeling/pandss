@@ -1,0 +1,6 @@
+site_name: pandss Documentation
+nav:
+  - Home: index.md
+theme: readthedocs
+markdown_extensions:
+  - admonition

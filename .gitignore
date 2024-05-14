@@ -95,3 +95,6 @@ target/
 
 # pyenv python configuration file
 .python-version
+
+# Documentation stuff
+site
