@@ -1,0 +1,3898 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>API Reference - pandss Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "API Reference";
+        var mkdocs_page_input_path = "api.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> pandss Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">API Reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#timeseries-objects">Timeseries Objects</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries">RegularTimeseries</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.__len__">__len__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.__eq__">__eq__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries._do_arithmetic">_do_arithmetic</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.update">update</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.to_frame">to_frame</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.to_json">to_json</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.timeseries.regular_timeseries.RegularTimeseries.from_json">from_json</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dss-and-catalog-objects">DSS, and Catalog Objects</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.dss.DSS">DSS</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.is_open">is_open</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.catalog">catalog</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.__enter__">__enter__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.read_catalog">read_catalog</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.read_rts">read_rts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.read_multiple_rts">read_multiple_rts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.write_rts">write_rts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.dss.DSS.resolve_wildcard">resolve_wildcard</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.catalog.Catalog">Catalog</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.catalog.Catalog.from_strs">from_strs</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.catalog.Catalog.from_frame">from_frame</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#path-and-path-collection-objects">Path, and Path Collection Objects</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.DatasetPath">DatasetPath</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.has_wildcard">has_wildcard</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.has_any_wildcard">has_any_wildcard</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.from_str">from_str</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.drop_date">drop_date</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__len__">__len__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__add__">__add__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__sub__">__sub__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.intersection">intersection</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.union">union</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.difference">difference</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.from_strs">from_strs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.enforce_similar_type">enforce_similar_type</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#errors">Errors</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.WildcardError">WildcardError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.FileVersionError">FileVersionError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.DatasetNotFound">DatasetNotFound</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.DatasetPathParseError">DatasetPathParseError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.ClosedDSSError">ClosedDSSError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pandss.errors.UnexpectedDSSReturn">UnexpectedDSSReturn</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pandss Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>API Reference</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference">API Reference</h1>
+<h2 id="timeseries-objects">Timeseries Objects</h2>
+<p>This object is the core of interacting with timeseries data in pandss.</p>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.timeseries.regular_timeseries.RegularTimeseries" class="doc doc-heading">
+          <code>RegularTimeseries</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>A regular timeseries within a DSS file.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The A-F path that the data had in the originating DSS file</p>
+              </div>
+            </li>
+            <li>
+              <b><code>values</code></b>
+                  (<code><span title="numpy.typing.NDArray">NDArray</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The timeseries data</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dates</code></b>
+                  (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.datetime64">datetime64</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Rendered dates, the alignment of which depends on the interval, and the
+first date in the timeseries. Different Engines align dates differently</p>
+              </div>
+            </li>
+            <li>
+              <b><code>period_type</code></b>
+                  (<code>str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The DSS period type the data had in the originating DSS file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>units</code></b>
+                  (<code>str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The units of the timeseries data</p>
+              </div>
+            </li>
+            <li>
+              <b><code>interval</code></b>
+                  (<code><span title="pandss.timeseries.interval.Interval">Interval</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The time interval in seconds between data in the DSS file.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+              <pre class="highlight"><code class="language-python">@dataclass(
+    kw_only=True,
+    eq=True,
+    slots=True,
+)
+class RegularTimeseries:
+    """A regular timeseries within a DSS file.
+
+    Attributes
+    -------
+    path: DatasetPath | str
+        The A-F path that the data had in the originating DSS file
+    values: NDArray
+        The timeseries data
+    dates: NDArray[datetime64]
+        Rendered dates, the alignment of which depends on the interval, and the
+        first date in the timeseries. Different Engines align dates differently
+    period_type: str
+        The DSS period type the data had in the originating DSS file.
+    units: str
+        The units of the timeseries data
+    interval: Interval
+        The time interval in seconds between data in the DSS file.
+    """
+
+    path: DatasetPath | str
+    values: NDArray
+    dates: NDArray[datetime64]
+    period_type: str
+    units: str
+    interval: Interval
+
+    def __post_init__(self):
+        if not isinstance(self.path, DatasetPath):
+            self.path = DatasetPath.from_str(self.path)
+        if not isinstance(self.dates, ndarray):
+            self.dates = array(self.dates, dtype=datetime64)
+        if not isinstance(self.values, ndarray):
+            self.values = array(self.values)
+        if not isinstance(self.interval, Interval):
+            self.interval = Interval(self.interval)
+
+    def __str__(self) -&gt; str:
+        return f"{self.__class__.__name__}(path={str(self.path)}, len={len(self)})"
+
+    def __len__(self) -&gt; int:
+        """The size of the data in the RegularTimeseries.
+
+        Returns
+        -------
+        int
+            The length of `self.values`
+        """
+        return len(self.values)
+
+    def __eq__(self, __other: object) -&gt; bool:
+        """Compare whether or not two `RegularTimeseries` are equal.
+
+        Compares all fields in the dataclass, and fails equality if any are not exactly
+        equal.
+
+        Parameters
+        ----------
+        __other : object
+            The other object to compare to.
+
+        Returns
+        -------
+        bool
+            Whether or not the two objects are equal.
+        """
+        if not isinstance(__other, self.__class__):
+            return False
+        for f in fields(self):
+            if not hasattr(__other, f.name):
+                return False
+            elif hasattr(getattr(self, f.name), "__iter__"):
+                for left, right in zip(getattr(self, f.name), getattr(__other, f.name)):
+                    if left != right:
+                        return False
+            elif getattr(self, f.name) != getattr(__other, f.name):
+                return False
+        return True
+
+    def __add__(self, __other: Self) -&gt; Self:
+        kwargs = self._do_arithmetic(__other, "__add__")
+
+        return RegularTimeseries(**kwargs)
+
+    def _do_arithmetic(self, __other: Self, method_name: str) -&gt; dict:
+        """Perform the arithmetic on two `RegularTimeseries` objects.
+
+        The operations are performed accordingly:
+        - interval: No change, must be identical left and right
+        - period_type: No change, must be identical left and right
+        - units: No change, must be identical left and right
+        - path: Combined part by part, where identical parts are not changed, and
+                differing parts are concatenated
+        - dates: Intersected with __other.dates
+        - values: The arithmatic is done on the subset of values selected using the same
+                intersection used for dates
+
+
+        Parameters
+        ----------
+        __other : Self
+            The other object to use when doing arithmetic.
+        method_name : str
+            One of `__add__`, `__sub__`, or other numeric dunders
+
+        Returns
+        -------
+        dict
+            The kwargs to use by `__init__` of the objects class
+
+        Raises
+        ------
+        ValueError
+            Raised if the two objects are not the same type
+        ValueError
+            Raised if certain attributes do not match as required
+        """
+        CONCAT_KEY = {"__add__": "+", "__sub__": "-"}
+        concat_char = CONCAT_KEY[method_name]
+        # Validate action
+        if not isinstance(__other, self.__class__):
+            raise ValueError(
+                f"Cannot perform arithmetic {self.__class__.__name__} "
+                + f"with {type(__other)}"
+            )
+        for attr in ("interval", "period_type", "units"):
+            s = getattr(self, attr)
+            o = getattr(__other, attr)
+            if s != o:
+                raise ValueError(f"Cannot add differing {attr}: {s}, {o}")
+        # Get kwargs for new instance
+        # path
+        new_path_kwargs = dict()
+        for part in ("a", "b", "c", "d", "e", "f"):
+            part_self = getattr(self.path, part)
+            part_other = getattr(__other.path, part)
+            if part_self == part_other:
+                new_path_kwargs[part] = part_self
+            else:
+                new_path_kwargs[part] = f"{part_self}{concat_char}{part_other}"
+        if self.path == __other.path:  # Rare case of adding identical paths
+            new_path_kwargs["b"] = f"{self.path.b}{concat_char}{__other.path.b}"
+        new_path = DatasetPath(**new_path_kwargs)
+        # dates
+        new_dates = intersect1d(self.dates, __other.dates)
+        # values
+        mask_left = [date in new_dates for date in self.dates]
+        values_left = self.values[mask_left]
+        mask_right = [date in new_dates for date in __other.dates]
+        values_right = __other.values[mask_right]
+        method = getattr(values_left, method_name)
+        new_values = method(values_right)
+
+        kwargs = dict(
+            path=new_path,
+            values=new_values,
+            dates=new_dates,
+            units=self.units,
+            period_type=self.period_type,
+            interval=self.interval,
+        )
+        return kwargs
+
+    def update(self, **kwargs) -&gt; Self:
+        """Update an attribute on the object, creating a new one in the process
+
+        Returns
+        -------
+        Self
+            A RegularTimseries object
+
+        Raises
+        ------
+        ValueError
+            Raised if the length of the values and dates arrays don't match
+            after updating
+        """
+        values = kwargs.get("values", None)
+        dates = kwargs.get("dates", None)
+        if values or dates:
+            if values is None:
+                values = self.values
+            if dates is None:
+                dates = self.dates
+            if len(values) != len(dates):
+                raise ValueError(
+                    "new values/dates must match length:\n"
+                    + f"\t{len(values)=}\n"
+                    + f"\t{len(dates)=}"
+                )
+
+        new_obj_kwargs = {f.name: deepcopy(getattr(self, f.name)) for f in fields(self)}
+        new_obj_kwargs.update(**kwargs)
+
+        return self.__class__(**new_obj_kwargs)
+
+    def to_frame(self) -&gt; DataFrame:
+        """Create a `pandas.DataFrame` from the `RegularTimeseries`
+
+        Returns
+        -------
+        DataFrame
+            The `DataFrame`, indexed by dates, with column names of: `A`-`F`, `UNITS`,
+            `PERIOD_TYPE`, `INTERVAL`
+        """
+        header = dict(self.path.items())
+        header["UNITS"] = self.units
+        header["PERIOD_TYPE"] = self.period_type
+        header["INTERVAL"] = str(self.interval)
+        header = {k.upper(): (v,) for k, v in header.items()}
+        columns = MultiIndex.from_arrays(
+            tuple(header.values()), names=tuple(header.keys())
+        )
+        df = DataFrame(
+            index=self.dates,
+            data=self.values,
+            columns=columns,
+        )
+
+        return df
+
+    def to_json(self) -&gt; dict:
+        """Create a JSON-compliant dictionary with the RegularTimeseries data
+
+        Returns
+        -------
+        dict
+            The JSON-compliant dictionary
+
+        Raises
+        ------
+        AttributeError
+            Raised if unrecognized fields are present in the object, protects against
+            converting subclasses naievely.
+        """
+        json_obj = dict()
+        str_encode = ("path", "period_type", "units", "interval")
+        tuple_encode = {"values": float, "dates": datetime_as_string}
+        for f in fields(self):
+            if f.name in str_encode:
+                json_obj[f.name] = str(getattr(self, f.name))
+            elif f.name in tuple_encode:
+                encoder = tuple_encode[f.name]
+                json_obj[f.name] = tuple(encoder(i) for i in getattr(self, f.name))
+            else:
+                raise AttributeError(
+                    f"unrecognized field `{f}`, cannot encode {self.__class__} to JSON."
+                )
+        return json_obj
+
+    @classmethod
+    def from_json(cls, obj: dict) -&gt; Self:
+        """Create a RegularTimeseries from a JSON-compliant dictionary
+
+        Extra data in the dictionary is ignored
+
+        Parameters
+        ----------
+        obj : dict
+            A JSON-compliant dictionary
+
+        Returns
+        -------
+        RegularTimeseries
+            The object with data corresponding to the info in the dictionary
+
+        Raises
+        ------
+        ValueError
+            Raised if attributes are missing in the dictionary
+        """
+        missing = list()
+        for f in fields(cls):
+            if f.name not in obj:
+                missing.append(f.name)
+        if missing:
+            raise ValueError(f"missing the following attributes in JSON obj: {missing}")
+        decoders = {
+            "path": DatasetPath.from_str,
+            "values": array,
+            "dates": decode_json_date_array,
+        }
+        kwargs = dict()
+        for f in fields(cls):
+            decoder = decoders.get(f.name, str)
+            kwargs[f.name] = decoder(obj.get(f.name))
+        return cls(**kwargs)</code></pre>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.__len__" class="doc doc-heading">
+          <code class="highlight language-python">__len__()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The size of the data in the RegularTimeseries.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>int</code>
+            –
+            <div class="doc-md-description">
+              <p>The length of <code>self.values</code></p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def __len__(self) -&gt; int:
+    """The size of the data in the RegularTimeseries.
+
+    Returns
+    -------
+    int
+        The length of `self.values`
+    """
+    return len(self.values)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.__eq__" class="doc doc-heading">
+          <code class="highlight language-python">__eq__(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compare whether or not two <code>RegularTimeseries</code> are equal.</p>
+<p>Compares all fields in the dataclass, and fails equality if any are not exactly
+equal.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>__other</code></b>
+                  (<code>object</code>)
+              –
+              <div class="doc-md-description">
+                <p>The other object to compare to.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>bool</code>
+            –
+            <div class="doc-md-description">
+              <p>Whether or not the two objects are equal.</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def __eq__(self, __other: object) -&gt; bool:
+    """Compare whether or not two `RegularTimeseries` are equal.
+
+    Compares all fields in the dataclass, and fails equality if any are not exactly
+    equal.
+
+    Parameters
+    ----------
+    __other : object
+        The other object to compare to.
+
+    Returns
+    -------
+    bool
+        Whether or not the two objects are equal.
+    """
+    if not isinstance(__other, self.__class__):
+        return False
+    for f in fields(self):
+        if not hasattr(__other, f.name):
+            return False
+        elif hasattr(getattr(self, f.name), "__iter__"):
+            for left, right in zip(getattr(self, f.name), getattr(__other, f.name)):
+                if left != right:
+                    return False
+        elif getattr(self, f.name) != getattr(__other, f.name):
+            return False
+    return True</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries._do_arithmetic" class="doc doc-heading">
+          <code class="highlight language-python">_do_arithmetic(__other, method_name)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Perform the arithmetic on two <code>RegularTimeseries</code> objects.</p>
+<p>The operations are performed accordingly:
+- interval: No change, must be identical left and right
+- period_type: No change, must be identical left and right
+- units: No change, must be identical left and right
+- path: Combined part by part, where identical parts are not changed, and
+        differing parts are concatenated
+- dates: Intersected with __other.dates
+- values: The arithmatic is done on the subset of values selected using the same
+        intersection used for dates</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>__other</code></b>
+                  (<code><span title="typing.Self">Self</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The other object to use when doing arithmetic.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>method_name</code></b>
+                  (<code>str</code>)
+              –
+              <div class="doc-md-description">
+                <p>One of <code>__add__</code>, <code>__sub__</code>, or other numeric dunders</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>dict</code>
+            –
+            <div class="doc-md-description">
+              <p>The kwargs to use by <code>__init__</code> of the objects class</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the two objects are not the same type</p>
+              </div>
+            </li>
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if certain attributes do not match as required</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def _do_arithmetic(self, __other: Self, method_name: str) -&gt; dict:
+    """Perform the arithmetic on two `RegularTimeseries` objects.
+
+    The operations are performed accordingly:
+    - interval: No change, must be identical left and right
+    - period_type: No change, must be identical left and right
+    - units: No change, must be identical left and right
+    - path: Combined part by part, where identical parts are not changed, and
+            differing parts are concatenated
+    - dates: Intersected with __other.dates
+    - values: The arithmatic is done on the subset of values selected using the same
+            intersection used for dates
+
+
+    Parameters
+    ----------
+    __other : Self
+        The other object to use when doing arithmetic.
+    method_name : str
+        One of `__add__`, `__sub__`, or other numeric dunders
+
+    Returns
+    -------
+    dict
+        The kwargs to use by `__init__` of the objects class
+
+    Raises
+    ------
+    ValueError
+        Raised if the two objects are not the same type
+    ValueError
+        Raised if certain attributes do not match as required
+    """
+    CONCAT_KEY = {"__add__": "+", "__sub__": "-"}
+    concat_char = CONCAT_KEY[method_name]
+    # Validate action
+    if not isinstance(__other, self.__class__):
+        raise ValueError(
+            f"Cannot perform arithmetic {self.__class__.__name__} "
+            + f"with {type(__other)}"
+        )
+    for attr in ("interval", "period_type", "units"):
+        s = getattr(self, attr)
+        o = getattr(__other, attr)
+        if s != o:
+            raise ValueError(f"Cannot add differing {attr}: {s}, {o}")
+    # Get kwargs for new instance
+    # path
+    new_path_kwargs = dict()
+    for part in ("a", "b", "c", "d", "e", "f"):
+        part_self = getattr(self.path, part)
+        part_other = getattr(__other.path, part)
+        if part_self == part_other:
+            new_path_kwargs[part] = part_self
+        else:
+            new_path_kwargs[part] = f"{part_self}{concat_char}{part_other}"
+    if self.path == __other.path:  # Rare case of adding identical paths
+        new_path_kwargs["b"] = f"{self.path.b}{concat_char}{__other.path.b}"
+    new_path = DatasetPath(**new_path_kwargs)
+    # dates
+    new_dates = intersect1d(self.dates, __other.dates)
+    # values
+    mask_left = [date in new_dates for date in self.dates]
+    values_left = self.values[mask_left]
+    mask_right = [date in new_dates for date in __other.dates]
+    values_right = __other.values[mask_right]
+    method = getattr(values_left, method_name)
+    new_values = method(values_right)
+
+    kwargs = dict(
+        path=new_path,
+        values=new_values,
+        dates=new_dates,
+        units=self.units,
+        period_type=self.period_type,
+        interval=self.interval,
+    )
+    return kwargs</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.update" class="doc doc-heading">
+          <code class="highlight language-python">update(**kwargs)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Update an attribute on the object, creating a new one in the process</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><span title="typing.Self">Self</span></code>
+            –
+            <div class="doc-md-description">
+              <p>A RegularTimseries object</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the length of the values and dates arrays don't match
+after updating</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def update(self, **kwargs) -&gt; Self:
+    """Update an attribute on the object, creating a new one in the process
+
+    Returns
+    -------
+    Self
+        A RegularTimseries object
+
+    Raises
+    ------
+    ValueError
+        Raised if the length of the values and dates arrays don't match
+        after updating
+    """
+    values = kwargs.get("values", None)
+    dates = kwargs.get("dates", None)
+    if values or dates:
+        if values is None:
+            values = self.values
+        if dates is None:
+            dates = self.dates
+        if len(values) != len(dates):
+            raise ValueError(
+                "new values/dates must match length:\n"
+                + f"\t{len(values)=}\n"
+                + f"\t{len(dates)=}"
+            )
+
+    new_obj_kwargs = {f.name: deepcopy(getattr(self, f.name)) for f in fields(self)}
+    new_obj_kwargs.update(**kwargs)
+
+    return self.__class__(**new_obj_kwargs)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.to_frame" class="doc doc-heading">
+          <code class="highlight language-python">to_frame()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a <code>pandas.DataFrame</code> from the <code>RegularTimeseries</code></p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><span title="pandas.DataFrame">DataFrame</span></code>
+            –
+            <div class="doc-md-description">
+              <p>The <code>DataFrame</code>, indexed by dates, with column names of: <code>A</code>-<code>F</code>, <code>UNITS</code>,
+<code>PERIOD_TYPE</code>, <code>INTERVAL</code></p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def to_frame(self) -&gt; DataFrame:
+    """Create a `pandas.DataFrame` from the `RegularTimeseries`
+
+    Returns
+    -------
+    DataFrame
+        The `DataFrame`, indexed by dates, with column names of: `A`-`F`, `UNITS`,
+        `PERIOD_TYPE`, `INTERVAL`
+    """
+    header = dict(self.path.items())
+    header["UNITS"] = self.units
+    header["PERIOD_TYPE"] = self.period_type
+    header["INTERVAL"] = str(self.interval)
+    header = {k.upper(): (v,) for k, v in header.items()}
+    columns = MultiIndex.from_arrays(
+        tuple(header.values()), names=tuple(header.keys())
+    )
+    df = DataFrame(
+        index=self.dates,
+        data=self.values,
+        columns=columns,
+    )
+
+    return df</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.to_json" class="doc doc-heading">
+          <code class="highlight language-python">to_json()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a JSON-compliant dictionary with the RegularTimeseries data</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>dict</code>
+            –
+            <div class="doc-md-description">
+              <p>The JSON-compliant dictionary</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>AttributeError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if unrecognized fields are present in the object, protects against
+converting subclasses naievely.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">def to_json(self) -&gt; dict:
+    """Create a JSON-compliant dictionary with the RegularTimeseries data
+
+    Returns
+    -------
+    dict
+        The JSON-compliant dictionary
+
+    Raises
+    ------
+    AttributeError
+        Raised if unrecognized fields are present in the object, protects against
+        converting subclasses naievely.
+    """
+    json_obj = dict()
+    str_encode = ("path", "period_type", "units", "interval")
+    tuple_encode = {"values": float, "dates": datetime_as_string}
+    for f in fields(self):
+        if f.name in str_encode:
+            json_obj[f.name] = str(getattr(self, f.name))
+        elif f.name in tuple_encode:
+            encoder = tuple_encode[f.name]
+            json_obj[f.name] = tuple(encoder(i) for i in getattr(self, f.name))
+        else:
+            raise AttributeError(
+                f"unrecognized field `{f}`, cannot encode {self.__class__} to JSON."
+            )
+    return json_obj</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.timeseries.regular_timeseries.RegularTimeseries.from_json" class="doc doc-heading">
+          <code class="highlight language-python">from_json(obj)</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a RegularTimeseries from a JSON-compliant dictionary</p>
+<p>Extra data in the dictionary is ignored</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>obj</code></b>
+                  (<code>dict</code>)
+              –
+              <div class="doc-md-description">
+                <p>A JSON-compliant dictionary</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.timeseries.regular_timeseries.RegularTimeseries" href="#pandss.timeseries.regular_timeseries.RegularTimeseries">RegularTimeseries</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The object with data corresponding to the info in the dictionary</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if attributes are missing in the dictionary</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\timeseries\regular_timeseries.py</code></summary>
+            <pre class="highlight"><code class="language-python">@classmethod
+def from_json(cls, obj: dict) -&gt; Self:
+    """Create a RegularTimeseries from a JSON-compliant dictionary
+
+    Extra data in the dictionary is ignored
+
+    Parameters
+    ----------
+    obj : dict
+        A JSON-compliant dictionary
+
+    Returns
+    -------
+    RegularTimeseries
+        The object with data corresponding to the info in the dictionary
+
+    Raises
+    ------
+    ValueError
+        Raised if attributes are missing in the dictionary
+    """
+    missing = list()
+    for f in fields(cls):
+        if f.name not in obj:
+            missing.append(f.name)
+    if missing:
+        raise ValueError(f"missing the following attributes in JSON obj: {missing}")
+    decoders = {
+        "path": DatasetPath.from_str,
+        "values": array,
+        "dates": decode_json_date_array,
+    }
+    kwargs = dict()
+    for f in fields(cls):
+        decoder = decoders.get(f.name, str)
+        kwargs[f.name] = decoder(obj.get(f.name))
+    return cls(**kwargs)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div><h2 id="dss-and-catalog-objects">DSS, and Catalog Objects</h2>
+<p>This object represents a <code>*.dss</code> file on disk, and handles the IO for <code>pandss</code>.</p>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.dss.DSS" class="doc doc-heading">
+          <code>DSS</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Class representing an open DSS file. Binds to various other python based
+HEC-DSS file readers through an "engine". The Engine classes wrap the other
+libraries, creating one API that this class uses.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>src</code></b>
+                  (<code>str | <span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The path to the DSS file on disk.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>engine</code></b>
+                  (<code>str | <span title="pandss.engines.EngineABC">EngineABC</span></code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>The engine object that handles the DSS interactions. Available engines:
+    - pyhecdss
+    - pydsstools</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>src\pandss\dss.py</code></summary>
+              <pre class="highlight"><code class="language-python">class DSS:
+    """Class representing an open DSS file. Binds to various other python based
+    HEC-DSS file readers through an "engine". The Engine classes wrap the other
+    libraries, creating one API that this class uses.
+
+    Parameters
+    ----------
+    src: pathlib.Path
+        The path to the DSS file on disk.
+    engine: str | EngineABC, default "pyhecdss"
+        The engine object that handles the DSS interactions. Available engines:
+            - pyhecdss
+            - pydsstools
+    """
+
+    __slots__ = ["src", "engine", "_opened"]
+
+    def __init__(self, src: str | Path, engine: str | EngineABC = None):
+        if engine is None:
+            engine = module_engine.selected
+        self.src: Path = Path(src).resolve()
+        if isinstance(engine, str):
+            engine = get_engine(engine)
+        elif not isinstance(engine, EngineABC):
+            raise ValueError(f"engine type not recognized: {type(engine)=}")
+        logging.debug(f"using engine {engine}")
+        self.engine: EngineABC = engine(self.src)
+        self._opened = 0
+
+    def __str__(self) -&gt; str:
+        return f"{self.__class__.__name__}({self.src})"
+
+    @silent
+    def __enter__(self):
+        """Wraps Engine class `open` and enables the use of engine classes in
+        pythons context manager pattern. Correspondingly, `DSS.__close__()`
+        wraps Engine class `close`.
+
+        ```
+        with DSS(path_to_dss_file) as DSS_File:
+            # read/write data in DSS file
+            cat = DSS_File.read_catalog()
+        # Engine.close() automatically called.
+        ```
+
+        Returns
+        -------
+        self
+            The open DSS file.
+        """
+        if self._opened &lt;= 0:
+            logging.debug(f"opening dss file {self.src}")
+            self.engine.open()
+        self._opened += 1
+        return self
+
+    @silent
+    def __exit__(self, exc_type, exc_inst, traceback):
+        self._opened += -1
+        if self._opened &lt;= 0:
+            logging.debug(f"closing dss file {self.src}")
+            self.engine.close()
+            self._opened = 0
+
+    def read_catalog(self, drop_date: bool = False) -&gt; Catalog:
+        """Read the Catalog of the open DSS file.
+
+        The Catalog will contain all the DatasetPath objects present in the DSS
+        file.
+
+        Parameters
+        ----------
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default False
+
+        Returns
+        -------
+        Catalog
+            A pandss.Catalog object for the DSS file
+        """
+        logging.debug(f"reading catalog, {self.src=}")
+        with suppress_stdout_stderr():
+            catalog = self.engine.read_catalog()
+        if drop_date:
+            catalog = catalog.collapse_dates()
+        logging.debug(f"catalog read, size is {len(catalog)}")
+        return catalog
+
+    def read_rts(
+        self,
+        path: DatasetPath | str,
+        expect_single: bool = True,
+        drop_date: bool = True,
+    ) -&gt; RegularTimeseries:
+        """Read a RegularTimeseries from a DSS file.
+
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The A-F path of the data in the DSS, may contain wildcards
+        expect_single : bool, optional
+            Whether or not to expect a single entry and error on unexpected result, by
+            default True
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default True
+
+        Returns
+        -------
+        RegularTimeseries
+            The RegularTimeseries data stored in the DSS file.
+
+        Raises
+        ------
+        UnexpectedDSSReturn
+            Raised if `expect_single` is True, and multiple paths were matched.
+        WildcardError
+            Raised if `expect_single` is False, and the path given contains wildcards.
+        """
+        logging.debug(f"reading regular time series, {path}")
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
+        if path.has_wildcard:
+            if expect_single:
+                rtss = tuple(self.read_multiple_rts(path, drop_date))
+                if len(rtss) != 1:
+                    raise UnexpectedDSSReturn(
+                        f"expected {path} to resolve to single path, "
+                        + f"DSS returned {len(rtss)} items."
+                    )
+                else:
+                    return rtss[0]
+            else:
+                raise WildcardError(
+                    f"path has wildcard, use `read_multiple_rts` method, {path=}"
+                )
+        with suppress_stdout_stderr():
+            return self.engine.read_rts(path)
+
+    def read_multiple_rts(
+        self,
+        paths: DatasetPath | DatasetPathCollection,
+        drop_date: bool = True,
+    ) -&gt; Iterator[RegularTimeseries]:
+        """Iteratively read multiple RegularTimeseries.
+
+        Parameters
+        ----------
+        paths : DatasetPath | DatasetPathCollection
+            The A-F path of the data in the DSS, may contain wildcards
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default True
+
+        Yields
+        ------
+        Iterator[RegularTimeseries]
+            An iterator that yields the found RegularTimeseries objects
+
+        Raises
+        ------
+        ValueError
+            Raised if the `paths` argument isn't the correct type.
+        """
+        if hasattr(self.engine, "read_multiple_rts"):
+            yield from self.engine.read_multiple_rts(paths, drop_date)
+        else:  # If the engine doesn't optimize this, we can just iterate one at a time
+            # If passed a single path, check for wildcard that might expand it
+            if isinstance(paths, DatasetPath):
+                if paths.has_wildcard:
+                    paths = self.resolve_wildcard(paths)
+                else:
+                    logging.debug(
+                        "`read_multiple_rts` called with only one path,"
+                        + " path contains no wildcards to expand"
+                    )
+                    paths = DatasetPathCollection(paths={paths})
+            elif isinstance(paths, DatasetPathCollection):
+                # If passed multple paths, expand any of them with wildcards
+                if any(p.has_wildcard for p in paths):
+                    for p in paths:
+                        paths = paths &amp; self.resolve_wildcard(p)
+            else:
+                raise ValueError(
+                    "paths must be given as DatasetPath or DatasetPathCollection"
+                    + " so wildcards can be correctly resolved"
+                )
+            # When expanding wildcards, paths might be specific to a single chunk,
+            # use the special method here to re-combine the paths (combine D-parts)
+            if drop_date is True:
+                paths = paths.collapse_dates()
+            # Read each individually
+            for p in paths:
+                yield self.read_rts(p)
+
+    def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
+        """Write a RegularTimeseries to a DSS file.
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The A-F path to write into the DSS file
+        rts : RegularTimeseries
+            The RegularTimeseries object containing the data to be written
+
+
+        Raises
+        ------
+        WildcardError
+            Raised if the `path` argument contains wildcards.
+        """
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
+        logging.debug(f"writing regular time series, {path}")
+        if path.has_wildcard:
+            raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
+        with suppress_stdout_stderr():
+            return self.engine.write_rts(path, rts)
+
+    def resolve_wildcard(
+        self,
+        path: DatasetPath | str,
+        drop_date: bool = False,
+    ) -&gt; DatasetPathCollection:
+        """Search the DSS for DatasetPaths that match the `path` argument.
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The path with wildcards to match in the DSS file
+        drop_date : bool, optional
+            If True, treat paths as if the D part does not exists, by default False
+
+        Returns
+        -------
+        DatasetPathCollection
+            The collection of paths that were matched
+        """
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
+        logging.debug("resolving wildcards")
+        if not path.has_wildcard:
+            return DatasetPathCollection(paths={path})
+        if self.engine.catalog is None:
+            self.engine.read_catalog()
+        collection = self.engine.catalog.resolve_wildcard(path)
+        if drop_date:
+            collection = collection.collapse_dates()
+        return collection
+
+    @property
+    def is_open(self) -&gt; bool:
+        """Whether or not the DSS is currently open."""
+        return self.engine.is_open
+
+    @property
+    def catalog(self) -&gt; Catalog:
+        """The `Catalog` of the DSS file."""
+        return self.engine.catalog</code></pre>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pandss.dss.DSS.is_open" class="doc doc-heading">
+          <code class="highlight language-python">is_open: bool</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Whether or not the DSS is currently open.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pandss.dss.DSS.catalog" class="doc doc-heading">
+          <code class="highlight language-python">catalog: Catalog</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The <code>Catalog</code> of the DSS file.</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.__enter__" class="doc doc-heading">
+          <code class="highlight language-python">__enter__()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Wraps Engine class <code>open</code> and enables the use of engine classes in
+pythons context manager pattern. Correspondingly, <code>DSS.__close__()</code>
+wraps Engine class <code>close</code>.</p>
+<pre><code>with DSS(path_to_dss_file) as DSS_File:
+    # read/write data in DSS file
+    cat = DSS_File.read_catalog()
+# Engine.close() automatically called.
+</code></pre>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>self</code>
+            –
+            <div class="doc-md-description">
+              <p>The open DSS file.</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">@silent
+def __enter__(self):
+    """Wraps Engine class `open` and enables the use of engine classes in
+    pythons context manager pattern. Correspondingly, `DSS.__close__()`
+    wraps Engine class `close`.
+
+    ```
+    with DSS(path_to_dss_file) as DSS_File:
+        # read/write data in DSS file
+        cat = DSS_File.read_catalog()
+    # Engine.close() automatically called.
+    ```
+
+    Returns
+    -------
+    self
+        The open DSS file.
+    """
+    if self._opened &lt;= 0:
+        logging.debug(f"opening dss file {self.src}")
+        self.engine.open()
+    self._opened += 1
+    return self</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.read_catalog" class="doc doc-heading">
+          <code class="highlight language-python">read_catalog(drop_date=False)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Read the Catalog of the open DSS file.</p>
+<p>The Catalog will contain all the DatasetPath objects present in the DSS
+file.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>drop_date</code></b>
+                  (<code>bool</code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If True, treat all paths as if they did not have a D part, by default False</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.catalog.Catalog" href="#pandss.catalog.Catalog">Catalog</a></code>
+            –
+            <div class="doc-md-description">
+              <p>A pandss.Catalog object for the DSS file</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">def read_catalog(self, drop_date: bool = False) -&gt; Catalog:
+    """Read the Catalog of the open DSS file.
+
+    The Catalog will contain all the DatasetPath objects present in the DSS
+    file.
+
+    Parameters
+    ----------
+    drop_date : bool, optional
+        If True, treat all paths as if they did not have a D part, by default False
+
+    Returns
+    -------
+    Catalog
+        A pandss.Catalog object for the DSS file
+    """
+    logging.debug(f"reading catalog, {self.src=}")
+    with suppress_stdout_stderr():
+        catalog = self.engine.read_catalog()
+    if drop_date:
+        catalog = catalog.collapse_dates()
+    logging.debug(f"catalog read, size is {len(catalog)}")
+    return catalog</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.read_rts" class="doc doc-heading">
+          <code class="highlight language-python">read_rts(path, expect_single=True, drop_date=True)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Read a RegularTimeseries from a DSS file.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The A-F path of the data in the DSS, may contain wildcards</p>
+              </div>
+            </li>
+            <li>
+              <b><code>expect_single</code></b>
+                  (<code>bool</code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether or not to expect a single entry and error on unexpected result, by
+default True</p>
+              </div>
+            </li>
+            <li>
+              <b><code>drop_date</code></b>
+                  (<code>bool</code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If True, treat all paths as if they did not have a D part, by default True</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.timeseries.RegularTimeseries" href="#pandss.timeseries.regular_timeseries.RegularTimeseries">RegularTimeseries</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The RegularTimeseries data stored in the DSS file.</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="pandss.errors.UnexpectedDSSReturn" href="#pandss.errors.UnexpectedDSSReturn">UnexpectedDSSReturn</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if <code>expect_single</code> is True, and multiple paths were matched.</p>
+              </div>
+            </li>
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="pandss.errors.WildcardError" href="#pandss.errors.WildcardError">WildcardError</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if <code>expect_single</code> is False, and the path given contains wildcards.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">def read_rts(
+    self,
+    path: DatasetPath | str,
+    expect_single: bool = True,
+    drop_date: bool = True,
+) -&gt; RegularTimeseries:
+    """Read a RegularTimeseries from a DSS file.
+
+
+    Parameters
+    ----------
+    path : DatasetPath | str
+        The A-F path of the data in the DSS, may contain wildcards
+    expect_single : bool, optional
+        Whether or not to expect a single entry and error on unexpected result, by
+        default True
+    drop_date : bool, optional
+        If True, treat all paths as if they did not have a D part, by default True
+
+    Returns
+    -------
+    RegularTimeseries
+        The RegularTimeseries data stored in the DSS file.
+
+    Raises
+    ------
+    UnexpectedDSSReturn
+        Raised if `expect_single` is True, and multiple paths were matched.
+    WildcardError
+        Raised if `expect_single` is False, and the path given contains wildcards.
+    """
+    logging.debug(f"reading regular time series, {path}")
+    if isinstance(path, str):
+        path = DatasetPath.from_str(path)
+    if path.has_wildcard:
+        if expect_single:
+            rtss = tuple(self.read_multiple_rts(path, drop_date))
+            if len(rtss) != 1:
+                raise UnexpectedDSSReturn(
+                    f"expected {path} to resolve to single path, "
+                    + f"DSS returned {len(rtss)} items."
+                )
+            else:
+                return rtss[0]
+        else:
+            raise WildcardError(
+                f"path has wildcard, use `read_multiple_rts` method, {path=}"
+            )
+    with suppress_stdout_stderr():
+        return self.engine.read_rts(path)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.read_multiple_rts" class="doc doc-heading">
+          <code class="highlight language-python">read_multiple_rts(paths, drop_date=True)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Iteratively read multiple RegularTimeseries.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>paths</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | <a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>The A-F path of the data in the DSS, may contain wildcards</p>
+              </div>
+            </li>
+            <li>
+              <b><code>drop_date</code></b>
+                  (<code>bool</code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If True, treat all paths as if they did not have a D part, by default True</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Yields:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Iterator">Iterator</span>[<a class="autorefs autorefs-internal" title="pandss.timeseries.RegularTimeseries" href="#pandss.timeseries.regular_timeseries.RegularTimeseries">RegularTimeseries</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>An iterator that yields the found RegularTimeseries objects</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the <code>paths</code> argument isn't the correct type.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">def read_multiple_rts(
+    self,
+    paths: DatasetPath | DatasetPathCollection,
+    drop_date: bool = True,
+) -&gt; Iterator[RegularTimeseries]:
+    """Iteratively read multiple RegularTimeseries.
+
+    Parameters
+    ----------
+    paths : DatasetPath | DatasetPathCollection
+        The A-F path of the data in the DSS, may contain wildcards
+    drop_date : bool, optional
+        If True, treat all paths as if they did not have a D part, by default True
+
+    Yields
+    ------
+    Iterator[RegularTimeseries]
+        An iterator that yields the found RegularTimeseries objects
+
+    Raises
+    ------
+    ValueError
+        Raised if the `paths` argument isn't the correct type.
+    """
+    if hasattr(self.engine, "read_multiple_rts"):
+        yield from self.engine.read_multiple_rts(paths, drop_date)
+    else:  # If the engine doesn't optimize this, we can just iterate one at a time
+        # If passed a single path, check for wildcard that might expand it
+        if isinstance(paths, DatasetPath):
+            if paths.has_wildcard:
+                paths = self.resolve_wildcard(paths)
+            else:
+                logging.debug(
+                    "`read_multiple_rts` called with only one path,"
+                    + " path contains no wildcards to expand"
+                )
+                paths = DatasetPathCollection(paths={paths})
+        elif isinstance(paths, DatasetPathCollection):
+            # If passed multple paths, expand any of them with wildcards
+            if any(p.has_wildcard for p in paths):
+                for p in paths:
+                    paths = paths &amp; self.resolve_wildcard(p)
+        else:
+            raise ValueError(
+                "paths must be given as DatasetPath or DatasetPathCollection"
+                + " so wildcards can be correctly resolved"
+            )
+        # When expanding wildcards, paths might be specific to a single chunk,
+        # use the special method here to re-combine the paths (combine D-parts)
+        if drop_date is True:
+            paths = paths.collapse_dates()
+        # Read each individually
+        for p in paths:
+            yield self.read_rts(p)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.write_rts" class="doc doc-heading">
+          <code class="highlight language-python">write_rts(path, rts)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write a RegularTimeseries to a DSS file.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The A-F path to write into the DSS file</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rts</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.timeseries.RegularTimeseries" href="#pandss.timeseries.regular_timeseries.RegularTimeseries">RegularTimeseries</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>The RegularTimeseries object containing the data to be written</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="pandss.errors.WildcardError" href="#pandss.errors.WildcardError">WildcardError</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the <code>path</code> argument contains wildcards.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
+    """Write a RegularTimeseries to a DSS file.
+
+    Parameters
+    ----------
+    path : DatasetPath | str
+        The A-F path to write into the DSS file
+    rts : RegularTimeseries
+        The RegularTimeseries object containing the data to be written
+
+
+    Raises
+    ------
+    WildcardError
+        Raised if the `path` argument contains wildcards.
+    """
+    if isinstance(path, str):
+        path = DatasetPath.from_str(path)
+    logging.debug(f"writing regular time series, {path}")
+    if path.has_wildcard:
+        raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
+    with suppress_stdout_stderr():
+        return self.engine.write_rts(path, rts)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.dss.DSS.resolve_wildcard" class="doc doc-heading">
+          <code class="highlight language-python">resolve_wildcard(path, drop_date=False)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Search the DSS for DatasetPaths that match the <code>path</code> argument.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The path with wildcards to match in the DSS file</p>
+              </div>
+            </li>
+            <li>
+              <b><code>drop_date</code></b>
+                  (<code>bool</code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If True, treat paths as if the D part does not exists, by default False</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The collection of paths that were matched</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\dss.py</code></summary>
+            <pre class="highlight"><code class="language-python">def resolve_wildcard(
+    self,
+    path: DatasetPath | str,
+    drop_date: bool = False,
+) -&gt; DatasetPathCollection:
+    """Search the DSS for DatasetPaths that match the `path` argument.
+
+    Parameters
+    ----------
+    path : DatasetPath | str
+        The path with wildcards to match in the DSS file
+    drop_date : bool, optional
+        If True, treat paths as if the D part does not exists, by default False
+
+    Returns
+    -------
+    DatasetPathCollection
+        The collection of paths that were matched
+    """
+    if isinstance(path, str):
+        path = DatasetPath.from_str(path)
+    logging.debug("resolving wildcards")
+    if not path.has_wildcard:
+        return DatasetPathCollection(paths={path})
+    if self.engine.catalog is None:
+        self.engine.read_catalog()
+    collection = self.engine.catalog.resolve_wildcard(path)
+    if drop_date:
+        collection = collection.collapse_dates()
+    return collection</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.catalog.Catalog" class="doc doc-heading">
+          <code>Catalog</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code></p>
+
+  
+      <p>An unordered collection of <code>pandss.DatasetPath</code> objects.</p>
+<p>A <code>Catalog</code> contains all of the A-F paths present in a DSS file. A <code>Catalog</code> isn't
+ususally initialized by the user, but is typically created by a <code>pandss.DSS</code> object
+using the <code>pandss.DSS.read_catalog()</code> method.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>paths</code></b>
+                  (<code>set[<a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a>]</code>, default:
+                      <code>set()</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>The paths present in the DSS Catalog.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>src</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The path to the DSS file on disk.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>src\pandss\catalog.py</code></summary>
+              <pre class="highlight"><code class="language-python">@dataclass(
+    kw_only=True,
+    frozen=True,
+    slots=True,
+    eq=True,
+)
+class Catalog(DatasetPathCollection):
+    """An unordered collection of `pandss.DatasetPath` objects.
+
+    A `Catalog` contains all of the A-F paths present in a DSS file. A `Catalog` isn't
+    ususally initialized by the user, but is typically created by a `pandss.DSS` object
+    using the `pandss.DSS.read_catalog()` method.
+
+    Parameters
+    ----------
+    paths : set[DatasetPath]
+        The paths present in the DSS Catalog.
+    src: pathlib.Path
+        The path to the DSS file on disk.
+    """
+
+    src: Path
+
+    @classmethod
+    def from_strs(cls, paths: list[str], src: Path) -&gt; Self:
+        """Create a `Catalog` from an iterable of strings"""
+        paths = set(DatasetPath.from_str(p) for p in paths)
+        if any(p.has_wildcard for p in paths):
+            raise ValueError(f"{cls.__name__} cannot be created with wildcard paths")
+        return cls(
+            paths=paths,
+            src=src,
+        )
+
+    @classmethod
+    def from_frame(cls, df: DataFrame, src: Path) -&gt; Self:
+        """Create a `Catalog` from a `DataFrame`.
+
+        Parameters
+        ----------
+        df : DataFrame
+            The frame containing the paths to collect
+        src : Path
+            The path of the DSS file
+
+        Returns
+        -------
+        Catalog
+            The created object
+
+        Raises
+        ------
+        ValueError
+            Raised if the `DataFrame` is missing required columns
+        WildcardError
+            Raised if the paths in the `DataFrame` contain wildcards
+        """
+        df.columns = df.columns.str.lower()
+        missing = [c for c in ("a", "b", "c", "d", "e", "f") if c not in df.columns]
+        if missing:
+            raise ValueError(
+                f"DataFrame is misssing required columns: {missing}\n\t{df.sample(2)}"
+            )
+        df = df[["a", "b", "c", "d", "e", "f"]]
+        paths = set(DatasetPath(*row) for row in df.itertuples(index=False))
+        if any(p.has_wildcard for p in paths):
+            raise WildcardError(f"{cls.__name__} cannot be created with wildcard paths")
+        return cls(paths=paths, src=src)
+
+    def resolve_wildcard(self, path: DatasetPath) -&gt; DatasetPathCollection:
+        return super(Catalog, self).resolve_wildcard(path)
+
+    def find(self, path: DatasetPath) -&gt; DatasetPathCollection:
+        return self.resolve_wildcard(path)</code></pre>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.catalog.Catalog.from_strs" class="doc doc-heading">
+          <code class="highlight language-python">from_strs(paths, src)</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a <code>Catalog</code> from an iterable of strings</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\catalog.py</code></summary>
+            <pre class="highlight"><code class="language-python">@classmethod
+def from_strs(cls, paths: list[str], src: Path) -&gt; Self:
+    """Create a `Catalog` from an iterable of strings"""
+    paths = set(DatasetPath.from_str(p) for p in paths)
+    if any(p.has_wildcard for p in paths):
+        raise ValueError(f"{cls.__name__} cannot be created with wildcard paths")
+    return cls(
+        paths=paths,
+        src=src,
+    )</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.catalog.Catalog.from_frame" class="doc doc-heading">
+          <code class="highlight language-python">from_frame(df, src)</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a <code>Catalog</code> from a <code>DataFrame</code>.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>df</code></b>
+                  (<code><span title="pandas.DataFrame">DataFrame</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The frame containing the paths to collect</p>
+              </div>
+            </li>
+            <li>
+              <b><code>src</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The path of the DSS file</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.catalog.Catalog" href="#pandss.catalog.Catalog">Catalog</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The created object</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>ValueError</code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the <code>DataFrame</code> is missing required columns</p>
+              </div>
+            </li>
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="pandss.errors.WildcardError" href="#pandss.errors.WildcardError">WildcardError</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the paths in the <code>DataFrame</code> contain wildcards</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\catalog.py</code></summary>
+            <pre class="highlight"><code class="language-python">@classmethod
+def from_frame(cls, df: DataFrame, src: Path) -&gt; Self:
+    """Create a `Catalog` from a `DataFrame`.
+
+    Parameters
+    ----------
+    df : DataFrame
+        The frame containing the paths to collect
+    src : Path
+        The path of the DSS file
+
+    Returns
+    -------
+    Catalog
+        The created object
+
+    Raises
+    ------
+    ValueError
+        Raised if the `DataFrame` is missing required columns
+    WildcardError
+        Raised if the paths in the `DataFrame` contain wildcards
+    """
+    df.columns = df.columns.str.lower()
+    missing = [c for c in ("a", "b", "c", "d", "e", "f") if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"DataFrame is misssing required columns: {missing}\n\t{df.sample(2)}"
+        )
+    df = df[["a", "b", "c", "d", "e", "f"]]
+    paths = set(DatasetPath(*row) for row in df.itertuples(index=False))
+    if any(p.has_wildcard for p in paths):
+        raise WildcardError(f"{cls.__name__} cannot be created with wildcard paths")
+    return cls(paths=paths, src=src)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div><h2 id="path-and-path-collection-objects">Path, and Path Collection Objects</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.paths.DatasetPath" class="doc doc-heading">
+          <code>DatasetPath</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Representation of a single DSS dataset path, made of five parts, A-F.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src\pandss\paths.py</code></summary>
+              <pre class="highlight"><code class="language-python">@dataclass(
+    frozen=True,
+    slots=True,
+    eq=True,
+    order=True,
+)
+class DatasetPath:
+    """Representation of a single DSS dataset path, made of five parts, A-F."""
+
+    a: str = ".*"
+    b: str = ".*"
+    c: str = ".*"
+    d: str = ".*"
+    e: str = ".*"
+    f: str = ".*"
+
+    @classmethod
+    def from_str(cls, path: str) -&gt; Self:
+        """Create a DatasetPath from a string.
+
+        Parameters
+        ----------
+        path : str
+            The string representation of the path
+
+        Returns
+        -------
+        DatasetPath
+            The DatasetPath object
+
+        Raises
+        ------
+        DatasetPathParseError
+            Raised if the string cannot be parsed
+        """
+        try:
+            path = path.strip("/")
+            args = path.split("/")
+        except Exception as e:
+            raise DatasetPathParseError(f"couldn't parse {path} as path") from e
+        for bad_wild in ("", "*"):
+            args = tuple(val if val != bad_wild else ".*" for val in args)
+        if len(args) != len(cls.__annotations__):
+            raise DatasetPathParseError(
+                "not enough path parts given:\n"
+                + f"\t{path=}\n"
+                + f"\tparsed to:{args}"
+            )
+
+        return cls(*args)
+
+    def drop_date(self) -&gt; Self:
+        """Remove the D part of the path, and return a new DatasetPath object
+
+        Returns
+        -------
+        DatasetPath
+            The new object
+        """
+        kwargs = {k: v for k, v in self.items() if k != "d"}
+        kwargs["d"] = ".*"
+        return self.__class__(**kwargs)
+
+    def __str__(self):
+        return f"/{self.a}/{self.b}/{self.c}/{self.d}/{self.e}/{self.f}/"
+
+    def __dict__(self) -&gt; dict[str, str]:
+        return dict(self.items())
+
+    def __iter__(self):
+        for f in fields(self):
+            yield getattr(self, f.name)
+
+    def items(self):
+        for f in fields(self):
+            yield f.name, getattr(self, f.name)
+
+    @property
+    def has_wildcard(self) -&gt; bool:
+        """Whether or not the path as a wildcard, ignoring D-part wildcards."""
+        s = f"/{self.a}/{self.b}/{self.c}//{self.e}/{self.f}/"
+        return bool(WILDCARD_PATTERN.findall(s))
+
+    @property
+    def has_any_wildcard(self) -&gt; dict[str, bool]:
+        """Whether or not the path as a wildcard, including D-part wildcards."""
+        return bool(WILDCARD_PATTERN.findall(str(self)))</code></pre>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pandss.paths.DatasetPath.has_wildcard" class="doc doc-heading">
+          <code class="highlight language-python">has_wildcard: bool</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Whether or not the path as a wildcard, ignoring D-part wildcards.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pandss.paths.DatasetPath.has_any_wildcard" class="doc doc-heading">
+          <code class="highlight language-python">has_any_wildcard: dict[str, bool]</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Whether or not the path as a wildcard, including D-part wildcards.</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPath.from_str" class="doc doc-heading">
+          <code class="highlight language-python">from_str(path)</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a DatasetPath from a string.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code>str</code>)
+              –
+              <div class="doc-md-description">
+                <p>The string representation of the path</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The DatasetPath object</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="pandss.errors.DatasetPathParseError" href="#pandss.errors.DatasetPathParseError">DatasetPathParseError</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Raised if the string cannot be parsed</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">@classmethod
+def from_str(cls, path: str) -&gt; Self:
+    """Create a DatasetPath from a string.
+
+    Parameters
+    ----------
+    path : str
+        The string representation of the path
+
+    Returns
+    -------
+    DatasetPath
+        The DatasetPath object
+
+    Raises
+    ------
+    DatasetPathParseError
+        Raised if the string cannot be parsed
+    """
+    try:
+        path = path.strip("/")
+        args = path.split("/")
+    except Exception as e:
+        raise DatasetPathParseError(f"couldn't parse {path} as path") from e
+    for bad_wild in ("", "*"):
+        args = tuple(val if val != bad_wild else ".*" for val in args)
+    if len(args) != len(cls.__annotations__):
+        raise DatasetPathParseError(
+            "not enough path parts given:\n"
+            + f"\t{path=}\n"
+            + f"\tparsed to:{args}"
+        )
+
+    return cls(*args)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPath.drop_date" class="doc doc-heading">
+          <code class="highlight language-python">drop_date()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Remove the D part of the path, and return a new DatasetPath object</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a></code>
+            –
+            <div class="doc-md-description">
+              <p>The new object</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def drop_date(self) -&gt; Self:
+    """Remove the D part of the path, and return a new DatasetPath object
+
+    Returns
+    -------
+    DatasetPath
+        The new object
+    """
+    kwargs = {k: v for k, v in self.items() if k != "d"}
+    kwargs["d"] = ".*"
+    return self.__class__(**kwargs)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.paths.DatasetPathCollection" class="doc doc-heading">
+          <code>DatasetPathCollection</code>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Representation of multiple pandss.DatasetPath objects. Acts similarly to
+and ordered set of DatasetPath objects.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src\pandss\paths.py</code></summary>
+              <pre class="highlight"><code class="language-python">@dataclass(
+    kw_only=True,
+    frozen=True,
+    slots=True,
+    eq=True,
+)
+class DatasetPathCollection:
+    """Representation of multiple pandss.DatasetPath objects. Acts similarly to
+    and ordered set of DatasetPath objects.
+    """
+
+    paths: set[DatasetPath] = field(default_factory=set)
+
+    def __post_init__(self):
+        if not isinstance(self.paths, set):
+            raise ValueError("paths must be given as a set of pdss.DatasetPath")
+        bad_types = list()
+        for obj in self.paths:
+            if not isinstance(obj, DatasetPath):
+                bad_types.append(obj)
+        if bad_types:
+            bad_types = set([type(obj) for obj in bad_types])
+            raise ValueError(
+                f"paths must be given as `{DatasetPath.__name__}` objects,"
+                + f" {len(bad_types)} bad items given,"
+                + " seen types: {bad_types}"
+            )
+
+    def __iter__(self) -&gt; Iterator[DatasetPath]:
+        yield from sorted(list(self.paths))
+
+    def __len__(self) -&gt; int:
+        """The size of the collection
+
+        Returns
+        -------
+        int
+            The number of paths in the collection
+        """
+        return len(self.paths)
+
+    @enforce_similar_type
+    def __add__(self, __other: Self) -&gt; Self:
+        """Alias for self.__and__"""
+        return self.__and__(__other)
+
+    @enforce_similar_type
+    def __sub__(self, __other: Self) -&gt; Self:
+        """Set-style __sub__ of the collections"""
+        new = self.paths.__sub__(__other.paths)
+        return DatasetPathCollection(paths=new)
+
+    @enforce_similar_type
+    def __and__(self, __other: Self) -&gt; Self:
+        new = self.paths.__and__(__other.paths)
+        return DatasetPathCollection(paths=new)
+
+    @enforce_similar_type
+    def __or__(self, __other: Self) -&gt; Self:
+        new = self.paths.__or__(__other.paths)
+        return DatasetPathCollection(paths=new)
+
+    def intersection(self, __other: Self) -&gt; Self:
+        """Set style &amp; operation"""
+        return self.paths &amp; __other
+
+    def union(self, __other: Self) -&gt; Self:
+        """Set style &amp; operation"""
+        return self.paths &amp; __other
+
+    def difference(self, __other: Self) -&gt; Self:
+        """Set style - operation"""
+        return self.paths - __other
+
+    @classmethod
+    def from_strs(cls, paths: Iterable[str]) -&gt; Self:
+        """Create a DatasetPathCollection from an iterable of strings"""
+        return cls(paths=set(DatasetPath.from_str(p) for p in paths))
+
+    def resolve_wildcard(self, path: DatasetPath) -&gt; Self:
+        logging.debug(f"finding paths that match {path}")
+        if any(p.has_any_wildcard for p in self.paths):
+            warn(
+                "some paths in the searched collection contain wildcards,"
+                + " matching might not return expected results.",
+                Warning,
+            )
+        regex = compile(str(path), flags=IGNORECASE)
+        logging.debug(f"{regex=}")
+        buffer = "\n".join(str(p) for p in self.paths)
+        matched = regex.findall(buffer)
+        matched = [item.lstrip("/").rstrip("/") for item in matched]
+        logging.debug(f"matched {len(matched)} paths")
+        return DatasetPathCollection(
+            paths=set(DatasetPath(*p.split("/")) for p in matched)
+        )
+
+    def collapse_dates(self) -&gt; Self:
+        logging.debug("collapsing dates")
+        # get the kwargs needed to re-build the class
+        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        # set construction removes duplicates automatically, so drop the dates
+        # in each of the paths in the current object
+        kwargs["paths"] = {p.drop_date() for p in self.paths}
+        return self.__class__(**kwargs)  # Maintain subclasses by calling __class__</code></pre>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.__len__" class="doc doc-heading">
+          <code class="highlight language-python">__len__()</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The size of the collection</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+      <ul class="first simple">
+          <li>
+                <code>int</code>
+            –
+            <div class="doc-md-description">
+              <p>The number of paths in the collection</p>
+            </div>
+          </li>
+      </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def __len__(self) -&gt; int:
+    """The size of the collection
+
+    Returns
+    -------
+    int
+        The number of paths in the collection
+    """
+    return len(self.paths)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.__add__" class="doc doc-heading">
+          <code class="highlight language-python">__add__(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Alias for self.<strong>and</strong></p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">@enforce_similar_type
+def __add__(self, __other: Self) -&gt; Self:
+    """Alias for self.__and__"""
+    return self.__and__(__other)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.__sub__" class="doc doc-heading">
+          <code class="highlight language-python">__sub__(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set-style <strong>sub</strong> of the collections</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">@enforce_similar_type
+def __sub__(self, __other: Self) -&gt; Self:
+    """Set-style __sub__ of the collections"""
+    new = self.paths.__sub__(__other.paths)
+    return DatasetPathCollection(paths=new)</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.intersection" class="doc doc-heading">
+          <code class="highlight language-python">intersection(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set style &amp; operation</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def intersection(self, __other: Self) -&gt; Self:
+    """Set style &amp; operation"""
+    return self.paths &amp; __other</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.union" class="doc doc-heading">
+          <code class="highlight language-python">union(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set style &amp; operation</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def union(self, __other: Self) -&gt; Self:
+    """Set style &amp; operation"""
+    return self.paths &amp; __other</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.difference" class="doc doc-heading">
+          <code class="highlight language-python">difference(__other)</code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set style - operation</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def difference(self, __other: Self) -&gt; Self:
+    """Set style - operation"""
+    return self.paths - __other</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pandss.paths.DatasetPathCollection.from_strs" class="doc doc-heading">
+          <code class="highlight language-python">from_strs(paths)</code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a DatasetPathCollection from an iterable of strings</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">@classmethod
+def from_strs(cls, paths: Iterable[str]) -&gt; Self:
+    """Create a DatasetPathCollection from an iterable of strings"""
+    return cls(paths=set(DatasetPath.from_str(p) for p in paths))</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pandss.paths.enforce_similar_type" class="doc doc-heading">
+          <code class="highlight language-python">enforce_similar_type(func)</code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Decorator for ensuring that binary operators are acting on objects of
+the same class inheritance.</p>
+<p>Used on many methods in DatasetPathCollection.</p>
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>TypeError</code>
+              –
+              <div class="doc-md-description">
+                <p>Error raised if the objects are not of the same class.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <details class="quote">
+            <summary>Source code in <code>src\pandss\paths.py</code></summary>
+            <pre class="highlight"><code class="language-python">def enforce_similar_type(func):
+    """Decorator for ensuring that binary operators are acting on objects of
+    the same class inheritance.
+
+    Used on many methods in DatasetPathCollection.
+
+    Raises
+    ------
+    TypeError
+        Error raised if the objects are not of the same class.
+    """
+
+    def enforce_similar_type_inner(obj, __other):
+        if not isinstance(__other, type(obj)):
+            raise TypeError(f"cannot {func.__name__} {type(obj)} with {type(__other)}")
+        return func(obj, __other)
+
+    return enforce_similar_type_inner</code></pre>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div><h2 id="errors">Errors</h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.WildcardError" class="doc doc-heading">
+          <code>WildcardError</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Operation on path with wildcard is invalid.</p>
+
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.FileVersionError" class="doc doc-heading">
+          <code>FileVersionError</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Version of DSS file is invalid for this operation.</p>
+
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.DatasetNotFound" class="doc doc-heading">
+          <code>DatasetNotFound</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Dataset is not present in the DSS file.</p>
+
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.DatasetPathParseError" class="doc doc-heading">
+          <code>DatasetPathParseError</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>DatasetPath could not be constructed from the given information.</p>
+
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.ClosedDSSError" class="doc doc-heading">
+          <code>ClosedDSSError</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Operation attempted to access a closed DSS file.</p>
+
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pandss.errors.UnexpectedDSSReturn" class="doc doc-heading">
+          <code>UnexpectedDSSReturn</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Operation returned an unexpected result from a DSS read operation.</p>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
