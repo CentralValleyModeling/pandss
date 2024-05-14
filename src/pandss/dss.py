@@ -25,15 +25,6 @@ class DSS:
         The engine object that handles the DSS interactions. Available engines:
             - pyhecdss
             - pydsstools
-
-    See Also
-    --------
-    DSS.read_catalog: Read the DSS and return a pandss.Catalog object
-    DSS.reaf_rts: Read a single regular timeseries from the DSS and return a
-        pandss.RegularTimeseries object.
-    DSS.read_multiple_rts: Read multiple regular timeseries from the DSS and
-        return a iterator of pandss.RegularTimeseries objects.
-    DSS.write_rts: Write a pandss.RegularTimeseries object to a DSS file.
     """
 
     __slots__ = ["src", "engine", "_opened"]
@@ -56,18 +47,20 @@ class DSS:
     @silent
     def __enter__(self):
         """Wraps Engine class `open` and enables the use of engine classes in
-        pythons context manager pattern.
+        pythons context manager pattern. Correspondingly, `DSS.__close__()`
+        wraps Engine class `close`.
 
+        ```
         with DSS(path_to_dss_file) as DSS_File:
             # read/write data in DSS file
-            ...
+            cat = DSS_File.read_catalog()
         # Engine.close() automatically called.
-
+        ```
 
         Returns
         -------
         self
-            Returns a DSS object.
+            The open DSS file.
         """
         if self._opened <= 0:
             logging.debug(f"opening dss file {self.src}")
@@ -77,9 +70,6 @@ class DSS:
 
     @silent
     def __exit__(self, exc_type, exc_inst, traceback):
-        """Wraps Engine `close()` and enables the use of this class
-        in pythons context manager pattern.
-        """
         self._opened += -1
         if self._opened <= 0:
             logging.debug(f"closing dss file {self.src}")
@@ -87,6 +77,21 @@ class DSS:
             self._opened = 0
 
     def read_catalog(self, drop_date: bool = False) -> Catalog:
+        """Read the Catalog of the open DSS file.
+
+        The Catalog will contain all the DatasetPath objects present in the DSS
+        file.
+
+        Parameters
+        ----------
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default False
+
+        Returns
+        -------
+        Catalog
+            A pandss.Catalog object for the DSS file
+        """
         logging.debug(f"reading catalog, {self.src=}")
         with suppress_stdout_stderr():
             catalog = self.engine.read_catalog()
@@ -101,6 +106,31 @@ class DSS:
         expect_single: bool = True,
         drop_date: bool = True,
     ) -> RegularTimeseries:
+        """Read a RegularTimeseries from a DSS file.
+
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The A-F path of the data in the DSS, may contain wildcards
+        expect_single : bool, optional
+            Whether or not to expect a single entry and error on unexpected result, by
+            default True
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default True
+
+        Returns
+        -------
+        RegularTimeseries
+            The RegularTimeseries data stored in the DSS file.
+
+        Raises
+        ------
+        UnexpectedDSSReturn
+            Raised if `expect_single` is True, and multiple paths were matched.
+        WildcardError
+            Raised if `expect_single` is False, and the path given contains wildcards.
+        """
         logging.debug(f"reading regular time series, {path}")
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
@@ -126,6 +156,25 @@ class DSS:
         paths: DatasetPath | DatasetPathCollection,
         drop_date: bool = True,
     ) -> Iterator[RegularTimeseries]:
+        """Iteratively read multiple RegularTimeseries.
+
+        Parameters
+        ----------
+        paths : DatasetPath | DatasetPathCollection
+            The A-F path of the data in the DSS, may contain wildcards
+        drop_date : bool, optional
+            If True, treat all paths as if they did not have a D part, by default True
+
+        Yields
+        ------
+        Iterator[RegularTimeseries]
+            An iterator that yields the found RegularTimeseries objects
+
+        Raises
+        ------
+        ValueError
+            Raised if the `paths` argument isn't the correct type.
+        """
         if hasattr(self.engine, "read_multiple_rts"):
             yield from self.engine.read_multiple_rts(paths, drop_date)
         else:  # If the engine doesn't optimize this, we can just iterate one at a time
@@ -158,6 +207,21 @@ class DSS:
                 yield self.read_rts(p)
 
     def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
+        """Write a RegularTimeseries to a DSS file.
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The A-F path to write into the DSS file
+        rts : RegularTimeseries
+            The RegularTimeseries object containing the data to be written
+
+
+        Raises
+        ------
+        WildcardError
+            Raised if the `path` argument contains wildcards.
+        """
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         logging.debug(f"writing regular time series, {path}")
@@ -171,6 +235,20 @@ class DSS:
         path: DatasetPath | str,
         drop_date: bool = False,
     ) -> DatasetPathCollection:
+        """Search the DSS for DatasetPaths that match the `path` argument.
+
+        Parameters
+        ----------
+        path : DatasetPath | str
+            The path with wildcards to match in the DSS file
+        drop_date : bool, optional
+            If True, treat paths as if the D part does not exists, by default False
+
+        Returns
+        -------
+        DatasetPathCollection
+            The collection of paths that were matched
+        """
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         logging.debug("resolving wildcards")
@@ -184,9 +262,11 @@ class DSS:
         return collection
 
     @property
-    def is_open(self):
+    def is_open(self) -> bool:
+        """Whether or not the DSS is currently open."""
         return self.engine.is_open
 
     @property
     def catalog(self) -> Catalog:
+        """The `Catalog` of the DSS file."""
         return self.engine.catalog

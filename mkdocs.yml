@@ -1,6 +1,16 @@
-site_name: pandss Documentation
+site_name: "pandss Documentation"
 nav:
   - Home: index.md
-theme: readthedocs
-markdown_extensions:
-  - admonition
+  - API Reference: api.md
+theme: "readthedocs"
+plugins:
+- mkdocstrings:
+    default_handler: python
+    handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_root_toc_entry: false
+            heading_level: 3
+            members_order: source

@@ -1,9 +1,3 @@
-"""pandss - Interact with HEC DSS files in a pandas like API.
-
-Zachary Roy, DWR
-June 2023
-"""
-
 from importlib.metadata import PackageNotFoundError, version
 
 from . import errors, quiet
