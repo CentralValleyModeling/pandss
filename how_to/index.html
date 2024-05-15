@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>How-To - pandss Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "How-To";
+        var mkdocs_page_input_path = "how_to.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> pandss Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../tutorials/">Tutorials</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../explanation/">Explanation</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">How-To</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-do-i-read-data-from-a-dss-file">How do I read data from a DSS file?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-do-i-read-a-lot-of-data-from-a-dss-file">How do I read a lot of data from a DSS file?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-do-i-combine-many-datasets-to-a-single-dataframe">How do I combine many datasets to a single DataFrame?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-do-i-write-data-to-a-dss-file">How do I write data to a DSS file?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-can-i-copy-data-between-two-dss-files">How can I copy data between two DSS files?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-can-i-analyze-the-data-in-a-dss-file">How can I analyze the data in a DSS file?</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pandss Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>How-To</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="how-to">How To</h1>
+<h2 id="how-do-i-read-data-from-a-dss-file">How do I read data from a DSS file?</h2>
+<pre><code class="language-python">import pandss as pdss
+
+file = &quot;path/to/file.dss&quot;
+with pdss.DSS(file) as dss:
+    # Read the catalog of the DSS file
+    catalog = dss.read_catalog()
+
+    # For this example, we are just grabbing the first path from the catalog
+    path = catalog.paths.pop()
+
+    # Get the data corresponding to that path from the DSS
+    rts = dss.read_rts(path)
+</code></pre>
+<h2 id="how-do-i-read-a-lot-of-data-from-a-dss-file">How do I read a lot of data from a DSS file?</h2>
+<pre><code class="language-python">import pandss as pdss
+
+file = &quot;path/to/file.dss&quot;
+# Use regular expressions that conform to the python re module to match paths
+path = pdss.DatasetPath(b=&quot;.*&quot;, c=&quot;C&quot;)
+for rts in pdss.read_multiple_rts(file, path):
+    # Do something with the rts
+    print(rts.values[0:10])
+</code></pre>
+<h2 id="how-do-i-combine-many-datasets-to-a-single-dataframe">How do I combine many datasets to a single DataFrame?</h2>
+<pre><code class="language-python">import pandss as pdss
+import pandas as pd
+
+file = &quot;path/to/file.dss&quot;
+path = pdss.DatasetPath(b=&quot;.*&quot;, c=&quot;C&quot;)
+
+# Create the generator, this will keep the DSS file open between reads
+generator = (
+    rts.to_frame() 
+    for rts in pdss.read_multiple_rts(file, path)
+)
+# Use the generator in pandas concat
+df = pd.concat(generator, axis=1)
+</code></pre>
+<h2 id="how-do-i-write-data-to-a-dss-file">How do I write data to a DSS file?</h2>
+<pre><code class="language-python">import pandss as pdss
+
+# Using a RegularTimeseries object that was created somehow...
+rts = pdss.RegularTimeseries(...)
+
+# Open a DSS file, which can be new or existing
+file = &quot;path/to/file.dss&quot;
+with pdss.DSS(file) as dss:
+    # Write the data in the rts to the DSS file
+    # This will overwrite data at the datasetpath if it existed already
+    rts = dss.write_rts(rts.path, rts)
+</code></pre>
+<h2 id="how-can-i-copy-data-between-two-dss-files">How can I copy data between two DSS files?</h2>
+<pre><code class="language-python">import pandss as pdss
+
+# Specify the dss files to copy from/to
+old_dss = &quot;old.dss&quot;
+new_dss = &quot;new.dss&quot;
+
+# Specify the names that will be read and written. 
+old_paths = (
+    &quot;/DOCS/MONTH_DAYS/DAY//1MON/2024/&quot;,
+    &quot;/DOCS/LOCATION/PRECIP//1MON/2024/&quot;,
+)
+new_paths = (
+    &quot;/DOCS/MONTH_DAYS/DAY//1MON/2024/&quot;,  # Same name ok
+    &quot;/DOCS/LOCATION_NEW/PRECIP//1MON/2024/&quot;,  # Changed name ok too
+)
+
+# Copy data
+pdss.copy_multiple_rts(
+    old_dss, 
+    new_dss, 
+    zip(p_old, p_new),
+)
+</code></pre>
+<h2 id="how-can-i-analyze-the-data-in-a-dss-file">How can I analyze the data in a DSS file?</h2>
+<pre><code class="language-python">import pandss as pdss
+
+file = &quot;path/to/file.dss&quot;
+path = &quot;/DOCS/LOCATION/PRECIP//1MON/2024/&quot;
+with pdss.DSS(file) as dss:
+    # Get the data corresponding to that path from the DSS
+    rts = dss.read_rts(path)
+
+# Convert the data to a pandas DataFrame and use your regular tools
+df = rts.to_frame()
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../explanation/" class="btn btn-neutral float-left" title="Explanation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../api/" class="btn btn-neutral float-right" title="API Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../explanation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../api/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

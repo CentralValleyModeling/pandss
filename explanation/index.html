@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Explanation - pandss Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Explanation";
+        var mkdocs_page_input_path = "explanation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> pandss Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../tutorials/">Tutorials</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Explanation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#pandss-engine">pandss Engine</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../how_to/">How-To</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pandss Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Explanation</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="library-design">Library Design</h1>
+<p>This library is designed to act as a consistent API to other DSS interaction libraries. Currently, many other libraries have overlapping but non-comprehensive support of DSS-interactions. For example the following libraries :</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>DSS Versions</th>
+<th>Timestamp Types Used for <code>PER-AVG</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pyhecdss</td>
+<td>6 Only</td>
+<td><code>pandas.Periods</code></td>
+</tr>
+<tr>
+<td>pydsstools</td>
+<td>6 and 7</td>
+<td><code>datetime.datetime</code></td>
+</tr>
+<tr>
+<td>hec-dss-python</td>
+<td>7 Only</td>
+<td>Inconsistent</td>
+</tr>
+</tbody>
+</table>
+<p><code>pandss</code> utilizes "Engines" to do the heavy lifting of the DSS interactions. Currently, engines are written to engage with the following libraries:</p>
+<ul>
+<li><a href="https://github.com/CADWRDeltaModeling/pyhecdss">pyhecdss</a></li>
+<li><a href="https://github.com/gyanz/pydsstools">pydsstools</a></li>
+</ul>
+<p>Engines are currently under development for the following:</p>
+<ul>
+<li><a href="https://github.com/CentralValleyModeling/dss7_ctypes_bindings">dss7_ctypes_bindings</a></li>
+</ul>
+<p>Other compatable libraries that are not currently supported include:</p>
+<ul>
+<li><a href="https://github.com/HydrologicEngineeringCenter/hec-dss-python">hec-dss-python</a></li>
+</ul>
+<h2 id="pandss-engine">pandss Engine</h2>
+<p>An Engine must implement the methods defined on <code>pandss.engines.EngineABC</code>:</p>
+<pre><code class="language-python">class EngineABC:
+    src: Path
+    use_units: bool = True
+    _catalog: Catalog
+    _is_open: bool
+    _object: Any
+    _create_new: bool
+
+    def __init__(self, src: str | Path, use_units: bool = True): ...
+
+    def open(self) -&gt; Self: ...
+
+    def close(self): ...
+
+    def read_catalog(self) -&gt; Catalog: ...
+
+    def read_rts(self, path: DatasetPath) -&gt; RegularTimeseries: ...
+
+    def write_rts(self, path: DatasetPath, rts: RegularTimeseries): ...
+
+    @property
+    def catalog(self) -&gt; Catalog: ...
+
+    @property
+    def is_open(self) -&gt; bool: ...
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../tutorials/" class="btn btn-neutral float-left" title="Tutorials"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../how_to/" class="btn btn-neutral float-right" title="How-To">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../tutorials/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../how_to/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
