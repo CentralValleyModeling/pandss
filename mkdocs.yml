@@ -1,9 +1,10 @@
 site_name: "pandss Documentation"
 nav:
   - Home: index.md
+  - Tutorials: tutorials.md
+  - Explanation: explanation.md
+  - How-To: how_to.md
   - API Reference: api.md
-  - Examples: 
-    - Getting Started: quickstart.md
 theme: "readthedocs"
 plugins:
 - mkdocstrings:

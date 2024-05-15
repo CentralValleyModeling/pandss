@@ -32,7 +32,7 @@ file = "example.dss"
 catalog = pdss.read_catalog(file)
 ```
 
-Read the cata log using the DSS context manager:
+Read the catalog using the DSS context manager:
 
 ```python
 import pandss as pdss
