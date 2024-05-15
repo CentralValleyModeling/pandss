@@ -18,7 +18,13 @@ In development:
 > [!NOTE]
 > Do you want to add support for a new DSS engine? Add a module under `pandss.engines` that implements the methods on `pandss.engines.EngineABC`, and add a lookup in `get_engine` to your new module. Pull requests are encouraged.
 
-## Examples
+## Documentation
+
+Check out our documentation on the [GitHub IO Page](https://centralvalleymodeling.github.io/pandss/).
+
+---
+
+## Quick Examples
 
 ### Read Catalog
 
@@ -99,6 +105,8 @@ pdss.copy_multiple_rts(
     zip(p_old, p_new),
 )
 ```
+
+---
 
 ## Objects and their attributes
 
