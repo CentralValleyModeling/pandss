@@ -191,12 +191,24 @@ class DSS:
             elif isinstance(paths, DatasetPathCollection):
                 # If passed multple paths, expand any of them with wildcards
                 if any(p.has_wildcard for p in paths):
+                    resolved = set()
                     for p in paths:
-                        paths = paths & self.resolve_wildcard(p)
+                        resolved = resolved | self.resolve_wildcard(p)
+                    paths = resolved
+            elif hasattr(paths, "__iter__"):
+                try:
+                    paths = DatasetPathCollection(paths={p for p in paths})
+                except Exception:
+                    raise ValueError(
+                        "paths must be given as DatasetPath or DatasetPathCollection"
+                        + " so wildcards can be correctly resolved, "
+                        + f"paths given as {type(paths)}"
+                    )
             else:
                 raise ValueError(
                     "paths must be given as DatasetPath or DatasetPathCollection"
-                    + " so wildcards can be correctly resolved"
+                    + " so wildcards can be correctly resolved, "
+                    + f"paths given as {type(paths)}"
                 )
             # When expanding wildcards, paths might be specific to a single chunk,
             # use the special method here to re-combine the paths (combine D-parts)
