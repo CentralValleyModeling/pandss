@@ -143,7 +143,7 @@ class DatasetPathCollection:
             raise ValueError(
                 f"paths must be given as `{DatasetPath.__name__}` objects,"
                 + f" {len(bad_types)} bad items given,"
-                + " seen types: {bad_types}"
+                + f" seen types: {bad_types}"
             )
 
     def __iter__(self) -> Iterator[DatasetPath]:
