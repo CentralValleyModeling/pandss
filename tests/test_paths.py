@@ -11,6 +11,71 @@ def test_partial_construction():
     assert str(p) == "/.*/FOO/.*/.*/.*/.*/"
 
 
+def test_strange_eq():
+    paths = {pdss.DatasetPath(b="A"), pdss.DatasetPath(b="B")}
+    dsp = pdss.DatasetPathCollection(paths=paths)
+    assert dsp == dsp
+    assert dsp == paths
+    assert paths == dsp
+    assert dsp == [p for p in paths]
+    assert [p for p in paths] == dsp
+    assert dsp != paths.pop()
+
+
+def test_set_operations():
+    dsp_1 = pdss.DatasetPathCollection(
+        paths={
+            pdss.DatasetPath(b="A"),
+            pdss.DatasetPath(b="B"),
+        }
+    )
+
+    dsp_2 = pdss.DatasetPathCollection(
+        paths={
+            pdss.DatasetPath(b="B"),
+            pdss.DatasetPath(b="C"),
+        }
+    )
+    add = dsp_1 + dsp_2
+    sub = dsp_1 - dsp_2
+    _and = dsp_1 & dsp_2
+    _or = dsp_1 | dsp_2
+    assert len(add) == 3
+    assert len(add) == len(_or)
+    assert len(sub) == 1
+    assert sub.paths.pop() == pdss.DatasetPath(b="A")
+    assert len(_and) == 1
+    assert _and.paths.pop() == pdss.DatasetPath(b="B")
+
+
+def test_swapped_operands():
+    dsp_collection = pdss.DatasetPathCollection(
+        paths={
+            pdss.DatasetPath(b="A"),
+            pdss.DatasetPath(b="B"),
+        }
+    )
+
+    set_collection = {
+        pdss.DatasetPath(b="B"),
+        pdss.DatasetPath(b="C"),
+    }
+    add_1 = dsp_collection + set_collection
+    sub_1 = dsp_collection - set_collection
+    _and_1 = dsp_collection & set_collection
+    _or_1 = dsp_collection | set_collection
+
+    add_2 = set_collection + dsp_collection
+    sub_2 = set_collection - dsp_collection
+    _and_2 = set_collection & dsp_collection
+    _or_2 = set_collection | dsp_collection
+
+    assert add_1 == add_2
+    assert sub_1 == sub_2
+    assert _and_1 == _and_2
+    assert _or_1 == _or_2
+
+
 @pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
 def test_wildcard(dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
@@ -30,6 +95,24 @@ def test_wildcard(dss, request: FixtureRequest):
         assert L.b == R.b
 
     assert len(collection) == 3
+
+
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_wildcard_on_read_multiple(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
+    p = pdss.DatasetPath.from_str(r"/.*/TESTING/.*/.*/.*/.*/")
+    assert p.has_wildcard is True
+
+    i = None
+    for i, rts in enumerate(pdss.read_multiple_rts(dss, p)):
+        assert isinstance(rts, pdss.RegularTimeseries)
+    assert i == 0
+
+    dsp = pdss.DatasetPathCollection(paths={p})
+    i = None
+    for i, rts in enumerate(pdss.read_multiple_rts(dss, dsp)):
+        assert isinstance(rts, pdss.RegularTimeseries)
+    assert i == 0
 
 
 @pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
