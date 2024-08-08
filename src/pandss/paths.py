@@ -1,32 +1,12 @@
 import logging
 from dataclasses import dataclass, field, fields
 from re import IGNORECASE, compile
-from typing import Iterable, Iterator, Self
+from typing import Any, Iterable, Iterator, Self
 from warnings import warn
 
 from .errors import DatasetPathParseError
 
 WILDCARD_PATTERN = compile(r"\.\*")
-
-
-def enforce_similar_type(func):
-    """Decorator for ensuring that binary operators are acting on objects of
-    the same class inheritance.
-
-    Used on many methods in DatasetPathCollection.
-
-    Raises
-    ------
-    TypeError
-        Error raised if the objects are not of the same class.
-    """
-
-    def enforce_similar_type_inner(obj, __other):
-        if not isinstance(__other, type(obj)):
-            raise TypeError(f"cannot {func.__name__} {type(obj)} with {type(__other)}")
-        return func(obj, __other)
-
-    return enforce_similar_type_inner
 
 
 @dataclass(
@@ -118,12 +98,7 @@ class DatasetPath:
         return bool(WILDCARD_PATTERN.findall(str(self)))
 
 
-@dataclass(
-    kw_only=True,
-    frozen=True,
-    slots=True,
-    eq=True,
-)
+@dataclass(kw_only=True, frozen=True, slots=True, order=True)
 class DatasetPathCollection:
     """Representation of multiple pandss.DatasetPath objects. Acts similarly to
     and ordered set of DatasetPath objects.
@@ -159,26 +134,40 @@ class DatasetPathCollection:
         """
         return len(self.paths)
 
-    @enforce_similar_type
-    def __add__(self, __other: Self) -> Self:
-        """Alias for self.__and__"""
+    def __eq__(self, __other: Any) -> bool:
+        if isinstance(__other, self.__class__):
+            return self.paths == __other.paths
+        return self.paths == set(__other)
+
+    def __add__(self, __other: Any) -> Self:
+        return self.__or__(__other)
+
+    def __sub__(self, __other: Any) -> Self:
+        new = self.paths.__sub__(set(__other))
+        return DatasetPathCollection(paths=new)
+
+    def __and__(self, __other: Any) -> Self:
+        new = self.paths.__and__(set(__other))
+        return DatasetPathCollection(paths=new)
+
+    def __or__(self, __other: Any) -> Self:
+        new = self.paths.__or__(set(__other))
+        return DatasetPathCollection(paths=new)
+
+    def __req__(self, __other: Any) -> bool:
+        return self.__eq__(__other)
+
+    def __radd__(self, __other: Any) -> Self:
+        return self.__add__(__other)
+
+    def __rsub__(self, __other: Any) -> Self:
+        return self.__sub__(__other)
+
+    def __rand__(self, __other: Any) -> Self:
         return self.__and__(__other)
 
-    @enforce_similar_type
-    def __sub__(self, __other: Self) -> Self:
-        """Set-style __sub__ of the collections"""
-        new = self.paths.__sub__(__other.paths)
-        return DatasetPathCollection(paths=new)
-
-    @enforce_similar_type
-    def __and__(self, __other: Self) -> Self:
-        new = self.paths.__and__(__other.paths)
-        return DatasetPathCollection(paths=new)
-
-    @enforce_similar_type
-    def __or__(self, __other: Self) -> Self:
-        new = self.paths.__or__(__other.paths)
-        return DatasetPathCollection(paths=new)
+    def __ror__(self, __other: Any) -> Self:
+        return self.__or__(__other)
 
     def intersection(self, __other: Self) -> Self:
         """Set style & operation"""
