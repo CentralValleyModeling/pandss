@@ -29,7 +29,7 @@ def test_wildcard(dss, request: FixtureRequest):
     for L, R in zip(collection, expected):
         assert L.b == R.b
 
-    assert len(collection) == 2
+    assert len(collection) == 3
 
 
 @pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
