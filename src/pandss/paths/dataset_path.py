@@ -2,24 +2,23 @@ from dataclasses import dataclass, fields
 from typing import Self
 
 from ..errors import DatasetPathParseError
-from .wildcard import WILDCARD_PATTERN
+from .wildcard import WILDCARD_PATTERN, WILDCARD_STR
 
 
 @dataclass(
     frozen=True,
     slots=True,
-    eq=True,
     order=True,
 )
 class DatasetPath:
     """Representation of a single DSS dataset path, made of five parts, A-F."""
 
-    a: str = ".*"
-    b: str = ".*"
-    c: str = ".*"
-    d: str = ".*"
-    e: str = ".*"
-    f: str = ".*"
+    a: str = WILDCARD_STR
+    b: str = WILDCARD_STR
+    c: str = WILDCARD_STR
+    d: str = WILDCARD_STR
+    e: str = WILDCARD_STR
+    f: str = WILDCARD_STR
 
     @classmethod
     def from_str(cls, path: str) -> Self:
@@ -46,7 +45,7 @@ class DatasetPath:
         except Exception as e:
             raise DatasetPathParseError(f"couldn't parse {path} as path") from e
         for bad_wild in ("", "*"):
-            args = tuple(val if val != bad_wild else ".*" for val in args)
+            args = tuple(val if val != bad_wild else WILDCARD_STR for val in args)
         if len(args) != len(cls.__annotations__):
             raise DatasetPathParseError(
                 "not enough path parts given:\n"
@@ -65,8 +64,27 @@ class DatasetPath:
             The new object
         """
         kwargs = {k: v for k, v in self.items() if k != "d"}
-        kwargs["d"] = ".*"
+        kwargs["d"] = WILDCARD_STR
         return self.__class__(**kwargs)
+
+    def __eq__(self, __other: object) -> bool:
+        if isinstance(__other, self.__class__):
+            check_for_equal = (
+                (
+                    (getattr(self, f.name) == WILDCARD_STR),
+                    (getattr(__other, f.name) == WILDCARD_STR),
+                    (getattr(self, f.name) == getattr(__other, f.name)),
+                )
+                for f in fields(self)
+            )
+            return all(any(pair) for pair in check_for_equal)
+
+        elif isinstance(__other, str):
+            return self == self.__class__.from_str(__other)
+        else:  # Emulate ordered tuple equality
+            return all(
+                getattr(__other, f.name) == getattr(self, f.name) for f in fields(self)
+            )
 
     def __str__(self):
         return f"/{self.a}/{self.b}/{self.c}/{self.d}/{self.e}/{self.f}/"
