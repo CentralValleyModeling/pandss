@@ -27,7 +27,7 @@ def test_read_time(dss, request: FixtureRequest):
     assert average <= 0.02, f"average time is: {average} for {dss}"
 
 
-@pytest.mark.parametrize("dss", ("dss_6",))
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
 def test_from_frame(dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
     with pyhecdss.DSSFile(str(dss)) as dss:
@@ -35,3 +35,13 @@ def test_from_frame(dss, request: FixtureRequest):
     cat = pdss.Catalog.from_frame(df_cat, dss)
     assert isinstance(cat, pdss.Catalog)
     assert len(cat) == len(df_cat)
+
+
+@pytest.mark.parametrize("dss", ("dss_6",))
+def test_path_in_catalog(dss, request: FixtureRequest):
+    dss_file = request.getfixturevalue(dss)
+    cat = pdss.read_catalog(dss_file)
+    path = list(cat.paths)[0]
+    assert path in cat
+    path_wildcard = pdss.DatasetPath(b=path.b)
+    assert path_wildcard in cat
