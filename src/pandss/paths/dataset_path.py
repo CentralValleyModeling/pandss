@@ -1,14 +1,16 @@
 from dataclasses import dataclass, fields
-from typing import Self
+from re import compile
+from typing import Any, Self
 
 from ..errors import DatasetPathParseError
-from .wildcard import WILDCARD_PATTERN, WILDCARD_STR
+from .wildcard import WILDCARD_PATTERN_LITERAL, WILDCARD_STR
 
 
 @dataclass(
     frozen=True,
     slots=True,
     order=True,
+    eq=True,
 )
 class DatasetPath:
     """Representation of a single DSS dataset path, made of five parts, A-F."""
@@ -44,7 +46,7 @@ class DatasetPath:
             args = path.split("/")
         except Exception as e:
             raise DatasetPathParseError(f"couldn't parse {path} as path") from e
-        for bad_wild in ("", "*"):
+        for bad_wild in ("", *WILDCARD_STR):
             args = tuple(val if val != bad_wild else WILDCARD_STR for val in args)
         if len(args) != len(cls.__annotations__):
             raise DatasetPathParseError(
@@ -67,24 +69,96 @@ class DatasetPath:
         kwargs["d"] = WILDCARD_STR
         return self.__class__(**kwargs)
 
-    def __eq__(self, __other: object) -> bool:
-        if isinstance(__other, self.__class__):
-            check_for_equal = (
-                (
-                    (getattr(self, f.name) == WILDCARD_STR),
-                    (getattr(__other, f.name) == WILDCARD_STR),
-                    (getattr(self, f.name) == getattr(__other, f.name)),
-                )
-                for f in fields(self)
-            )
-            return all(any(pair) for pair in check_for_equal)
+    def matches(self, __other: Self | str) -> bool:
+        """Determine whether or not two DatasetPath objects match against each
+        other. Matching is not the same as equality. Paths with wildcards will only
+        match each other if they have the same string representation. Matching is
+        transative. For example:
 
+            /A/B/C/D/E/F/ matches /A/B/C/D/E/F/, and they are equal
+            /A/B/C/.*/E/F/  matches /A/B/C/.*/E/F/, and they are equal
+            /A/B/C/.*/E/F/ matches /A/B/C/D/E/F/, but they are not equal
+            /A/B/C/.*/E/F/ does not match /.*/B/C/D/E/F/, and they are not equal
+
+        Parameters
+        ----------
+        __other : Self | str
+            The other object to match against.
+
+        Returns
+        -------
+        bool
+            Whether or not the two paths match.
+        """
+        # If __other is a str, just do equality
+        if isinstance(__other, str):
+            return self == __other
+        # Lets do some duck-typing
+        try:
+            if (not self.has_wildcard) and (not self.has_wildcard):
+                # If there are no wildcards, just look for equality
+                return self == __other
+            # For each attr, check for equality, or regex matching
+            L_to_R = False
+            R_to_L = False
+            for f in fields(self):
+                L = getattr(self, f.name)
+                R = getattr(__other, f.name)
+                if L == R:
+                    pass
+                elif compile(L).findall(R):
+                    L_to_R = True
+                elif compile(R).findall(L):
+                    R_to_L = True
+                else:
+                    # One of the above should catch if the objects match
+                    return False
+            # Make sure we are only matching in one direction
+            if L_to_R and R_to_L:
+                return False
+
+        except Exception:
+            # fall back to equality
+            print(2, self, __other)
+            return self == __other
+        # All other check passed
+        return True
+
+    def __eq__(self, __other: Any):
+        """Determine whether or not two DatasetPath objects equal each other. Equalit is
+        not the same as matching. Paths with wildcards will only equal each other if
+        they have the same fields exactly. Equality is transative. For example:
+
+            /A/B/C/D/E/F/ matches /A/B/C/D/E/F/, and they are equal
+            /A/B/C/.*/E/F/  matches /A/B/C/.*/E/F/, and they are equal
+            /A/B/C/.*/E/F/ matches /A/B/C/D/E/F/, but they are not equal
+            /A/B/C/.*/E/F/ does not match /.*/B/C/D/E/F/, and they are not equal
+
+        Parameters
+        ----------
+        __other : Self | str
+            The other object to check for equality against.
+
+        Returns
+        -------
+        bool
+            Whether or not the two paths are equal.
+        """
+        if isinstance(__other, self.__class__):
+            # Compare on all fields
+            try:
+                return all(
+                    getattr(self, f.name) == getattr(__other, f.name)
+                    for f in fields(self)
+                )
+            except AttributeError:
+                return False
         elif isinstance(__other, str):
-            return self == self.__class__.from_str(__other)
-        else:  # Emulate ordered tuple equality
-            return all(
-                getattr(__other, f.name) == getattr(self, f.name) for f in fields(self)
-            )
+            # First clean up, then do str comparison
+            return str(self) == str(self.__class__.from_str(__other))
+        else:
+            # Resort to regular string comparison
+            return str(self) == str(__other)
 
     def __str__(self):
         return f"/{self.a}/{self.b}/{self.c}/{self.d}/{self.e}/{self.f}/"
@@ -104,9 +178,17 @@ class DatasetPath:
     def has_wildcard(self) -> bool:
         """Whether or not the path as a wildcard, ignoring D-part wildcards."""
         s = f"/{self.a}/{self.b}/{self.c}//{self.e}/{self.f}/"
-        return bool(WILDCARD_PATTERN.findall(s))
+        return bool(WILDCARD_PATTERN_LITERAL.findall(s))
 
     @property
     def has_any_wildcard(self) -> dict[str, bool]:
         """Whether or not the path as a wildcard, including D-part wildcards."""
-        return bool(WILDCARD_PATTERN.findall(str(self)))
+        return bool(WILDCARD_PATTERN_LITERAL.findall(str(self)))
+
+    @property
+    def wildcard_parts(self) -> set[str]:
+        parts = set()
+        for f, v in self.items():
+            if WILDCARD_PATTERN_LITERAL.findall(v):
+                parts.add(f)
+        return parts
