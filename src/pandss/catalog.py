@@ -73,8 +73,12 @@ class Catalog(DatasetPathCollection):
             )
         df = df[["a", "b", "c", "d", "e", "f"]]
         paths = set(DatasetPath(*row) for row in df.itertuples(index=False))
-        if any(p.has_wildcard for p in paths):
-            raise WildcardError(f"{cls.__name__} cannot be created with wildcard paths")
+        wild = [str(p) for p in paths if p.has_wildcard]
+        if wild:
+            wild_str = "\n\t".join(wild)
+            raise WildcardError(
+                f"{cls.__name__} cannot be created with wildcard paths:\n\t{wild_str}"
+            )
         return cls(paths=paths, src=src)
 
     def resolve_wildcard(self, path: DatasetPath) -> DatasetPathCollection:

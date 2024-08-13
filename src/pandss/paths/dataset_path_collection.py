@@ -30,6 +30,9 @@ class DatasetPathCollection:
                 + f" seen types: {bad_types}"
             )
 
+    def __contains__(self, __other: Any) -> bool:
+        return any(__other is p or __other == p for p in self.paths)
+
     def __iter__(self) -> Iterator[DatasetPath]:
         yield from sorted(list(self.paths))
 
