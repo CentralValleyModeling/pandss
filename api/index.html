@@ -111,40 +111,6 @@
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#path-and-path-collection-objects">Path, and Path Collection Objects</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.DatasetPath">DatasetPath</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.has_wildcard">has_wildcard</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.has_any_wildcard">has_any_wildcard</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.from_str">from_str</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPath.drop_date">drop_date</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__len__">__len__</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__add__">__add__</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.__sub__">__sub__</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.intersection">intersection</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.union">union</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.difference">difference</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#pandss.paths.DatasetPathCollection.from_strs">from_strs</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#pandss.paths.enforce_similar_type">enforce_similar_type</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#errors">Errors</a>
         <ul>
@@ -245,7 +211,7 @@
         <ul class="first simple">
             <li>
               <b><code>path</code></b>
-                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+                  (<code><span title="pandss.paths.DatasetPath">DatasetPath</span> | str</code>)
               –
               <div class="doc-md-description">
                 <p>The A-F path that the data had in the originating DSS file</p>
@@ -1642,12 +1608,24 @@ libraries, creating one API that this class uses.</p>
             elif isinstance(paths, DatasetPathCollection):
                 # If passed multple paths, expand any of them with wildcards
                 if any(p.has_wildcard for p in paths):
+                    resolved = set()
                     for p in paths:
-                        paths = paths &amp; self.resolve_wildcard(p)
+                        resolved = resolved | self.resolve_wildcard(p)
+                    paths = resolved
+            elif hasattr(paths, "__iter__"):
+                try:
+                    paths = DatasetPathCollection(paths={p for p in paths})
+                except Exception:
+                    raise ValueError(
+                        "paths must be given as DatasetPath or DatasetPathCollection"
+                        + " so wildcards can be correctly resolved, "
+                        + f"paths given as {type(paths)}"
+                    )
             else:
                 raise ValueError(
                     "paths must be given as DatasetPath or DatasetPathCollection"
-                    + " so wildcards can be correctly resolved"
+                    + " so wildcards can be correctly resolved, "
+                    + f"paths given as {type(paths)}"
                 )
             # When expanding wildcards, paths might be specific to a single chunk,
             # use the special method here to re-combine the paths (combine D-parts)
@@ -1980,7 +1958,7 @@ file.</p>
         <ul class="first simple">
             <li>
               <b><code>path</code></b>
-                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+                  (<code><span title="pandss.paths.DatasetPath">DatasetPath</span> | str</code>)
               –
               <div class="doc-md-description">
                 <p>The A-F path of the data in the DSS, may contain wildcards</p>
@@ -2153,7 +2131,7 @@ default True</p>
         <ul class="first simple">
             <li>
               <b><code>paths</code></b>
-                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | <a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code>)
+                  (<code><span title="pandss.paths.DatasetPath">DatasetPath</span> | <span title="pandss.paths.DatasetPathCollection">DatasetPathCollection</span></code>)
               –
               <div class="doc-md-description">
                 <p>The A-F path of the data in the DSS, may contain wildcards</p>
@@ -2264,12 +2242,24 @@ default True</p>
         elif isinstance(paths, DatasetPathCollection):
             # If passed multple paths, expand any of them with wildcards
             if any(p.has_wildcard for p in paths):
+                resolved = set()
                 for p in paths:
-                    paths = paths &amp; self.resolve_wildcard(p)
+                    resolved = resolved | self.resolve_wildcard(p)
+                paths = resolved
+        elif hasattr(paths, "__iter__"):
+            try:
+                paths = DatasetPathCollection(paths={p for p in paths})
+            except Exception:
+                raise ValueError(
+                    "paths must be given as DatasetPath or DatasetPathCollection"
+                    + " so wildcards can be correctly resolved, "
+                    + f"paths given as {type(paths)}"
+                )
         else:
             raise ValueError(
                 "paths must be given as DatasetPath or DatasetPathCollection"
-                + " so wildcards can be correctly resolved"
+                + " so wildcards can be correctly resolved, "
+                + f"paths given as {type(paths)}"
             )
         # When expanding wildcards, paths might be specific to a single chunk,
         # use the special method here to re-combine the paths (combine D-parts)
@@ -2312,7 +2302,7 @@ default True</p>
         <ul class="first simple">
             <li>
               <b><code>path</code></b>
-                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+                  (<code><span title="pandss.paths.DatasetPath">DatasetPath</span> | str</code>)
               –
               <div class="doc-md-description">
                 <p>The A-F path to write into the DSS file</p>
@@ -2414,7 +2404,7 @@ default True</p>
         <ul class="first simple">
             <li>
               <b><code>path</code></b>
-                  (<code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a> | str</code>)
+                  (<code><span title="pandss.paths.DatasetPath">DatasetPath</span> | str</code>)
               –
               <div class="doc-md-description">
                 <p>The path with wildcards to match in the DSS file</p>
@@ -2448,7 +2438,7 @@ default True</p>
     <td class="field-body">
       <ul class="first simple">
           <li>
-                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code>
+                <code><span title="pandss.paths.DatasetPathCollection">DatasetPathCollection</span></code>
             –
             <div class="doc-md-description">
               <p>The collection of paths that were matched</p>
@@ -2549,7 +2539,7 @@ default True</p>
 
   <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPathCollection" href="#pandss.paths.DatasetPathCollection">DatasetPathCollection</a></code></p>
+            Bases: <code><span title="pandss.paths.DatasetPathCollection">DatasetPathCollection</span></code></p>
 
   
       <p>An unordered collection of <code>pandss.DatasetPath</code> objects.</p>
@@ -2571,7 +2561,7 @@ using the <code>pandss.DSS.read_catalog()</code> method.</p>
         <ul class="first simple">
             <li>
               <b><code>paths</code></b>
-                  (<code>set[<a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a>]</code>, default:
+                  (<code>set[<span title="pandss.paths.DatasetPath">DatasetPath</span>]</code>, default:
                       <code>set()</code>
 )
               –
@@ -2659,8 +2649,12 @@ class Catalog(DatasetPathCollection):
             )
         df = df[["a", "b", "c", "d", "e", "f"]]
         paths = set(DatasetPath(*row) for row in df.itertuples(index=False))
-        if any(p.has_wildcard for p in paths):
-            raise WildcardError(f"{cls.__name__} cannot be created with wildcard paths")
+        wild = [str(p) for p in paths if p.has_wildcard]
+        if wild:
+            wild_str = "\n\t".join(wild)
+            raise WildcardError(
+                f"{cls.__name__} cannot be created with wildcard paths:\n\t{wild_str}"
+            )
         return cls(paths=paths, src=src)
 
     def resolve_wildcard(self, path: DatasetPath) -&gt; DatasetPathCollection:
@@ -2858,8 +2852,12 @@ def from_frame(cls, df: DataFrame, src: Path) -&gt; Self:
         )
     df = df[["a", "b", "c", "d", "e", "f"]]
     paths = set(DatasetPath(*row) for row in df.itertuples(index=False))
-    if any(p.has_wildcard for p in paths):
-        raise WildcardError(f"{cls.__name__} cannot be created with wildcard paths")
+    wild = [str(p) for p in paths if p.has_wildcard]
+    if wild:
+        wild_str = "\n\t".join(wild)
+        raise WildcardError(
+            f"{cls.__name__} cannot be created with wildcard paths:\n\t{wild_str}"
+        )
     return cls(paths=paths, src=src)</code></pre>
           </details>
   </div>
@@ -2903,800 +2901,6 @@ def from_frame(cls, df: DataFrame, src: Path) -&gt; Self:
 
 
 
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="pandss.paths.DatasetPath" class="doc doc-heading">
-          <code>DatasetPath</code>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-
-  
-      <p>Representation of a single DSS dataset path, made of five parts, A-F.</p>
-
-            <details class="quote">
-              <summary>Source code in <code>src\pandss\paths.py</code></summary>
-              <pre class="highlight"><code class="language-python">@dataclass(
-    frozen=True,
-    slots=True,
-    eq=True,
-    order=True,
-)
-class DatasetPath:
-    """Representation of a single DSS dataset path, made of five parts, A-F."""
-
-    a: str = ".*"
-    b: str = ".*"
-    c: str = ".*"
-    d: str = ".*"
-    e: str = ".*"
-    f: str = ".*"
-
-    @classmethod
-    def from_str(cls, path: str) -&gt; Self:
-        """Create a DatasetPath from a string.
-
-        Parameters
-        ----------
-        path : str
-            The string representation of the path
-
-        Returns
-        -------
-        DatasetPath
-            The DatasetPath object
-
-        Raises
-        ------
-        DatasetPathParseError
-            Raised if the string cannot be parsed
-        """
-        try:
-            path = path.strip("/")
-            args = path.split("/")
-        except Exception as e:
-            raise DatasetPathParseError(f"couldn't parse {path} as path") from e
-        for bad_wild in ("", "*"):
-            args = tuple(val if val != bad_wild else ".*" for val in args)
-        if len(args) != len(cls.__annotations__):
-            raise DatasetPathParseError(
-                "not enough path parts given:\n"
-                + f"\t{path=}\n"
-                + f"\tparsed to:{args}"
-            )
-
-        return cls(*args)
-
-    def drop_date(self) -&gt; Self:
-        """Remove the D part of the path, and return a new DatasetPath object
-
-        Returns
-        -------
-        DatasetPath
-            The new object
-        """
-        kwargs = {k: v for k, v in self.items() if k != "d"}
-        kwargs["d"] = ".*"
-        return self.__class__(**kwargs)
-
-    def __str__(self):
-        return f"/{self.a}/{self.b}/{self.c}/{self.d}/{self.e}/{self.f}/"
-
-    def __dict__(self) -&gt; dict[str, str]:
-        return dict(self.items())
-
-    def __iter__(self):
-        for f in fields(self):
-            yield getattr(self, f.name)
-
-    def items(self):
-        for f in fields(self):
-            yield f.name, getattr(self, f.name)
-
-    @property
-    def has_wildcard(self) -&gt; bool:
-        """Whether or not the path as a wildcard, ignoring D-part wildcards."""
-        s = f"/{self.a}/{self.b}/{self.c}//{self.e}/{self.f}/"
-        return bool(WILDCARD_PATTERN.findall(s))
-
-    @property
-    def has_any_wildcard(self) -&gt; dict[str, bool]:
-        """Whether or not the path as a wildcard, including D-part wildcards."""
-        return bool(WILDCARD_PATTERN.findall(str(self)))</code></pre>
-            </details>
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="pandss.paths.DatasetPath.has_wildcard" class="doc doc-heading">
-          <code class="highlight language-python">has_wildcard: bool</code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Whether or not the path as a wildcard, ignoring D-part wildcards.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="pandss.paths.DatasetPath.has_any_wildcard" class="doc doc-heading">
-          <code class="highlight language-python">has_any_wildcard: dict[str, bool]</code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Whether or not the path as a wildcard, including D-part wildcards.</p>
-  </div>
-
-</div>
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPath.from_str" class="doc doc-heading">
-          <code class="highlight language-python">from_str(path)</code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Create a DatasetPath from a string.</p>
-
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>path</code></b>
-                  (<code>str</code>)
-              –
-              <div class="doc-md-description">
-                <p>The string representation of the path</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-    <th class="field-name">Returns:</th>
-    <td class="field-body">
-      <ul class="first simple">
-          <li>
-                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a></code>
-            –
-            <div class="doc-md-description">
-              <p>The DatasetPath object</p>
-            </div>
-          </li>
-      </ul>
-    </td>
-    </tr>
-  </tbody>
-</table>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Raises:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-                  <code><a class="autorefs autorefs-internal" title="pandss.errors.DatasetPathParseError" href="#pandss.errors.DatasetPathParseError">DatasetPathParseError</a></code>
-              –
-              <div class="doc-md-description">
-                <p>Raised if the string cannot be parsed</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">@classmethod
-def from_str(cls, path: str) -&gt; Self:
-    """Create a DatasetPath from a string.
-
-    Parameters
-    ----------
-    path : str
-        The string representation of the path
-
-    Returns
-    -------
-    DatasetPath
-        The DatasetPath object
-
-    Raises
-    ------
-    DatasetPathParseError
-        Raised if the string cannot be parsed
-    """
-    try:
-        path = path.strip("/")
-        args = path.split("/")
-    except Exception as e:
-        raise DatasetPathParseError(f"couldn't parse {path} as path") from e
-    for bad_wild in ("", "*"):
-        args = tuple(val if val != bad_wild else ".*" for val in args)
-    if len(args) != len(cls.__annotations__):
-        raise DatasetPathParseError(
-            "not enough path parts given:\n"
-            + f"\t{path=}\n"
-            + f"\tparsed to:{args}"
-        )
-
-    return cls(*args)</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPath.drop_date" class="doc doc-heading">
-          <code class="highlight language-python">drop_date()</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Remove the D part of the path, and return a new DatasetPath object</p>
-
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-    <th class="field-name">Returns:</th>
-    <td class="field-body">
-      <ul class="first simple">
-          <li>
-                <code><a class="autorefs autorefs-internal" title="pandss.paths.DatasetPath" href="#pandss.paths.DatasetPath">DatasetPath</a></code>
-            –
-            <div class="doc-md-description">
-              <p>The new object</p>
-            </div>
-          </li>
-      </ul>
-    </td>
-    </tr>
-  </tbody>
-</table>
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def drop_date(self) -&gt; Self:
-    """Remove the D part of the path, and return a new DatasetPath object
-
-    Returns
-    -------
-    DatasetPath
-        The new object
-    """
-    kwargs = {k: v for k, v in self.items() if k != "d"}
-    kwargs["d"] = ".*"
-    return self.__class__(**kwargs)</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="pandss.paths.DatasetPathCollection" class="doc doc-heading">
-          <code>DatasetPathCollection</code>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-
-  
-      <p>Representation of multiple pandss.DatasetPath objects. Acts similarly to
-and ordered set of DatasetPath objects.</p>
-
-            <details class="quote">
-              <summary>Source code in <code>src\pandss\paths.py</code></summary>
-              <pre class="highlight"><code class="language-python">@dataclass(
-    kw_only=True,
-    frozen=True,
-    slots=True,
-    eq=True,
-)
-class DatasetPathCollection:
-    """Representation of multiple pandss.DatasetPath objects. Acts similarly to
-    and ordered set of DatasetPath objects.
-    """
-
-    paths: set[DatasetPath] = field(default_factory=set)
-
-    def __post_init__(self):
-        if not isinstance(self.paths, set):
-            raise ValueError("paths must be given as a set of pdss.DatasetPath")
-        bad_types = list()
-        for obj in self.paths:
-            if not isinstance(obj, DatasetPath):
-                bad_types.append(obj)
-        if bad_types:
-            bad_types = set([type(obj) for obj in bad_types])
-            raise ValueError(
-                f"paths must be given as `{DatasetPath.__name__}` objects,"
-                + f" {len(bad_types)} bad items given,"
-                + " seen types: {bad_types}"
-            )
-
-    def __iter__(self) -&gt; Iterator[DatasetPath]:
-        yield from sorted(list(self.paths))
-
-    def __len__(self) -&gt; int:
-        """The size of the collection
-
-        Returns
-        -------
-        int
-            The number of paths in the collection
-        """
-        return len(self.paths)
-
-    @enforce_similar_type
-    def __add__(self, __other: Self) -&gt; Self:
-        """Alias for self.__and__"""
-        return self.__and__(__other)
-
-    @enforce_similar_type
-    def __sub__(self, __other: Self) -&gt; Self:
-        """Set-style __sub__ of the collections"""
-        new = self.paths.__sub__(__other.paths)
-        return DatasetPathCollection(paths=new)
-
-    @enforce_similar_type
-    def __and__(self, __other: Self) -&gt; Self:
-        new = self.paths.__and__(__other.paths)
-        return DatasetPathCollection(paths=new)
-
-    @enforce_similar_type
-    def __or__(self, __other: Self) -&gt; Self:
-        new = self.paths.__or__(__other.paths)
-        return DatasetPathCollection(paths=new)
-
-    def intersection(self, __other: Self) -&gt; Self:
-        """Set style &amp; operation"""
-        return self.paths &amp; __other
-
-    def union(self, __other: Self) -&gt; Self:
-        """Set style &amp; operation"""
-        return self.paths &amp; __other
-
-    def difference(self, __other: Self) -&gt; Self:
-        """Set style - operation"""
-        return self.paths - __other
-
-    @classmethod
-    def from_strs(cls, paths: Iterable[str]) -&gt; Self:
-        """Create a DatasetPathCollection from an iterable of strings"""
-        return cls(paths=set(DatasetPath.from_str(p) for p in paths))
-
-    def resolve_wildcard(self, path: DatasetPath) -&gt; Self:
-        logging.debug(f"finding paths that match {path}")
-        if any(p.has_any_wildcard for p in self.paths):
-            warn(
-                "some paths in the searched collection contain wildcards,"
-                + " matching might not return expected results.",
-                Warning,
-            )
-        regex = compile(str(path), flags=IGNORECASE)
-        logging.debug(f"{regex=}")
-        buffer = "\n".join(str(p) for p in self.paths)
-        matched = regex.findall(buffer)
-        matched = [item.lstrip("/").rstrip("/") for item in matched]
-        logging.debug(f"matched {len(matched)} paths")
-        return DatasetPathCollection(
-            paths=set(DatasetPath(*p.split("/")) for p in matched)
-        )
-
-    def collapse_dates(self) -&gt; Self:
-        logging.debug("collapsing dates")
-        # get the kwargs needed to re-build the class
-        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
-        # set construction removes duplicates automatically, so drop the dates
-        # in each of the paths in the current object
-        kwargs["paths"] = {p.drop_date() for p in self.paths}
-        return self.__class__(**kwargs)  # Maintain subclasses by calling __class__</code></pre>
-            </details>
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.__len__" class="doc doc-heading">
-          <code class="highlight language-python">__len__()</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>The size of the collection</p>
-
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-    <th class="field-name">Returns:</th>
-    <td class="field-body">
-      <ul class="first simple">
-          <li>
-                <code>int</code>
-            –
-            <div class="doc-md-description">
-              <p>The number of paths in the collection</p>
-            </div>
-          </li>
-      </ul>
-    </td>
-    </tr>
-  </tbody>
-</table>
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def __len__(self) -&gt; int:
-    """The size of the collection
-
-    Returns
-    -------
-    int
-        The number of paths in the collection
-    """
-    return len(self.paths)</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.__add__" class="doc doc-heading">
-          <code class="highlight language-python">__add__(__other)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Alias for self.<strong>and</strong></p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">@enforce_similar_type
-def __add__(self, __other: Self) -&gt; Self:
-    """Alias for self.__and__"""
-    return self.__and__(__other)</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.__sub__" class="doc doc-heading">
-          <code class="highlight language-python">__sub__(__other)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Set-style <strong>sub</strong> of the collections</p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">@enforce_similar_type
-def __sub__(self, __other: Self) -&gt; Self:
-    """Set-style __sub__ of the collections"""
-    new = self.paths.__sub__(__other.paths)
-    return DatasetPathCollection(paths=new)</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.intersection" class="doc doc-heading">
-          <code class="highlight language-python">intersection(__other)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Set style &amp; operation</p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def intersection(self, __other: Self) -&gt; Self:
-    """Set style &amp; operation"""
-    return self.paths &amp; __other</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.union" class="doc doc-heading">
-          <code class="highlight language-python">union(__other)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Set style &amp; operation</p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def union(self, __other: Self) -&gt; Self:
-    """Set style &amp; operation"""
-    return self.paths &amp; __other</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.difference" class="doc doc-heading">
-          <code class="highlight language-python">difference(__other)</code>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Set style - operation</p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def difference(self, __other: Self) -&gt; Self:
-    """Set style - operation"""
-    return self.paths - __other</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pandss.paths.DatasetPathCollection.from_strs" class="doc doc-heading">
-          <code class="highlight language-python">from_strs(paths)</code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Create a DatasetPathCollection from an iterable of strings</p>
-
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">@classmethod
-def from_strs(cls, paths: Iterable[str]) -&gt; Self:
-    """Create a DatasetPathCollection from an iterable of strings"""
-    return cls(paths=set(DatasetPath.from_str(p) for p in paths))</code></pre>
-          </details>
-  </div>
-
-</div>
-
-
-
-  </div>
-
-  </div>
-
-
-</div>
-
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h3 id="pandss.paths.enforce_similar_type" class="doc doc-heading">
-          <code class="highlight language-python">enforce_similar_type(func)</code>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Decorator for ensuring that binary operators are acting on objects of
-the same class inheritance.</p>
-<p>Used on many methods in DatasetPathCollection.</p>
-
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Raises:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-                  <code>TypeError</code>
-              –
-              <div class="doc-md-description">
-                <p>Error raised if the objects are not of the same class.</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-          <details class="quote">
-            <summary>Source code in <code>src\pandss\paths.py</code></summary>
-            <pre class="highlight"><code class="language-python">def enforce_similar_type(func):
-    """Decorator for ensuring that binary operators are acting on objects of
-    the same class inheritance.
-
-    Used on many methods in DatasetPathCollection.
-
-    Raises
-    ------
-    TypeError
-        Error raised if the objects are not of the same class.
-    """
-
-    def enforce_similar_type_inner(obj, __other):
-        if not isinstance(__other, type(obj)):
-            raise TypeError(f"cannot {func.__name__} {type(obj)} with {type(__other)}")
-        return func(obj, __other)
-
-    return enforce_similar_type_inner</code></pre>
-          </details>
-  </div>
-
-</div>
 
 
 
