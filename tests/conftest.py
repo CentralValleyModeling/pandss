@@ -1,3 +1,4 @@
+import logging
 from os import remove
 from pathlib import Path
 from random import choice
@@ -50,4 +51,7 @@ def temporary_dss(created_dir: Path, random_name: str) -> Generator[Path, None, 
     remove(file)
     for f in file.parent.iterdir():
         if f.stem == file.stem:
-            remove(f)
+            try:
+                remove(f)
+            except PermissionError:
+                logging.warning(f"couldn't clean up {f}")

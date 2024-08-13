@@ -28,10 +28,10 @@ def test_read_time(dss, request: FixtureRequest):
 
 
 @pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
-def test_from_frame(dss, request: FixtureRequest):
+def test_from_frame(dss, dss_6, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
-    with pyhecdss.DSSFile(str(dss)) as dss:
-        df_cat = dss.read_catalog()
+    with pyhecdss.DSSFile(str(dss_6)) as dss_6_obj:
+        df_cat = dss_6_obj.read_catalog()
     cat = pdss.Catalog.from_frame(df_cat, dss)
     assert isinstance(cat, pdss.Catalog)
     assert len(cat) == len(df_cat)
@@ -42,6 +42,8 @@ def test_path_in_catalog(dss, request: FixtureRequest):
     dss_file = request.getfixturevalue(dss)
     cat = pdss.read_catalog(dss_file)
     path = list(cat.paths)[0]
+    assert cat.has_match(path)
     assert path in cat
     path_wildcard = pdss.DatasetPath(b=path.b)
-    assert path_wildcard in cat
+    assert cat.has_match(path_wildcard)
+    assert path_wildcard not in cat

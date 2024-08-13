@@ -2,8 +2,8 @@ import logging
 from dataclasses import dataclass, field, fields
 from re import IGNORECASE, compile
 from typing import Any, Iterable, Iterator, Self
-from warnings import warn
 
+from ..errors import WildcardError
 from .dataset_path import DatasetPath
 
 
@@ -29,6 +29,13 @@ class DatasetPathCollection:
                 + f" {len(bad_types)} bad items given,"
                 + f" seen types: {bad_types}"
             )
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({len(self.paths)} paths)"
+
+    def __repr__(self) -> str:
+        inner = "{" + ", ".join(repr(p) for p in self.paths) + "}"
+        return f"{self.__class__.__name__}(paths={inner})"
 
     def __contains__(self, __other: Any) -> bool:
         return any(__other is p or __other == p for p in self.paths)
@@ -100,11 +107,9 @@ class DatasetPathCollection:
 
     def resolve_wildcard(self, path: DatasetPath) -> Self:
         logging.debug(f"finding paths that match {path}")
-        if any(p.has_any_wildcard for p in self.paths):
-            warn(
-                "some paths in the searched collection contain wildcards,"
-                + " matching might not return expected results.",
-                Warning,
+        if any(p.has_any_wildcard for p in self.paths) and path.has_wildcard:
+            raise WildcardError(
+                f"{self} contains paths with wildcards, cannot resolve another path."
             )
         regex = compile(str(path), flags=IGNORECASE)
         logging.debug(f"{regex=}")
@@ -115,6 +120,10 @@ class DatasetPathCollection:
         return DatasetPathCollection(
             paths=set(DatasetPath(*p.split("/")) for p in matched)
         )
+
+    def has_match(self, path: DatasetPath) -> bool:
+        dsc = self.resolve_wildcard(path)
+        return len(dsc.paths) > 0
 
     def collapse_dates(self) -> Self:
         logging.debug("collapsing dates")
