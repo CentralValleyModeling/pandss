@@ -1,3 +1,5 @@
+from itertools import product
+
 import pytest
 from pytest import FixtureRequest
 
@@ -120,9 +122,10 @@ def test_replace_bad_wildcard(dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
     blank = pdss.DatasetPath.from_str(r"/*/////*/")
     star = pdss.DatasetPath.from_str(r"/.*/.*/.*/.*/.*/.*/")
-    with pdss.DSS(dss) as dss:
-        blank = dss.resolve_wildcard(blank)
-        star = dss.resolve_wildcard(star)
+    assert blank == star
+    with pdss.DSS(dss) as dss_obj:
+        blank = dss_obj.resolve_wildcard(blank)
+        star = dss_obj.resolve_wildcard(star)
     assert blank == star
 
 
@@ -132,8 +135,9 @@ def test_warn_findall_if_wildcard_in_set(dss, request: FixtureRequest):
     star = pdss.DatasetPath.from_str(r"/*/*/*/*/*/*/")
     with pdss.DSS(dss) as dss:
         catalog = dss.read_catalog()
+        _ = catalog.resolve_wildcard(star)
         catalog = catalog.collapse_dates()
-        with pytest.warns(Warning):
+        with pytest.raises(pdss.errors.WildcardError):
             catalog.resolve_wildcard(star)
 
 
@@ -172,3 +176,45 @@ def test_optional_formatting():
         assert isinstance(p, pdss.DatasetPath)
         assert p.a == "A"
         assert p.f == "F"
+
+
+def test_matching_and_equality():
+    abc = pdss.DatasetPath(a="A", b="B", c="C")
+    ab_ = pdss.DatasetPath(a="A", b="B")
+    a_c = pdss.DatasetPath(a="A", c="C")
+    _bc = pdss.DatasetPath(b="B", c="C")
+
+    wildcards = [ab_, a_c, _bc]
+    for w in wildcards:
+        assert abc != w
+        assert w != abc
+        assert abc.matches(w)
+        assert w.matches(abc)
+
+    for L, R in product(wildcards, wildcards):
+        if L is R:
+            continue
+        assert L != R
+        assert R != L
+        assert not L.matches(R)
+        assert not R.matches(L)
+
+    for pattern in wildcards:
+        assert pattern == pattern
+        assert pattern.matches(pattern)
+
+    assert abc == abc
+    assert abc.matches(abc)
+
+    L = pdss.DatasetPath(a="Foo.*")
+    R = pdss.DatasetPath(a=".*Bar")
+    C = pdss.DatasetPath(a="FooBar", b="Anything")
+    for side in (L, R):
+        assert C.matches(side)
+        assert side.matches(C)
+        assert C != side
+        assert side != C
+    assert L != R
+    assert not L.matches(R)
+    assert R != L
+    assert not R.matches(L)
