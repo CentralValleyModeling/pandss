@@ -47,14 +47,14 @@ class DatasetPath:
             args = path.split("/")
         except Exception as e:
             raise DatasetPathParseError(f"couldn't parse {path} as path") from e
-        for bad_wild in ("", *WILDCARD_STR):
-            args = tuple(val if val != bad_wild else WILDCARD_STR for val in args)
         if len(args) != len(cls.__annotations__):
             raise DatasetPathParseError(
                 "not enough path parts given:\n"
                 + f"\t{path=}\n"
                 + f"\tparsed to:{args}"
             )
+        for bad_wild in ("", *WILDCARD_STR):
+            args = tuple(val if val != bad_wild else WILDCARD_STR for val in args)
 
         return cls(*args)
 
