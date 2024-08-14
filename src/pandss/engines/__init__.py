@@ -34,13 +34,13 @@ class EngineABC:
             f"read_catalog not implemented on {self.__class__.__name__}"
         )
 
-    def read_rts(self, path: DatasetPath) -> RegularTimeseries:
+    def read_rts(self, path: DatasetPath | str) -> RegularTimeseries:
         """Reads a single regular timeseries from a DSS file."""
         raise NotImplementedError(
             f"read_rts not implemented on {self.__class__.__name__}"
         )
 
-    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+    def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
         """Writes a single regular timeseries to a DSS file."""
         raise NotImplementedError(
             f"write_rts not implemented on {self.__class__.__name__}"

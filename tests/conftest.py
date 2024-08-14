@@ -9,8 +9,6 @@ import pytest
 
 import pandss as pdss
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 @pytest.fixture()
 def dss_6() -> Path:

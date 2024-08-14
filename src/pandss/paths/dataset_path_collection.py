@@ -105,8 +105,10 @@ class DatasetPathCollection:
         """Create a DatasetPathCollection from an iterable of strings"""
         return cls(paths=set(DatasetPath.from_str(p) for p in paths))
 
-    def resolve_wildcard(self, path: DatasetPath) -> Self:
+    def resolve_wildcard(self, path: DatasetPath | str) -> Self:
         logging.debug(f"finding paths that match {path}")
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         if any(p.has_any_wildcard for p in self.paths) and path.has_wildcard:
             raise WildcardError(
                 f"{self} contains paths with wildcards, cannot resolve another path."
@@ -121,7 +123,7 @@ class DatasetPathCollection:
             paths=set(DatasetPath(*p.split("/")) for p in matched)
         )
 
-    def has_match(self, path: DatasetPath) -> bool:
+    def has_match(self, path: DatasetPath | str) -> bool:
         dsc = self.resolve_wildcard(path)
         return len(dsc.paths) > 0
 

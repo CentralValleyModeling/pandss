@@ -41,13 +41,15 @@ def read_rts(src: str | Path, path: DatasetPath | str) -> RegularTimeseries:
     RegularTimeseries
         The dataset read from the DSS file.
     """
+    if isinstance(path, str):
+        path = DatasetPath.from_str(path)
     with DSS(src) as dss:
         return dss.read_rts(path)
 
 
 def read_multiple_rts(
     src: str | Path,
-    path: DatasetPath | DatasetPathCollection,
+    path: DatasetPath | str | DatasetPathCollection,
     drop_date: bool = True,
 ) -> Iterator[RegularTimeseries]:
     """Read the DSS file for multiple regular timeseries, and return an
@@ -57,7 +59,7 @@ def read_multiple_rts(
     ----------
     src : str | Path
         The path to the DSS file to be read from.
-    path : DatasetPath | DatasetPathCollection
+    path : DatasetPath | str | DatasetPathCollection
         The paths to be found, or a single path with wildcards that resolves to
         multiple paths.
     drop_date : bool, optional
@@ -69,6 +71,8 @@ def read_multiple_rts(
     Iterator[RegularTimeseries]
         The datasets read from the DSS file.
     """
+    if isinstance(path, str):
+        path = DatasetPath.from_str(path)
     with DSS(src) as dss:
         yield from dss.read_multiple_rts(path, drop_date)
 

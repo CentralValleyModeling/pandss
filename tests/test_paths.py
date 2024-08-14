@@ -225,3 +225,12 @@ def test_matching_and_equality():
     assert has_date != wild_date
     assert wild_date.matches(has_date)
     assert has_date.matches(wild_date)
+
+
+def test_auto_convert():
+    bad_path = ""
+    with pytest.raises(pdss.errors.DatasetPathParseError):
+        for _ in pdss.read_multiple_rts(None, bad_path):
+            pass
+    with pytest.raises(pdss.errors.DatasetPathParseError):
+        pdss.read_rts(None, bad_path)

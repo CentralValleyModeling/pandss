@@ -67,7 +67,13 @@ class PyDssToolsEngine(EngineABC):
 
         return self._convert_to_pandss_rts(data, path)
 
-    def _convert_to_pandss_rts(self, data: Any, path: DatasetPath) -> RegularTimeseries:
+    def _convert_to_pandss_rts(
+        self,
+        data: Any,
+        path: DatasetPath | str,
+    ) -> RegularTimeseries:
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         attr_map = {
             "values": "values",
             "dates": "pytimes",

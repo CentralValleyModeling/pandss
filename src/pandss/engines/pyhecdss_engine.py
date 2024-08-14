@@ -57,8 +57,10 @@ class PyHecDssEngine(EngineABC):
         return catalog
 
     @must_be_open
-    def read_rts(self, path: DatasetPath) -> RegularTimeseries:
+    def read_rts(self, path: DatasetPath | str) -> RegularTimeseries:
         """Reads a single regular timeseries from a DSS file."""
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         logging.debug(f"reading regular time series, {path}")
         if path.has_wildcard:
             raise ValueError("path has wildcard, use `read_multiple_rts` method")
@@ -82,7 +84,9 @@ class PyHecDssEngine(EngineABC):
 
         return self._convert_to_pandss_rts(data, path)
 
-    def write_rts(self, path: DatasetPath, rts: RegularTimeseries):
+    def write_rts(self, path: DatasetPath | str, rts: RegularTimeseries):
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         if rts.period_type.startswith("PER"):
             periods = pd.DatetimeIndex(rts.dates).to_period()
         else:
@@ -98,8 +102,12 @@ class PyHecDssEngine(EngineABC):
         self._object.write_rts(p, df, rts.units, rts.period_type)
 
     def _convert_to_pandss_rts(
-        self, data: pyhecdss.DSSData, path: DatasetPath
+        self,
+        data: pyhecdss.DSSData,
+        path: DatasetPath | str,
     ) -> RegularTimeseries:
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         # Convert to RegularTimeseries
         attr_map = {
             "period_type": "period_type",
