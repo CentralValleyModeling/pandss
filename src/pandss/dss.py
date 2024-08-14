@@ -131,9 +131,9 @@ class DSS:
         WildcardError
             Raised if `expect_single` is False, and the path given contains wildcards.
         """
-        logging.debug(f"reading regular time series, {path}")
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
+        logging.debug(f"reading regular time series, {path}")
         if path.has_wildcard:
             if expect_single:
                 rtss = tuple(self.read_multiple_rts(path, drop_date))
@@ -153,14 +153,14 @@ class DSS:
 
     def read_multiple_rts(
         self,
-        paths: DatasetPath | DatasetPathCollection,
+        paths: DatasetPath | str | DatasetPathCollection,
         drop_date: bool = True,
     ) -> Iterator[RegularTimeseries]:
         """Iteratively read multiple RegularTimeseries.
 
         Parameters
         ----------
-        paths : DatasetPath | DatasetPathCollection
+        paths : DatasetPath | str | DatasetPathCollection
             The A-F path of the data in the DSS, may contain wildcards
         drop_date : bool, optional
             If True, treat all paths as if they did not have a D part, by default True
@@ -175,6 +175,8 @@ class DSS:
         ValueError
             Raised if the `paths` argument isn't the correct type.
         """
+        if isinstance(paths, str):
+            paths = DatasetPath.from_str(paths)
         if hasattr(self.engine, "read_multiple_rts"):
             yield from self.engine.read_multiple_rts(paths, drop_date)
         else:  # If the engine doesn't optimize this, we can just iterate one at a time

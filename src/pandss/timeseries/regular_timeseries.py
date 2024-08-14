@@ -24,7 +24,7 @@ class RegularTimeseries:
 
     Attributes
     -------
-    path: DatasetPath | str
+    path: DatasetPath
         The A-F path that the data had in the originating DSS file
     values: NDArray
         The timeseries data
@@ -39,7 +39,7 @@ class RegularTimeseries:
         The time interval in seconds between data in the DSS file.
     """
 
-    path: DatasetPath | str
+    path: DatasetPath
     values: NDArray
     dates: NDArray[datetime64]
     period_type: str

@@ -81,8 +81,12 @@ class Catalog(DatasetPathCollection):
             )
         return cls(paths=paths, src=src)
 
-    def resolve_wildcard(self, path: DatasetPath) -> DatasetPathCollection:
+    def resolve_wildcard(self, path: DatasetPath | str) -> DatasetPathCollection:
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         return super(Catalog, self).resolve_wildcard(path)
 
-    def find(self, path: DatasetPath) -> DatasetPathCollection:
+    def find(self, path: DatasetPath | str) -> DatasetPathCollection:
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
         return self.resolve_wildcard(path)
