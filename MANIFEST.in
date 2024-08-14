@@ -1,2 +1,2 @@
-ecursive-include pandss *.py
+recursive-include pandss *.py
 recursive-include pandss *.json

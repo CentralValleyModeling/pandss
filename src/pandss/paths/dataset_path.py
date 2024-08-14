@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, fields
 from re import compile
 from typing import Any, Self
@@ -91,11 +92,13 @@ class DatasetPath:
             Whether or not the two paths match.
         """
         # If __other is a str, just do equality
+        logging.debug(f"matching {self} <-> {__other}")
         if isinstance(__other, str):
+            logging.debug("reverting to equality")
             return self == __other
         # Lets do some duck-typing
         try:
-            if (not self.has_wildcard) and (not self.has_wildcard):
+            if (not self.has_any_wildcard) and (not __other.has_any_wildcard):
                 # If there are no wildcards, just look for equality
                 return self == __other
             # For each attr, check for equality, or regex matching
@@ -112,16 +115,19 @@ class DatasetPath:
                     R_to_L = True
                 else:
                     # One of the above should catch if the objects match
+                    logging.debug(f"nagative match on part {f.name}, {L}<->{R}")
                     return False
             # Make sure we are only matching in one direction
             if L_to_R and R_to_L:
+                logging.debug("nagative match on multi-direction matching")
                 return False
 
         except Exception:
             # fall back to equality
-            print(2, self, __other)
+            logging.debug("match gave an error, reverting to equality")
             return self == __other
         # All other check passed
+        logging.debug("positive match")
         return True
 
     def __eq__(self, __other: Any):

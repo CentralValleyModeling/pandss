@@ -218,3 +218,10 @@ def test_matching_and_equality():
     assert not L.matches(R)
     assert R != L
     assert not R.matches(L)
+
+    wild_date = pdss.DatasetPath(a="A", b="B", c="C", e="E", f="F")
+    has_date = pdss.DatasetPath(a="A", b="B", c="C", d="D", e="E", f="F")
+    assert wild_date != has_date
+    assert has_date != wild_date
+    assert wild_date.matches(has_date)
+    assert has_date.matches(wild_date)
