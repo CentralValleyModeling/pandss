@@ -1,10 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Self
+
+import pandas as pd
 
 from .catalog import Catalog
 from .engines import EngineABC, ModuleEngine, get_engine
-from .errors import UnexpectedDSSReturn, WildcardError
+from .errors import EmptyCollectionError, UnexpectedDSSReturn, WildcardError
 from .paths import DatasetPath, DatasetPathCollection
 from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
@@ -75,6 +77,98 @@ class DSS:
             logging.debug(f"closing dss file {self.src}")
             self.engine.close()
             self._opened = 0
+
+    @classmethod
+    def from_plaintext(cls, src: Path | str) -> Self:
+        src = Path(src)
+        # make sure dst was specified correctly
+        if src.is_file():
+            raise ValueError(
+                "The source must be specified as a directory, "
+                + f"file type {src.suffix} given"
+            )
+        if not src.exists():
+            raise ValueError("src must exist")
+
+        new_file = src.parent / f"{src.stem}.dss"
+        if new_file.exists():
+            raise ValueError(f"DSS {new_file} already exists")
+        new_dss = cls(new_file)
+        for f in src.iterdir():
+            if f.stem.startswith("rts"):
+                df = pd.read_csv(
+                    f,
+                    header=list(range(0, 9)),
+                    index_col=0,
+                    parse_dates=True,
+                )
+                with new_dss:
+                    for col in df.columns:
+                        path = DatasetPath(
+                            a=col[0],
+                            b=col[1],
+                            c=col[2],
+                            d=col[3],
+                            e=col[4],
+                            f=col[5],
+                        )
+                        series = df.loc[:, col]
+                        idx_s = series.first_valid_index()  # Trim the nan values
+                        idx_e = series.last_valid_index()
+                        series = series.loc[idx_s:idx_e]
+                        rts = RegularTimeseries(
+                            path=path,
+                            values=series.values,
+                            dates=series.index.values,
+                            units=col[6],
+                            period_type=col[7],
+                            interval=col[8],
+                        )
+                        print(rts.period_type, rts.interval)
+                        new_dss.write_rts(rts.path, rts)
+
+        return new_dss
+
+    def to_plaintext(
+        self,
+        dst: Path | str,
+        filter: DatasetPathCollection | DatasetPath | None = None,
+    ):
+        # make sure dst was specified correctly
+        if dst.is_file():
+            raise ValueError(
+                "The destination must be specified as a empty directory, "
+                + f"file type {dst.suffix} given"
+            )
+        if dst.exists():
+            if files := [f for f in dst.iterdir()]:
+                raise ValueError(
+                    "The destination must be an empty directory, found "
+                    + f"{len(files)} files"
+                )
+        else:
+            dst.mkdir(exist_ok=True, parents=False)
+        with self:
+            # Resolve the different filters
+            if isinstance(filter, DatasetPath):
+                filter = DatasetPathCollection(paths=set(filter))
+            if filter is None:
+                filter = self.read_catalog(drop_date=True)
+
+            frames: dict[str, list] = dict()
+
+            for rts in self.read_multiple_rts(filter):
+                if rts.interval.e not in frames:
+                    frames[rts.interval.e] = list()
+                frames[rts.interval.e].append(rts.to_frame())
+        if not frames:
+            path_list = "\n\t".join(str(p) for p in filter)
+            raise EmptyCollectionError(
+                f"None of the following paths were found in {self.src}\n\t{path_list}"
+            )
+        for e, frm in frames.items():
+            df = pd.concat(frm, axis=1)
+            df.to_csv(dst / f"rts_{e}.csv")
 
     def read_catalog(self, drop_date: bool = False) -> Catalog:
         """Read the Catalog of the open DSS file.
