@@ -32,3 +32,9 @@ class UnexpectedDSSReturn(Exception):
     """Operation returned an unexpected result from a DSS read operation."""
 
     ...
+
+
+class EmptyCollectionError(Exception):
+    """When collecting data from a DSS file, no data was returned."""
+
+    ...
