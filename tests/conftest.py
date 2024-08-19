@@ -13,7 +13,7 @@ import pandss as pdss
 def cleanup(d: Path):
     cutoff = datetime.datetime.now() - datetime.timedelta(minutes=1)
     if d.is_file():
-        remove(d)
+        d.unlink()
     else:
         for f in d.iterdir():
             if f.is_dir():
@@ -23,6 +23,9 @@ def cleanup(d: Path):
                     remove(f)
                 except PermissionError:
                     logging.warning(f"couldn't clean up old file {f}")
+        remaining = [f for f in d.iterdir()]
+        if not remaining:
+            d.rmdir()
 
 
 @pytest.fixture(scope="session")
