@@ -46,6 +46,14 @@ class DSS:
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.src})"
 
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            + f"engine={self.engine.__class__.__name__},"
+            + f" src={str(self.src)}"
+            + ")"
+        )
+
     @silent
     def __enter__(self):
         """Wraps Engine class `open` and enables the use of engine classes in
@@ -95,7 +103,7 @@ class DSS:
             raise ValueError(f"DSS {new_file} already exists")
         new_dss = cls(new_file)
         for f in src.iterdir():
-            if f.stem.startswith("rts"):
+            if f.stem.startswith(RegularTimeseries.__name__):
                 df = pd.read_csv(
                     f,
                     header=list(range(0, 9)),
@@ -124,7 +132,6 @@ class DSS:
                             period_type=col[7],
                             interval=col[8],
                         )
-                        print(rts.period_type, rts.interval)
                         new_dss.write_rts(rts.path, rts)
 
         return new_dss
@@ -148,27 +155,31 @@ class DSS:
                 )
         else:
             dst.mkdir(exist_ok=True, parents=False)
+
+        # frames is a mapping of the type of timeseries to a list of dataframes that are
+        # able to be concatenated. The key order is
+        #     0. The object class as as string
+        #     1. The interval of the timeseries (something like "1MON" or "1DAY")
+        frames: dict[tuple[str, str], list] = dict()
         with self:
             # Resolve the different filters
             if isinstance(filter, DatasetPath):
                 filter = DatasetPathCollection(paths=set(filter))
             if filter is None:
                 filter = self.read_catalog(drop_date=True)
-
-            frames: dict[str, list] = dict()
-
             for rts in self.read_multiple_rts(filter):
-                if rts.interval.e not in frames:
-                    frames[rts.interval.e] = list()
-                frames[rts.interval.e].append(rts.to_frame())
+                k = (rts.__class__.__name__, rts.interval.e)
+                if k not in frames:
+                    frames[k] = list()
+                frames[k].append(rts.to_frame())
         if not frames:
             path_list = "\n\t".join(str(p) for p in filter)
             raise EmptyCollectionError(
                 f"None of the following paths were found in {self.src}\n\t{path_list}"
             )
-        for e, frm in frames.items():
-            df = pd.concat(frm, axis=1)
-            df.to_csv(dst / f"rts_{e}.csv")
+        for (class_name, interval), frame_list in frames.items():
+            df = pd.concat(frame_list, axis=1)
+            df.to_csv(dst / f"{class_name}_{interval}.csv")
 
     def read_catalog(self, drop_date: bool = False) -> Catalog:
         """Read the Catalog of the open DSS file.
