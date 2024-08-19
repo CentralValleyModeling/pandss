@@ -1,3 +1,6 @@
+import tempfile
+from pathlib import Path
+
 import pytest
 from pytest import FixtureRequest
 
@@ -72,3 +75,19 @@ def test_path_as_string(dss, request: FixtureRequest):
     with pdss.DSS(dss) as dss:
         rts = dss.read_rts(p)
         assert isinstance(rts, pdss.RegularTimeseries)
+
+
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
+def test_to_plaintext(dss, created_dir, random_name, request: FixtureRequest):
+    dss_f = request.getfixturevalue(dss)
+    dss_obj = pdss.DSS(dss_f)
+    dst = created_dir / f"dss_to_plaintext_{dss}_{random_name}"
+    dss_obj.to_plaintext(dst)
+    new_dss = pdss.DSS.from_plaintext(dst)
+    with new_dss, dss_obj:
+        assert len(dss_obj.catalog) == len(new_dss.catalog)
+        for p in dss_obj.catalog:
+            rts_old = dss_obj.read_rts(p)
+            rts_new = new_dss.read_rts(p)
+            assert len(rts_old.values) == len(rts_new.values)
+            assert (sum(rts_old.values) - sum(rts_new.values)) < 0.000_000_000_1
