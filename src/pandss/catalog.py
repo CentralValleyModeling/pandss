@@ -31,6 +31,12 @@ class Catalog(DatasetPathCollection):
 
     src: Path
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.src})"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(src={self.src})"
+
     @classmethod
     def from_strs(cls, paths: list[str], src: Path) -> Self:
         """Create a `Catalog` from an iterable of strings"""

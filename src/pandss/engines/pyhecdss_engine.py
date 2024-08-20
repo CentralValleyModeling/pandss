@@ -88,15 +88,15 @@ class PyHecDssEngine(EngineABC):
         if isinstance(path, str):
             path = DatasetPath.from_str(path)
         if rts.period_type.startswith("PER"):
-            periods = pd.DatetimeIndex(rts.dates).to_period()
+            periods = pd.DatetimeIndex(rts.dates).to_period(freq=rts.interval.freq)
         else:
             periods = pd.DatetimeIndex(rts.dates)
         df = pd.DataFrame(
             data=rts.values,
             index=periods,
         )
-        if not rts.period_type.startswith("PER"):
-            df.index.freq = rts.interval.freq  # trick pyhecdss
+        if getattr(df.index, "freq", None) is None:
+            df = df.asfreq(rts.interval.freq)  # pyhecdss expects this object
 
         p = f"/{path.a}/{path.b}/{path.c}//{path.e}/{path.f}/"
         self._object.write_rts(p, df, rts.units, rts.period_type)

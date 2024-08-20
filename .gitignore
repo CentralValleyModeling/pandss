@@ -2,7 +2,7 @@
 # Calsim flavored ignores
 run/=ILP=
 Results
-assets
+tests/assets/created
 run/cvgroundwater/data/restart
 .vscode/
 # stubbed directories

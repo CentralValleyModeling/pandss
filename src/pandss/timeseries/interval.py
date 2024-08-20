@@ -93,7 +93,7 @@ class Interval:
         return self.e
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} {self.e}>"
+        return f"{self.__class__.__name__}(e={self.e})"
 
     @property
     def seconds(self) -> int:
