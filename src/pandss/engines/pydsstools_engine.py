@@ -32,6 +32,7 @@ class PyDssToolsEngine(EngineABC):
     def close(self):
         """Closes the underlying DSS file"""
         self._object.close()
+        self._object = None
         self._is_open = False
 
     @must_be_open
