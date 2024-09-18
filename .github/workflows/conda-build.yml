@@ -10,29 +10,34 @@ on:
 
 jobs:
   build:
-    # Set up a matrix to build on both Linux and Windows
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]  # Build for both Linux and Windows
-        python-version: [3.11]  # Specify your Python version here
+        os: [ubuntu-latest, windows-latest]  
+        python-version: [3.11]
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
+          mamba-version: "*"
+          channels: dwr-cvm,cadwr-dms,defaults,conda-forge
           python-version: ${{ matrix.python-version }}
+          activate-environment: build-pandss
+          auto-activate-base: false
       
       - name: conda info
-        shell: bash -el {0}
         run: conda info
 
       - name: Install conda-build
         run: conda install -y conda-build
 
       - name: conda list
-        shell: pwsh
         run: conda list
 
       - name: Build package
