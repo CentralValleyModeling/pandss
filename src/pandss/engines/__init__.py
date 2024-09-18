@@ -73,10 +73,17 @@ def get_engine(engine_name: str) -> EngineABC:
         from .pyhecdss_engine import PyHecDssEngine
 
         return PyHecDssEngine
+
     elif engine_name.lower() == "pydsstools":
         from .pydsstools_engine import PyDssToolsEngine
 
         return PyDssToolsEngine
+
+    elif engine_name.lower() == "hec-dss-python":
+        from .hec_dss_python_engine import HecDssPythonEngine
+
+        return HecDssPythonEngine
+
     raise ValueError(f"engine_name not recognized: `{engine_name}`")
 
 
