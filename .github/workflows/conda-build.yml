@@ -37,7 +37,7 @@ jobs:
 
       # Build the Conda package
       - name: Build package
-        run: conda-build .
+        run: conda build .
 
       # Upload the built package to Anaconda (Optional)
       - name: Upload package to Anaconda
