@@ -28,7 +28,7 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          activate-environment: base
+          activate-environment: build-pandss
           use-mamba: true  # Optional for faster builds
 
       # Install conda-build
