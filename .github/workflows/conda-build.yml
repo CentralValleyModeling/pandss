@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     # Set up a matrix to build on both Linux and Windows
+    name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -18,28 +19,25 @@ jobs:
         python-version: [3.11]  # Specify your Python version here
 
     steps:
-      # Check out the repository
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      # Set up Miniconda
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          activate-environment: build-pandss
-          use-mamba: true  # Optional for faster builds
+      
+      - name: conda info
+        shell: bash -el {0}
+        run: conda info
 
-      # Install conda-build
       - name: Install conda-build
         run: conda install -y conda-build
 
-      # Build the Conda package
+      - name: conda list
+        shell: pwsh
+        run: conda list
+
       - name: Build package
         run: conda build .
 
-      # Upload the built package to Anaconda (Optional)
       - name: Upload package to Anaconda
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest' }}
         env:
