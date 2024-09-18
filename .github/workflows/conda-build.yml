@@ -1,0 +1,48 @@
+name: Conda Package Build
+
+on:
+  push:
+    branches:
+      - production
+  pull_request:
+    branches:
+      - production
+
+jobs:
+  build:
+    # Set up a matrix to build on both Linux and Windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]  # Build for both Linux and Windows
+        python-version: [3.11]  # Specify your Python version here
+
+    steps:
+      # Check out the repository
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Set up Miniconda
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: base
+          use-mamba: true  # Optional for faster builds
+
+      # Install conda-build
+      - name: Install conda-build
+        run: conda install -y conda-build
+
+      # Build the Conda package
+      - name: Build package
+        run: conda-build .
+
+      # Upload the built package to Anaconda (Optional)
+      - name: Upload package to Anaconda
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest' }}
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        run: |
+          anaconda upload /opt/conda/conda-bld/${{ matrix.os == 'ubuntu-latest' && 'linux-64' || 'win-64' }}/pandss.tar.bz2 -u dwr-cvm
