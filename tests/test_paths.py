@@ -1,5 +1,6 @@
 from itertools import product
 
+import pandas as pd
 import pytest
 from pytest import FixtureRequest
 
@@ -234,3 +235,18 @@ def test_auto_convert():
             pass
     with pytest.raises(pdss.errors.DatasetPathParseError):
         pdss.read_rts(None, bad_path)
+
+
+def test_to_catalog():
+    dsp = pdss.DatasetPathCollection(
+        paths={
+            pdss.DatasetPath(b="1"),
+            pdss.DatasetPath(b="2"),
+        }
+    )
+    df = dsp.to_frame()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == 2
+    assert tuple(df.columns) == ("A", "B", "C", "D", "E", "F")
+    assert tuple(df["B"]) == ("1", "2")
+    assert tuple(df["C"]) == (".*", ".*")

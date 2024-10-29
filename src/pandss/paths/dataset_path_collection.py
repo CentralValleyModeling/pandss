@@ -3,6 +3,8 @@ from dataclasses import dataclass, field, fields
 from re import IGNORECASE, compile
 from typing import Any, Iterable, Iterator, Self
 
+from pandas import DataFrame
+
 from ..errors import WildcardError
 from .dataset_path import DatasetPath
 
@@ -135,3 +137,18 @@ class DatasetPathCollection:
         # in each of the paths in the current object
         kwargs["paths"] = {p.drop_date() for p in self.paths}
         return self.__class__(**kwargs)  # Maintain subclasses by calling __class__
+
+    def to_frame(self) -> DataFrame:
+        """Create a pandas.DataFrame representation of the data in the Catalog
+
+        Returns
+        -------
+        DataFrame
+            The DataFrame of the catalog, with columns for the path-parts
+        """
+        cols = ("A", "B", "C", "D", "E", "F")
+        data = [tuple(getattr(p, a.lower()) for a in cols) for p in self.paths]
+        return DataFrame(
+            data=data,
+            columns=cols,
+        )
