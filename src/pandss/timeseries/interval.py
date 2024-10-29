@@ -64,6 +64,7 @@ class Interval:
         self._lookup = INTERVAL_TO_PANDAS_OFFSET
         regex_match = interval_pattern.match(e)
         if not regex_match:
+            self.e = None
             raise ValueError(
                 f"couldn't parse {e=}, using regex={str(interval_pattern)}"
             )
