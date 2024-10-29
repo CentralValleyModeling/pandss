@@ -1,10 +1,10 @@
 from copy import deepcopy
 from dataclasses import dataclass, fields
-from typing import Self
+from typing import Literal, Self, get_args
 
 from numpy import array, datetime64, datetime_as_string, intersect1d, ndarray
 from numpy.typing import NDArray
-from pandas import DataFrame, MultiIndex
+from pandas import DataFrame, Index, MultiIndex
 
 from ..paths import DatasetPath
 from .interval import Interval
@@ -12,6 +12,19 @@ from .interval import Interval
 
 def decode_json_date_array(a: tuple[str]) -> NDArray[datetime64]:
     return array(a, dtype="datetime64")
+
+
+HEADER_OPTIONS = Literal[
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "UNITS",
+    "PERIOD_TYPE",
+    "INTERVAL",
+]
 
 
 @dataclass(
@@ -215,8 +228,18 @@ class RegularTimeseries:
 
         return self.__class__(**new_obj_kwargs)
 
-    def to_frame(self) -> DataFrame:
+    def to_frame(
+        self,
+        include_in_header: tuple[HEADER_OPTIONS, ...] | HEADER_OPTIONS = None,
+    ) -> DataFrame:
         """Create a `pandas.DataFrame` from the `RegularTimeseries`
+
+         Parameters
+        ----------
+        include_in_header : tuple[str, ...]
+            The headers to include in the resulting DataFrame. If this iterable has
+            more than one entry, the final DataFrame will have a MultiIndex for its
+            `column` attribute.
 
         Returns
         -------
@@ -224,14 +247,29 @@ class RegularTimeseries:
             The `DataFrame`, indexed by dates, with column names of: `A`-`F`, `UNITS`,
             `PERIOD_TYPE`, `INTERVAL`
         """
+        header_options = get_args(HEADER_OPTIONS)
+        if include_in_header is None:
+            include_in_header = tuple(v for v in header_options)
+        if isinstance(include_in_header, str):
+            include_in_header = (include_in_header,)  # Make sure to pack the tuple
+        if any(v not in header_options for v in include_in_header):
+            raise ValueError(
+                f"only {header_options} are accepted, given: {include_in_header}"
+            )
         header = dict(self.path.items())
         header["UNITS"] = self.units
         header["PERIOD_TYPE"] = self.period_type
         header["INTERVAL"] = str(self.interval)
-        header = {k.upper(): (v,) for k, v in header.items()}
-        columns = MultiIndex.from_arrays(
-            tuple(header.values()), names=tuple(header.keys())
-        )
+        header = {
+            k.upper(): (v,) for k, v in header.items() if k.upper() in include_in_header
+        }
+        if len(header) > 1:
+            columns = MultiIndex.from_arrays(
+                tuple(header.values()), names=tuple(header.keys())
+            )
+        else:
+            k, v = tuple(header.items())[0]
+            columns = Index(data=v, name=k)
         df = DataFrame(
             index=self.dates,
             data=self.values,
