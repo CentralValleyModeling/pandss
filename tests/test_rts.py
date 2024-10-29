@@ -306,4 +306,17 @@ def test_read_write_daily_inst(dss, temporary_dss, request: FixtureRequest):
         assert L == R
 
 
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_to_frame_small_header(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
+    p1 = pdss.DatasetPath(b="MONTH_DAYS")
+    rts = pdss.read_rts(dss, p1)
+    df_1 = rts.to_frame(include_in_header="B")
+    assert isinstance(df_1.columns, pd.Index)
+    assert len(df_1.columns) == 1
+    df_2 = rts.to_frame(include_in_header=("B", "C"))
+    assert isinstance(df_2.columns, pd.MultiIndex)
+    assert len(df_2.columns) == 1
+
+
 # TODO: add tests for daily data
