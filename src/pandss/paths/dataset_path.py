@@ -158,10 +158,16 @@ class DatasetPath:
                     for f in fields(self)
                 )
             except AttributeError:
+                # If the attributes don't match, return False
                 return False
         elif isinstance(__other, str):
             # First clean up, then do str comparison
-            return str(self) == str(self.__class__.from_str(__other))
+            try:
+                __other = self.__class__.from_str(__other)
+                return str(self) == str(__other)
+            except DatasetPathParseError:
+                # If you can't parse the second string, return False
+                return False
         else:
             # Resort to regular string comparison
             return str(self) == str(__other)
