@@ -319,4 +319,20 @@ def test_to_frame_small_header(dss, request: FixtureRequest):
     assert len(df_2.columns) == 1
 
 
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
+def test_pattern_mathcing(dss, request: FixtureRequest):
+    dss = request.getfixturevalue(dss)
+    p1 = pdss.DatasetPath(b="MONTH_DAYS")
+    rts = pdss.read_rts(dss, p1)
+    match rts:
+        case pdss.RegularTimeseries(
+            path=pdss.DatasetPath(b="MONTH_DAYS"),
+            values=values,
+            dates=dates,
+        ):
+            assert len(values) == len(dates)
+        case _:
+            assert False, "pattern matching failed"
+
+
 # TODO: add tests for daily data
