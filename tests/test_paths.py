@@ -250,3 +250,27 @@ def test_to_catalog():
     assert tuple(df.columns) == ("A", "B", "C", "D", "E", "F")
     assert tuple(df["B"]) == ("1", "2")
     assert tuple(df["C"]) == (".*", ".*")
+
+
+def test_pattern_matching_as_str():
+    dsp = pdss.DatasetPath(b="FOO")
+    match dsp:
+        case "/OTHER/FOO/.*/.*/.*/.*/":
+            assert False, "pattern matching succeeded too early"
+        case "FOO":
+            assert False, "pattern matching succeeded too early"
+        case "/.*/FOO/.*/.*/.*/.*/":
+            pass
+        case _:
+            assert False, "pattern matching failed"
+
+
+def test_pattern_matching():
+    dsp = pdss.DatasetPath(b="FOO")
+    match dsp:
+        case pdss.DatasetPath(b="FOO", c="BAR"):
+            assert False, "pattern matching succeeded too early"
+        case pdss.DatasetPath(b="FOO"):
+            pass
+        case _:
+            assert False, "pattern matching failed"
