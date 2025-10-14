@@ -10,6 +10,7 @@ from .errors import EmptyCollectionError, UnexpectedDSSReturn, WildcardError
 from .paths import DatasetPath, DatasetPathCollection
 from .quiet import silent, suppress_stdout_stderr
 from .timeseries import RegularTimeseries
+from .timeseries.interval import Interval
 
 module_engine = ModuleEngine()
 
@@ -348,6 +349,73 @@ class DSS:
             raise WildcardError(f"cannot write to path with non-date wildcard, {path=}")
         with suppress_stdout_stderr():
             return self.engine.write_rts(path, rts)
+
+    def write_dataframe(
+        self,
+        paths: list[DatasetPath],
+        df: pd.DataFrame,
+        units: str | list[str],
+        period_types: str | list[str],
+        intervals: str | Interval | list[str | Interval],
+    ):
+        """Write DSS data from a DataFrame, where each column is a RegularTimeseries
+
+        Parameters
+        ----------
+        paths : list[DatasetPath]
+            The paths to write to in the DSS file.
+        df : pd.DataFrame
+            The data to convert into a DSS file.
+        units : str | list[str]
+            The units to use for the data in the DSS file.
+        period_types : str | list[str]
+            The DSS period types to use for the data in the DSS file.
+        intervals : str | Interval | list[str  |  Interval]
+            The DSS intervals to use for the data in the DSS file.
+
+        Raises
+        ------
+        ValueError
+            Raised when the data given cannot be assigned uniquely to the columns of the
+            DataFrame, or when a RegularTimeseries object cannot be created.
+
+        """
+        if isinstance(units, str):
+            units = [units for _ in paths]
+        if isinstance(period_types, str):
+            period_types = [period_types for _ in paths]
+        if isinstance(intervals, (str, Interval)):
+            intervals = [intervals for _ in paths]
+
+        try:
+            data = zip(
+                paths,
+                df.columns,
+                units,
+                period_types,
+                intervals,
+            )
+        except Exception as e:
+            raise ValueError(
+                "The lengths of the data given do not match,"
+                + " could not determine a 1-to-1 retionship between inputs"
+                + " and dataframe columns"
+            ) from e
+        for p, col, unit, pt, inter in data:
+            series = df[col]
+            try:
+                rts = RegularTimeseries.from_series(
+                    s=series,
+                    path=p,
+                    units=unit,
+                    period_type=pt,
+                    interval=inter,
+                )
+            except Exception as e:
+                raise ValueError(
+                    "Could not create a RegularTimeseries object from the data given."
+                ) from e
+            self.write_rts(path=p, rts=rts)
 
     def resolve_wildcard(
         self,
