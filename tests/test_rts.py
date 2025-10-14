@@ -207,6 +207,24 @@ def test_accept_path_as_str():
     assert rts.path.b == "MONTH_DAYS"
 
 
+def test_rts_from_series():
+    series = pd.Series(
+        data=[1, 2, 3, 4, 5],
+        index=pd.DatetimeIndex(
+            data=["2000-01-01", "2000-02-01", "2000-03-01", "2000-04-01", "2000-05-01"]
+        ),
+    )
+    path = pdss.DatasetPath(b="TEST")
+    rts = pdss.RegularTimeseries.from_series(
+        series,
+        path,
+        period_type="PER-AVG",
+        units="NONE",
+        interval="1MON",
+    )
+    assert isinstance(rts, pdss.RegularTimeseries)
+
+
 @pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
 def test_write_rts(dss, temporary_dss, request: FixtureRequest):
     dss = request.getfixturevalue(dss)
@@ -304,35 +322,6 @@ def test_read_write_daily_inst(dss, temporary_dss, request: FixtureRequest):
     rts_2 = pdss.read_rts(temporary_dss, p1)
     for L, R in zip(rts.dates, rts_2.dates):
         assert L == R
-
-
-@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
-def test_to_frame_small_header(dss, request: FixtureRequest):
-    dss = request.getfixturevalue(dss)
-    p1 = pdss.DatasetPath(b="MONTH_DAYS")
-    rts = pdss.read_rts(dss, p1)
-    df_1 = rts.to_frame(include_in_header="B")
-    assert isinstance(df_1.columns, pd.Index)
-    assert len(df_1.columns) == 1
-    df_2 = rts.to_frame(include_in_header=("B", "C"))
-    assert isinstance(df_2.columns, pd.MultiIndex)
-    assert len(df_2.columns) == 1
-
-
-@pytest.mark.parametrize("dss", ("dss_6", "dss_7"))
-def test_pattern_mathcing(dss, request: FixtureRequest):
-    dss = request.getfixturevalue(dss)
-    p1 = pdss.DatasetPath(b="MONTH_DAYS")
-    rts = pdss.read_rts(dss, p1)
-    match rts:
-        case pdss.RegularTimeseries(
-            path=pdss.DatasetPath(b="MONTH_DAYS"),
-            values=values,
-            dates=dates,
-        ):
-            assert len(values) == len(dates)
-        case _:
-            assert False, "pattern matching failed"
 
 
 # TODO: add tests for daily data

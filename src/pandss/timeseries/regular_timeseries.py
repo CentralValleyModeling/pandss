@@ -4,7 +4,7 @@ from typing import Literal, Self, get_args
 
 from numpy import array, datetime64, datetime_as_string, intersect1d, ndarray
 from numpy.typing import NDArray
-from pandas import DataFrame, Index, MultiIndex
+from pandas import DataFrame, Index, MultiIndex, Series
 
 from ..paths import DatasetPath
 from .interval import Interval
@@ -277,6 +277,28 @@ class RegularTimeseries:
         )
 
         return df
+
+    @classmethod
+    def from_series(
+        cls,
+        s: Series,
+        path: DatasetPath | str,
+        period_type: str,
+        units: str,
+        interval: Interval | str,
+    ) -> "RegularTimeseries":
+        if isinstance(interval, str):
+            interval = Interval(interval)
+        if isinstance(path, str):
+            path = DatasetPath.from_str(path)
+        return cls(
+            path=path,
+            values=s.values,  # type: ignore
+            dates=s.index,  # type: ignore
+            period_type=period_type,
+            units=units,
+            interval=interval,
+        )
 
     def to_json(self) -> dict:
         """Create a JSON-compliant dictionary with the RegularTimeseries data

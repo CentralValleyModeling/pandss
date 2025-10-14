@@ -91,3 +91,23 @@ def test_to_plaintext(dss, created_dir, random_name, request: FixtureRequest):
             rts_new = new_dss.read_rts(p)
             assert len(rts_old.values) == len(rts_new.values)
             assert (sum(rts_old.values) - sum(rts_new.values)) < 0.000_000_000_1
+
+
+@pytest.mark.parametrize("dss", ("dss_6", "dss_7", "dss_large"))
+def test_write_from_dataframe(dss, request: FixtureRequest):
+    dss: Path = request.getfixturevalue(dss)
+    p = "/CALSIM/MONTH_DAYS/DAY//1MON/L2020A/"
+    p_new = "/CALSIM/TEST_WRITE_FROM_DF/DAY//1MON/L2020A/"
+    with pdss.DSS(dss) as DSS:
+        rts = DSS.read_rts(p)
+        df = rts.to_frame()
+        DSS.write_dataframe(
+            paths=[pdss.DatasetPath.from_str(p_new)],
+            df=df,
+            units=[rts.units],
+            period_types=[rts.period_type],
+            intervals=[rts.interval],
+        )
+    with pdss.DSS(dss) as DSS:
+        rts_new = DSS.read_rts(p_new)
+        assert rts_new.interval == rts.interval
